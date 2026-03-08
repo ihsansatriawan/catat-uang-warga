@@ -59,7 +59,7 @@ export default function SearchView({ onSearch }) {
         </div>
 
         {/* Hero heading */}
-        <div className="text-center mb-8 animate-slide-up stagger-1">
+        <div className="text-center mb-6 animate-slide-up stagger-1">
           <h1 className="font-heading text-4xl sm:text-5xl md:text-6xl font-black text-slate-dark leading-tight mb-3">
             Cek Status<br />
             <span className="relative inline-block">
@@ -85,10 +85,26 @@ export default function SearchView({ onSearch }) {
           </p>
         </div>
 
+        {/* Info Hint - Relocated above search card for better visibility on mobile */}
+        <div className="mb-6 animate-fade-in stagger-2 flex justify-center">
+          <div className="inline-flex items-center gap-2 bg-white/50 border-2 border-slate-dark/10 rounded-full px-4 py-2 shadow-sm backdrop-blur-sm">
+            <Calendar size={14} strokeWidth={2.5} className="text-violet flex-shrink-0" />
+            <p className="font-body text-[10px] leading-tight text-slate-dark/60">
+              Data diperbarui berkala oleh pengelola
+              {lastUpdateText && (
+                <>
+                  <br />
+                  <span className="font-semibold text-slate-dark/80 underline decoration-violet/30 underline-offset-2">Terakhir: {lastUpdateText}</span>
+                </>
+              )}
+            </p>
+          </div>
+        </div>
+
         {/* Search Card */}
         <form
           onSubmit={handleSubmit}
-          className="bg-white border-2 border-slate-dark rounded-3xl shadow-hard w-full max-w-sm animate-slide-up stagger-2"
+          className="bg-white border-2 border-slate-dark rounded-3xl shadow-hard w-full max-w-sm animate-slide-up stagger-3"
         >
           {/* Card header */}
           <div className="flex items-center gap-2 px-5 pt-5 pb-3 border-b-2 border-slate-dark/10">
@@ -168,21 +184,7 @@ export default function SearchView({ onSearch }) {
           </div>
         </form>
 
-        {/* Footer hint */}
-        <div className="mt-6 animate-fade-in stagger-3 flex justify-center">
-          <div className="inline-flex items-center gap-2 bg-white border-2 border-slate-dark/15 rounded-full px-4 py-2 shadow-sm">
-            <Calendar size={14} strokeWidth={2.5} className="text-violet flex-shrink-0" />
-            <p className="font-body text-xs text-slate-dark/60">
-              Data diperbarui secara berkala oleh pengelola
-              {lastUpdateText && (
-                <>
-                  <br />
-                  <span className="font-semibold text-slate-dark/80">Terakhir: {lastUpdateText}</span>
-                </>
-              )}
-            </p>
-          </div>
-        </div>
+
       </div>
 
       {/* Bottom safe area spacer */}
