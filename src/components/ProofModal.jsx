@@ -1,33 +1,60 @@
-import { X } from 'lucide-react'
+import { X, FileImage } from 'lucide-react'
 
 export default function ProofModal({ imageUrl, onClose }) {
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-dark/50 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-dark/60 backdrop-blur-sm animate-fade-in"
       onClick={onClose}
     >
+      {/* Bottom sheet on mobile, centered modal on sm+ */}
       <div
-        className="bg-white border-2 border-slate-dark rounded-2xl shadow-hard p-4 max-w-lg w-full mx-4 animate-bounce-in"
+        className="
+          bg-white border-2 border-slate-dark rounded-t-3xl sm:rounded-3xl shadow-hard
+          w-full sm:max-w-sm mx-0 sm:mx-4
+          p-4 pb-safe animate-bounce-in
+        "
+        style={{ paddingBottom: `max(1rem, env(safe-area-inset-bottom))` }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Close button */}
-        <div className="flex justify-end mb-2">
+        {/* Handle bar (mobile) */}
+        <div className="flex justify-center mb-3 sm:hidden">
+          <div className="w-10 h-1 bg-slate-dark/20 rounded-full" />
+        </div>
+
+        {/* Header */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <FileImage size={18} strokeWidth={2.5} className="text-violet" />
+            <h3 className="font-heading font-bold text-base">Bukti Transfer</h3>
+          </div>
           <button
             onClick={onClose}
-            className="bg-pink text-white border-2 border-slate-dark rounded-full p-1 shadow-hard-sm hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all"
+            className="
+              bg-pink text-white border-2 border-slate-dark rounded-full p-1.5
+              shadow-hard-sm active:translate-x-[1px] active:translate-y-[1px] active:shadow-none
+              transition-all
+            "
+            aria-label="Tutup"
           >
-            <X size={20} strokeWidth={2.5} />
+            <X size={16} strokeWidth={2.5} />
           </button>
         </div>
 
-        {/* Placeholder image */}
-        <div className="bg-cream border-2 border-slate-dark rounded-xl aspect-square flex flex-col items-center justify-center gap-3">
-          <div className="text-6xl">🧾</div>
-          <p className="font-heading font-bold text-slate-dark/40">Bukti Transfer</p>
-          <p className="font-body text-sm text-slate-dark/30 text-center px-4">
-            Placeholder — akan menampilkan bukti transfer asli saat data tersedia
-          </p>
+        {/* Placeholder image area */}
+        <div className="bg-cream border-2 border-slate-dark rounded-2xl aspect-[4/3] flex flex-col items-center justify-center gap-3 overflow-hidden">
+          <div className="text-5xl select-none">🧾</div>
+          <div className="text-center px-6">
+            <p className="font-heading font-bold text-sm text-slate-dark/40">Bukti Pembayaran</p>
+            <p className="font-body text-xs text-slate-dark/25 mt-1 leading-snug">
+              Akan menampilkan bukti transfer asli setelah terhubung ke sistem
+            </p>
+          </div>
         </div>
+
+        {/* CTA hint */}
+        <p className="text-center font-body text-xs text-slate-dark/30 mt-3">
+          Ketuk di luar untuk menutup
+        </p>
       </div>
     </div>
   )

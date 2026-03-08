@@ -1,6 +1,24 @@
 import { useState } from 'react'
-import { Search } from 'lucide-react'
+import { Search, Home, MapPin } from 'lucide-react'
 import { getAvailableBlocks } from '../data/helpers'
+
+const BLOCK_COLORS = {
+  A: 'bg-violet text-white border-violet',
+  B: 'bg-pink text-white border-pink',
+  C: 'bg-yellow text-slate-dark border-yellow',
+  D: 'bg-green text-white border-green',
+  E: 'bg-orange text-white border-orange',
+  F: 'bg-slate-dark text-cream border-slate-dark',
+}
+
+const BLOCK_COLORS_UNSELECTED = {
+  A: 'bg-white text-slate-dark border-slate-dark hover:bg-violet/10',
+  B: 'bg-white text-slate-dark border-slate-dark hover:bg-pink/10',
+  C: 'bg-white text-slate-dark border-slate-dark hover:bg-yellow/10',
+  D: 'bg-white text-slate-dark border-slate-dark hover:bg-green/10',
+  E: 'bg-white text-slate-dark border-slate-dark hover:bg-orange/10',
+  F: 'bg-white text-slate-dark border-slate-dark hover:bg-slate-dark/10',
+}
 
 export default function SearchView({ onSearch }) {
   const [blok, setBlok] = useState('')
@@ -16,69 +34,139 @@ export default function SearchView({ onSearch }) {
   const blocks = getAvailableBlocks()
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen px-4 animate-pop-in">
-      {/* Hero Header */}
-      <div className="text-center mb-8">
-        <h1 className="font-heading text-5xl md:text-6xl font-extrabold text-slate-dark mb-3">
-          Cek IPL Perumahan
-        </h1>
-        <p className="font-body text-lg text-slate-dark/70">
-          Masukkan blok dan nomor rumah untuk melihat status pembayaran
+    <div className="flex flex-col min-h-dvh safe-x">
+      {/* Top decoration strip */}
+      <div className="h-1.5 w-full bg-linear-to-r from-violet via-pink to-yellow" />
+
+      {/* Main content — scrollable, centered vertically on tall screens */}
+      <div className="flex-1 flex flex-col items-center justify-center py-10 px-4">
+
+        {/* Badge */}
+        <div className="animate-pop-in mb-6">
+          <span className="inline-flex items-center gap-1.5 bg-yellow border-2 border-slate-dark rounded-full px-4 py-1 font-heading font-bold text-sm shadow-hard-sm">
+            <Home size={14} strokeWidth={2.5} />
+            IPL Perumahan 2026
+          </span>
+        </div>
+
+        {/* Hero heading */}
+        <div className="text-center mb-8 animate-slide-up stagger-1">
+          <h1 className="font-heading text-4xl sm:text-5xl md:text-6xl font-black text-slate-dark leading-tight mb-3">
+            Cek Status<br />
+            <span className="relative inline-block">
+              Pembayaran
+              <svg
+                className="absolute -bottom-1 left-0 w-full"
+                height="8"
+                viewBox="0 0 100 8"
+                preserveAspectRatio="none"
+              >
+                <path
+                  d="M0 4 Q 12.5 0, 25 4 T 50 4 T 75 4 T 100 4"
+                  fill="none"
+                  stroke="#8B5CF6"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </span>
+          </h1>
+          <p className="font-body text-base text-slate-dark/60 max-w-xs mx-auto">
+            Pilih blok dan nomor rumah kamu untuk melihat status IPL
+          </p>
+        </div>
+
+        {/* Search Card */}
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white border-2 border-slate-dark rounded-3xl shadow-hard w-full max-w-sm animate-slide-up stagger-2"
+        >
+          {/* Card header */}
+          <div className="flex items-center gap-2 px-5 pt-5 pb-3 border-b-2 border-slate-dark/10">
+            <MapPin size={18} strokeWidth={2.5} className="text-violet" />
+            <span className="font-heading font-bold text-sm">Lokasi Rumah</span>
+          </div>
+
+          <div className="p-5 space-y-5">
+            {/* Block selector — tap grid */}
+            <div>
+              <label className="font-heading font-bold text-xs uppercase tracking-wider text-slate-dark/50 mb-3 block">
+                Pilih Blok
+              </label>
+              <div className="grid grid-cols-3 gap-2">
+                {blocks.map((b) => (
+                  <button
+                    key={b}
+                    type="button"
+                    onClick={() => setBlok(b)}
+                    className={`
+                      border-2 rounded-xl py-3 font-heading font-extrabold text-lg
+                      transition-all duration-150 shadow-hard-sm
+                      active:translate-x-[2px] active:translate-y-[2px] active:shadow-none
+                      ${blok === b
+                        ? `${BLOCK_COLORS[b]} shadow-hard`
+                        : BLOCK_COLORS_UNSELECTED[b]
+                      }
+                    `}
+                  >
+                    {b}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* House number — number pad style */}
+            <div>
+              <label className="font-heading font-bold text-xs uppercase tracking-wider text-slate-dark/50 mb-2 block">
+                Nomor Rumah <span className="text-slate-dark/30 normal-case">(1–15)</span>
+              </label>
+              <input
+                type="number"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                min="1"
+                max="15"
+                value={nomorRumah}
+                onChange={(e) => setNomorRumah(e.target.value)}
+                placeholder="Masukkan nomor…"
+                className="
+                  w-full border-2 border-slate-dark rounded-xl px-4 py-3
+                  font-heading text-xl font-bold bg-cream
+                  focus:outline-none focus:ring-2 focus:ring-violet focus:ring-offset-2
+                  placeholder:text-slate-dark/20 placeholder:font-normal placeholder:text-base
+                "
+              />
+            </div>
+
+            {/* Submit */}
+            <button
+              type="submit"
+              disabled={!blok || !nomorRumah}
+              className="
+                w-full bg-violet text-white font-heading font-extrabold text-lg
+                border-2 border-slate-dark rounded-2xl px-6 py-4
+                shadow-hard
+                hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg
+                active:translate-x-0 active:translate-y-0 active:shadow-hard-sm
+                transition-all duration-150
+                disabled:opacity-40 disabled:cursor-not-allowed disabled:translate-x-0 disabled:translate-y-0 disabled:shadow-hard
+                flex items-center justify-center gap-2
+              "
+            >
+              <Search size={20} strokeWidth={2.5} />
+              Cari Sekarang
+            </button>
+          </div>
+        </form>
+
+        {/* Footer hint */}
+        <p className="mt-6 font-body text-xs text-slate-dark/40 text-center animate-fade-in stagger-3">
+          Data diperbarui secara berkala oleh pengelola
         </p>
       </div>
 
-      {/* Sticker Card Search Box */}
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white border-2 border-slate-dark rounded-2xl shadow-hard p-8 w-full max-w-md hover:animate-wiggle transition-transform"
-      >
-        <div className="space-y-4">
-          {/* Blok Dropdown */}
-          <div>
-            <label className="font-heading font-bold text-sm mb-1 block">
-              Blok
-            </label>
-            <select
-              value={blok}
-              onChange={(e) => setBlok(e.target.value)}
-              className="w-full border-2 border-slate-dark rounded-xl px-4 py-3 font-body text-base bg-cream focus:outline-none focus:ring-2 focus:ring-violet"
-            >
-              <option value="">Pilih Blok...</option>
-              {blocks.map((b) => (
-                <option key={b} value={b}>
-                  Blok {b}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Nomor Rumah Input */}
-          <div>
-            <label className="font-heading font-bold text-sm mb-1 block">
-              Nomor Rumah
-            </label>
-            <input
-              type="number"
-              min="1"
-              max="15"
-              value={nomorRumah}
-              onChange={(e) => setNomorRumah(e.target.value)}
-              placeholder="1 - 15"
-              className="w-full border-2 border-slate-dark rounded-xl px-4 py-3 font-body text-base bg-cream focus:outline-none focus:ring-2 focus:ring-violet"
-            />
-          </div>
-
-          {/* Candy Button */}
-          <button
-            type="submit"
-            disabled={!blok || !nomorRumah}
-            className="w-full bg-violet text-white font-heading font-bold text-lg border-2 border-slate-dark rounded-full px-6 py-3 shadow-hard hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#1E293B] active:translate-x-0 active:translate-y-0 active:shadow-hard-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-          >
-            <Search size={20} strokeWidth={2.5} />
-            Cari
-          </button>
-        </div>
-      </form>
+      {/* Bottom safe area spacer */}
+      <div className="safe-bottom" />
     </div>
   )
 }

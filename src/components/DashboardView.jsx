@@ -1,116 +1,212 @@
 import { useState } from 'react'
-import { ArrowLeft, CheckCircle, XCircle, Receipt, Image } from 'lucide-react'
+import { ArrowLeft, CheckCircle, XCircle, Receipt, Image, Calendar } from 'lucide-react'
 import { formatRupiah } from '../data/helpers'
 import ProofModal from './ProofModal'
 
 export default function DashboardView({ resident, onBack }) {
   const [modalImage, setModalImage] = useState(null)
 
+  const progressPct = Math.min(100, Math.round((resident.totalPaid / resident.annualTarget) * 100))
+
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8 animate-pop-in">
-      {/* Back Button */}
-      <button
-        onClick={onBack}
-        className="flex items-center gap-2 font-heading font-bold text-sm mb-6 bg-yellow border-2 border-slate-dark rounded-full px-4 py-2 shadow-hard-sm hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all"
-      >
-        <ArrowLeft size={18} strokeWidth={2.5} />
-        Kembali
-      </button>
-
-      {/* Resident Header */}
-      <div className="mb-8 text-center">
-        <h1 className="font-heading text-4xl md:text-5xl font-extrabold text-slate-dark inline-block">
-          {resident.namaPemilik}
-        </h1>
-        {/* Squiggle underline */}
-        <svg className="mx-auto mt-2" width="200" height="12" viewBox="0 0 200 12">
-          <path
-            d="M0 6 Q 10 0, 20 6 T 40 6 T 60 6 T 80 6 T 100 6 T 120 6 T 140 6 T 160 6 T 180 6 T 200 6"
-            fill="none"
-            stroke="#8B5CF6"
-            strokeWidth="3"
-            strokeLinecap="round"
-          />
-        </svg>
-        <p className="font-body text-slate-dark/60 mt-2">
-          Blok {resident.blok} No. {resident.nomorRumah}
-        </p>
+    <div className="flex flex-col min-h-dvh animate-pop-in">
+      {/* Sticky top bar */}
+      <div className="sticky top-0 z-10 bg-cream/90 backdrop-blur-md border-b-2 border-slate-dark/10 safe-x px-4 py-3 flex items-center gap-3">
+        <button
+          onClick={onBack}
+          className="
+            flex items-center gap-1.5 font-heading font-bold text-sm
+            bg-yellow border-2 border-slate-dark rounded-full px-3 py-1.5
+            shadow-hard-sm
+            active:translate-x-[1px] active:translate-y-[1px] active:shadow-none
+            transition-all
+          "
+        >
+          <ArrowLeft size={16} strokeWidth={2.5} />
+          Kembali
+        </button>
+        <div className="flex-1 text-center">
+          <span className="font-heading font-bold text-sm text-slate-dark/50">
+            Blok {resident.blok} · No. {resident.nomorRumah}
+          </span>
+        </div>
+        {/* Status badge in top bar */}
+        <span className={`
+          font-heading font-extrabold text-xs px-2.5 py-1 rounded-full border-2 border-slate-dark shadow-hard-sm
+          ${resident.isLunas ? 'bg-green text-white' : 'bg-pink text-white'}
+        `}>
+          {resident.isLunas ? 'LUNAS' : 'BELUM'}
+        </span>
       </div>
 
-      {/* Summary Pills */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-8">
-        <div className="flex-1 bg-white border-2 border-slate-dark rounded-2xl shadow-hard p-5">
-          <div className="flex items-center gap-2 mb-2">
-            <Receipt size={20} strokeWidth={2.5} className="text-violet" />
-            <span className="font-heading font-bold text-sm">Total Terbayar</span>
-          </div>
-          <p className="font-heading text-2xl font-extrabold text-violet">
-            {formatRupiah(resident.totalPaid)}
-          </p>
-          <p className="font-body text-xs text-slate-dark/50 mt-1">
-            dari {formatRupiah(resident.annualTarget)}
-          </p>
-        </div>
+      {/* Scrollable content */}
+      <div className="flex-1 overflow-y-auto safe-x">
+        <div className="max-w-lg mx-auto px-4 py-6 space-y-5">
 
-        <div className={`flex-1 border-2 border-slate-dark rounded-2xl shadow-hard p-5 ${
-          resident.isLunas ? 'bg-green/10' : 'bg-pink/10'
-        }`}>
-          <div className="flex items-center gap-2 mb-2">
-            {resident.isLunas ? (
-              <CheckCircle size={20} strokeWidth={2.5} className="text-green" />
-            ) : (
-              <XCircle size={20} strokeWidth={2.5} className="text-pink" />
-            )}
-            <span className="font-heading font-bold text-sm">Status</span>
-          </div>
-          <p className={`font-heading text-2xl font-extrabold ${
-            resident.isLunas ? 'text-green' : 'text-pink'
-          }`}>
-            {resident.isLunas ? 'LUNAS' : 'BELUM LUNAS'}
-          </p>
-          <p className="font-body text-xs text-slate-dark/50 mt-1">
-            {resident.isLunas
-              ? 'Pembayaran tahun ini sudah lengkap'
-              : `Kurang ${formatRupiah(resident.annualTarget - resident.totalPaid)}`}
-          </p>
-        </div>
-      </div>
-
-      {/* Transaction History */}
-      <div className="bg-white border-2 border-slate-dark rounded-2xl shadow-hard overflow-hidden">
-        <div className="px-5 py-4 border-b-2 border-slate-dark">
-          <h2 className="font-heading font-bold text-lg">Riwayat Pembayaran</h2>
-        </div>
-        <div className="divide-y-2 divide-slate-dark/10">
-          {resident.transactions.map((tx, i) => (
-            <div
-              key={i}
-              className="flex items-center justify-between px-5 py-4 hover:bg-cream/50 transition-colors"
-              style={{ animationDelay: `${i * 0.1}s` }}
-            >
-              <div>
-                <p className="font-heading font-bold text-base">
-                  {formatRupiah(tx.jumlahPembayaran)}
-                </p>
-                <p className="font-body text-sm text-slate-dark/60">
-                  {new Date(tx.timestamp).toLocaleDateString('id-ID', {
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric',
-                  })}
+          {/* Resident hero card */}
+          <div className="bg-white border-2 border-slate-dark rounded-3xl shadow-hard p-5 animate-slide-up stagger-1">
+            <div className="flex items-start justify-between gap-3">
+              {/* Avatar initial */}
+              <div className={`
+                w-14 h-14 rounded-2xl border-2 border-slate-dark shadow-hard-sm
+                flex items-center justify-center font-heading font-black text-2xl flex-shrink-0
+                ${resident.isLunas ? 'bg-green text-white' : 'bg-violet text-white'}
+              `}>
+                {resident.namaPemilik.charAt(0)}
+              </div>
+              <div className="flex-1 min-w-0">
+                <h1 className="font-heading text-2xl sm:text-3xl font-extrabold text-slate-dark leading-tight truncate">
+                  {resident.namaPemilik}
+                </h1>
+                <p className="font-body text-sm text-slate-dark/50 mt-0.5">
+                  Blok {resident.blok} · Nomor {resident.nomorRumah}
                 </p>
               </div>
-              {/* Proof thumbnail */}
-              <button
-                onClick={() => setModalImage(tx.buktiTransfer)}
-                className="w-12 h-12 bg-cream border-2 border-slate-dark rounded-lg shadow-hard-sm hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all flex items-center justify-center"
-              >
-                <Image size={20} strokeWidth={2.5} className="text-slate-dark/40" />
-              </button>
+              <div className={`
+                flex-shrink-0 mt-0.5
+                ${resident.isLunas ? 'text-green' : 'text-pink'}
+              `}>
+                {resident.isLunas
+                  ? <CheckCircle size={24} strokeWidth={2.5} />
+                  : <XCircle size={24} strokeWidth={2.5} />
+                }
+              </div>
             </div>
-          ))}
+
+            {/* Progress section */}
+            <div className="mt-4 pt-4 border-t-2 border-slate-dark/10">
+              <div className="flex items-end justify-between mb-2">
+                <div>
+                  <p className="font-heading font-extrabold text-xl text-slate-dark">
+                    {formatRupiah(resident.totalPaid)}
+                  </p>
+                  <p className="font-body text-xs text-slate-dark/40">
+                    dari {formatRupiah(resident.annualTarget)} target tahunan
+                  </p>
+                </div>
+                <span className={`
+                  font-heading font-black text-2xl
+                  ${resident.isLunas ? 'text-green' : 'text-violet'}
+                `}>
+                  {progressPct}%
+                </span>
+              </div>
+
+              {/* Progress bar */}
+              <div className="h-4 bg-cream border-2 border-slate-dark rounded-full overflow-hidden">
+                <div
+                  className={`
+                    h-full rounded-full progress-bar
+                    ${resident.isLunas ? 'bg-green' : 'bg-violet'}
+                  `}
+                  style={{ '--progress-width': `${progressPct}%` }}
+                />
+              </div>
+
+              {!resident.isLunas && (
+                <p className="font-body text-xs text-pink font-semibold mt-2">
+                  Kurang {formatRupiah(resident.annualTarget - resident.totalPaid)} lagi untuk lunas
+                </p>
+              )}
+              {resident.isLunas && (
+                <p className="font-body text-xs text-green font-semibold mt-2">
+                  Pembayaran tahun 2026 sudah lengkap! 🎉
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Summary pills */}
+          <div className="grid grid-cols-2 gap-3 animate-slide-up stagger-2">
+            <div className="bg-violet/10 border-2 border-slate-dark rounded-2xl shadow-hard-sm p-4">
+              <Receipt size={18} strokeWidth={2.5} className="text-violet mb-2" />
+              <p className="font-heading font-extrabold text-lg text-violet leading-tight">
+                {resident.transactions.length}
+              </p>
+              <p className="font-body text-xs text-slate-dark/50 mt-0.5">transaksi</p>
+            </div>
+            <div className={`
+              border-2 border-slate-dark rounded-2xl shadow-hard-sm p-4
+              ${resident.isLunas ? 'bg-green/10' : 'bg-pink/10'}
+            `}>
+              {resident.isLunas
+                ? <CheckCircle size={18} strokeWidth={2.5} className="text-green mb-2" />
+                : <XCircle size={18} strokeWidth={2.5} className="text-pink mb-2" />
+              }
+              <p className={`font-heading font-extrabold text-lg leading-tight ${resident.isLunas ? 'text-green' : 'text-pink'}`}>
+                {resident.isLunas ? 'LUNAS' : 'BELUM'}
+              </p>
+              <p className="font-body text-xs text-slate-dark/50 mt-0.5">status IPL</p>
+            </div>
+          </div>
+
+          {/* Transaction history */}
+          <div className="bg-white border-2 border-slate-dark rounded-3xl shadow-hard overflow-hidden animate-slide-up stagger-3">
+            <div className="px-5 py-4 border-b-2 border-slate-dark flex items-center gap-2">
+              <Calendar size={18} strokeWidth={2.5} className="text-slate-dark/60" />
+              <h2 className="font-heading font-bold text-base">Riwayat Pembayaran</h2>
+            </div>
+
+            {resident.transactions.length === 0 ? (
+              <div className="py-10 text-center">
+                <p className="font-body text-sm text-slate-dark/40">Belum ada pembayaran tercatat</p>
+              </div>
+            ) : (
+              <div>
+                {resident.transactions.map((tx, i) => (
+                  <div
+                    key={i}
+                    className={`
+                      flex items-center justify-between px-5 py-4
+                      active:bg-cream/80 transition-colors
+                      ${i < resident.transactions.length - 1 ? 'border-b border-slate-dark/10' : ''}
+                    `}
+                  >
+                    {/* Left: amount + date */}
+                    <div className="flex items-center gap-3 min-w-0">
+                      {/* Color dot */}
+                      <div className={`
+                        w-2 h-2 rounded-full flex-shrink-0
+                        ${i % 3 === 0 ? 'bg-violet' : i % 3 === 1 ? 'bg-pink' : 'bg-yellow'}
+                      `} />
+                      <div className="min-w-0">
+                        <p className="font-heading font-bold text-base text-slate-dark">
+                          {formatRupiah(tx.jumlahPembayaran)}
+                        </p>
+                        <p className="font-body text-xs text-slate-dark/50 truncate">
+                          {new Date(tx.timestamp).toLocaleDateString('id-ID', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric',
+                          })}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Right: proof button */}
+                    <button
+                      onClick={() => setModalImage(tx.buktiTransfer)}
+                      className="
+                        ml-3 flex-shrink-0
+                        w-10 h-10 bg-cream border-2 border-slate-dark rounded-xl shadow-hard-sm
+                        active:translate-x-[2px] active:translate-y-[2px] active:shadow-none
+                        transition-all flex items-center justify-center
+                      "
+                      aria-label="Lihat bukti transfer"
+                    >
+                      <Image size={16} strokeWidth={2.5} className="text-slate-dark/50" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
         </div>
       </div>
+
+      {/* Bottom safe area */}
+      <div className="safe-bottom bg-cream" />
 
       {/* Proof Modal */}
       {modalImage && (
