@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { MessageCircle } from 'lucide-react'
 import { getResident } from './data/helpers'
 import SearchView from './components/SearchView'
@@ -8,6 +8,11 @@ function App() {
   const [resident, setResident] = useState(null)
   const [searched, setSearched] = useState(false)
   const [searchQuery, setSearchQuery] = useState({ blok: '', nomorRumah: '' })
+
+  // Reset scroll to top when switching views
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [searched])
 
   const handleSearch = (blok, nomorRumah) => {
     const result = getResident(blok, nomorRumah)
