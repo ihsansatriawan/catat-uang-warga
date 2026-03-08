@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { Search, Home, MapPin } from 'lucide-react'
-import { getAvailableBlocks } from '../data/helpers'
+import { Search, Home, MapPin, Calendar } from 'lucide-react'
+import { getAvailableBlocks, getLastUpdated } from '../data/helpers'
 
 const BLOCK_COLORS = {
   A: 'bg-violet text-white border-violet',
@@ -32,6 +32,15 @@ export default function SearchView({ onSearch }) {
   }
 
   const blocks = getAvailableBlocks()
+
+  const lastUpdatedRaw = getLastUpdated()
+  const lastUpdateText = lastUpdatedRaw
+    ? new Date(lastUpdatedRaw).toLocaleDateString('id-ID', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    })
+    : null
 
   return (
     <div className="flex flex-col min-h-dvh safe-x">
@@ -160,9 +169,20 @@ export default function SearchView({ onSearch }) {
         </form>
 
         {/* Footer hint */}
-        <p className="mt-6 font-body text-xs text-slate-dark/40 text-center animate-fade-in stagger-3">
-          Data diperbarui secara berkala oleh pengelola
-        </p>
+        <div className="mt-6 animate-fade-in stagger-3 flex justify-center">
+          <div className="inline-flex items-center gap-2 bg-white border-2 border-slate-dark/15 rounded-full px-4 py-2 shadow-sm">
+            <Calendar size={14} strokeWidth={2.5} className="text-violet flex-shrink-0" />
+            <p className="font-body text-xs text-slate-dark/60">
+              Data diperbarui secara berkala oleh pengelola
+              {lastUpdateText && (
+                <>
+                  <br />
+                  <span className="font-semibold text-slate-dark/80">Terakhir: {lastUpdateText}</span>
+                </>
+              )}
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Bottom safe area spacer */}
