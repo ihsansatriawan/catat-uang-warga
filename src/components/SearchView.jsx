@@ -54,7 +54,7 @@ export default function SearchView({ onSearch }) {
         <div className="animate-pop-in mb-6">
           <span className="inline-flex items-center gap-1.5 bg-yellow border-2 border-slate-dark rounded-full px-4 py-1 font-heading font-bold text-sm shadow-hard-sm">
             <Home size={14} strokeWidth={2.5} />
-            IPL Perumahan 2026
+            IPL D'talago Regency
           </span>
         </div>
 

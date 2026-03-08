@@ -11,10 +11,10 @@ export default function DashboardView({ resident, onBack }) {
   const lastUpdatedRaw = getLastUpdated()
   const lastUpdateText = lastUpdatedRaw
     ? new Date(lastUpdatedRaw).toLocaleDateString('id-ID', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-      })
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    })
     : null
 
   return (
@@ -92,6 +92,9 @@ export default function DashboardView({ resident, onBack }) {
                   <p className="font-body text-xs text-slate-dark/40">
                     dari {formatRupiah(resident.annualTarget)} target tahunan
                   </p>
+                  <span className="inline-flex items-center gap-1 bg-violet/10 text-violet font-body text-xs font-semibold rounded-full px-2.5 py-0.5 mt-1">
+                    💡 Rp 250.000/bulan × 12 bulan
+                  </span>
                 </div>
                 <span className={`
                   font-heading font-black text-2xl
