@@ -4,7 +4,7 @@ import { formatRupiah, getLastUpdated } from '../data/helpers'
 import ProofModal from './ProofModal'
 
 export default function DashboardView({ resident, onBack }) {
-  const [modalImage, setModalImage] = useState(null)
+  const [showProof, setShowProof] = useState(false)
 
   const progressPct = Math.min(100, Math.round((resident.totalPaid / resident.annualTarget) * 100))
 
@@ -203,7 +203,7 @@ export default function DashboardView({ resident, onBack }) {
 
                     {/* Right: proof button */}
                     <button
-                      onClick={() => setModalImage(tx.buktiTransfer)}
+                      onClick={() => setShowProof(true)}
                       className="
                         ml-3 flex-shrink-0
                         w-10 h-10 bg-cream border-2 border-slate-dark rounded-xl shadow-hard-sm
@@ -227,8 +227,8 @@ export default function DashboardView({ resident, onBack }) {
       <div className="safe-bottom bg-cream" />
 
       {/* Proof Modal */}
-      {modalImage && (
-        <ProofModal imageUrl={modalImage} onClose={() => setModalImage(null)} />
+      {showProof && (
+        <ProofModal onClose={() => setShowProof(false)} />
       )}
     </div>
   )

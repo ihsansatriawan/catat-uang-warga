@@ -1,6 +1,6 @@
 import { X, FileImage } from 'lucide-react'
 
-export default function ProofModal({ imageUrl, onClose }) {
+export default function ProofModal({ onClose }) {
   return (
     <div
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-dark/60 backdrop-blur-sm animate-fade-in"

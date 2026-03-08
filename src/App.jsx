@@ -28,6 +28,7 @@ function App() {
         <div className="flex flex-col items-center justify-center min-h-screen gap-4 animate-pop-in">
           <p className="font-heading text-xl font-bold">Data tidak ditemukan</p>
           <p className="font-body text-slate-dark/60">Blok atau nomor rumah tidak terdaftar</p>
+          <p className="font-body text-slate-dark/60">Harap hubungi pengurus untuk informasi lebih lanjut</p>
           <button
             onClick={handleBack}
             className="bg-violet text-white font-heading font-bold border-2 border-slate-dark rounded-full px-6 py-2 shadow-hard hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all"
