@@ -1,4 +1,6 @@
-import data from './validated.json'
+import validated from './validated.json'
+
+const { lastUpdate, data } = validated
 
 const MONTHLY_IPL = 250000
 const MONTHS_PER_YEAR = 12
@@ -29,6 +31,10 @@ export function getResident(blok, nomorRumah) {
 
 export function getAvailableBlocks() {
   return ['A', 'B', 'C', 'D', 'E', 'F']
+}
+
+export function getLastUpdated() {
+  return lastUpdate || null
 }
 
 export function formatRupiah(amount) {

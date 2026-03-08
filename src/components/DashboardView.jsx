@@ -1,12 +1,21 @@
 import { useState } from 'react'
 import { ArrowLeft, CheckCircle, XCircle, Receipt, Image, Calendar } from 'lucide-react'
-import { formatRupiah } from '../data/helpers'
+import { formatRupiah, getLastUpdated } from '../data/helpers'
 import ProofModal from './ProofModal'
 
 export default function DashboardView({ resident, onBack }) {
   const [modalImage, setModalImage] = useState(null)
 
   const progressPct = Math.min(100, Math.round((resident.totalPaid / resident.annualTarget) * 100))
+
+  const lastUpdatedRaw = getLastUpdated()
+  const lastUpdateText = lastUpdatedRaw
+    ? new Date(lastUpdatedRaw).toLocaleDateString('id-ID', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      })
+    : null
 
   return (
     <div className="flex flex-col min-h-dvh animate-pop-in">
@@ -112,6 +121,15 @@ export default function DashboardView({ resident, onBack }) {
                 <p className="font-body text-xs text-green font-semibold mt-2">
                   Pembayaran tahun 2026 sudah lengkap! 🎉
                 </p>
+              )}
+
+              {lastUpdateText && (
+                <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-slate-dark/10">
+                  <Calendar size={12} strokeWidth={2.5} className="text-slate-dark/30 flex-shrink-0" />
+                  <p className="font-body text-xs text-slate-dark/40">
+                    Terakhir diperbarui: <span className="font-semibold text-slate-dark/60">{lastUpdateText}</span>
+                  </p>
+                </div>
               )}
             </div>
           </div>

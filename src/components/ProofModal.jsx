@@ -46,7 +46,7 @@ export default function ProofModal({ imageUrl, onClose }) {
           <div className="text-center px-6">
             <p className="font-heading font-bold text-sm text-slate-dark/40">Bukti Pembayaran</p>
             <p className="font-body text-xs text-slate-dark/25 mt-1 leading-snug">
-              Akan menampilkan bukti transfer asli setelah terhubung ke sistem
+              Harap hubungi pengurus untuk melihat bukti transfer yang sudah disubmit
             </p>
           </div>
         </div>
