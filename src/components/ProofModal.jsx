@@ -44,15 +44,15 @@ export default function ProofModal({ onClose }) {
         <div className="bg-cream border-2 border-slate-dark rounded-2xl aspect-[4/3] flex flex-col items-center justify-center gap-3 overflow-hidden">
           <div className="text-5xl select-none">🧾</div>
           <div className="text-center px-6">
-            <p className="font-heading font-bold text-sm text-slate-dark/40">Bukti Pembayaran</p>
-            <p className="font-body text-xs text-slate-dark/25 mt-1 leading-snug">
+            <p className="font-heading font-bold text-sm text-slate-dark/75">Bukti Pembayaran</p>
+            <p className="font-body text-xs text-slate-dark/60 mt-1 leading-snug">
               Harap hubungi pengurus untuk melihat bukti transfer yang sudah disubmit
             </p>
           </div>
         </div>
 
         {/* CTA hint */}
-        <p className="text-center font-body text-xs text-slate-dark/30 mt-3">
+        <p className="text-center font-body text-xs text-slate-dark/55 mt-3">
           Ketuk di luar untuk menutup
         </p>
       </div>
