@@ -1,1 +1,47 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
+
+@theme {
+  --color-cream: #FFFDF5;
+  --color-slate-dark: #1E293B;
+  --color-violet: #8B5CF6;
+  --color-pink: #F472B6;
+  --color-yellow: #FBBF24;
+  --color-green: #22C55E;
+
+  --font-heading: 'Outfit', sans-serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
+
+  --shadow-hard: 4px 4px 0px 0px #1E293B;
+  --shadow-hard-sm: 2px 2px 0px 0px #1E293B;
+
+  --animate-wiggle: wiggle 0.3s ease-in-out;
+  --animate-pop-in: pop-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  --animate-bounce-in: bounce-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-2deg); }
+  75% { transform: rotate(2deg); }
+}
+
+@keyframes pop-in {
+  0% { transform: scale(0); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes bounce-in {
+  0% { transform: scale(0.3); opacity: 0; }
+  50% { transform: scale(1.05); }
+  70% { transform: scale(0.95); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--color-slate-dark);
+  background-color: var(--color-cream);
+  background-image: radial-gradient(circle, #1E293B 1px, transparent 1px);
+  background-size: 24px 24px;
+}
