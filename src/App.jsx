@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { MessageCircle } from 'lucide-react'
 import { getResident } from './data/helpers'
 import SearchView from './components/SearchView'
 import DashboardView from './components/DashboardView'
@@ -6,11 +7,13 @@ import DashboardView from './components/DashboardView'
 function App() {
   const [resident, setResident] = useState(null)
   const [searched, setSearched] = useState(false)
+  const [searchQuery, setSearchQuery] = useState({ blok: '', nomorRumah: '' })
 
   const handleSearch = (blok, nomorRumah) => {
     const result = getResident(blok, nomorRumah)
     setResident(result)
     setSearched(true)
+    setSearchQuery({ blok, nomorRumah })
   }
 
   const handleBack = () => {
@@ -49,6 +52,29 @@ function App() {
                 className="inline-flex items-center gap-1.5 text-violet font-heading font-bold underline underline-offset-2 hover:text-violet/80 transition-colors"
               >
                 🔗 Isi Form Konfirmasi
+              </a>
+            </div>
+
+            <div className="border-t-2 border-slate-dark/10 pt-4">
+              <p className="font-body text-sm text-slate-dark/70 mb-3">
+                Harap hubungi pengurus untuk informasi lebih lanjut
+              </p>
+              <a
+                href={`https://wa.me/628111719913?text=${encodeURIComponent(`Saya mencari nomor rumah saya: Blok ${searchQuery.blok} No. ${searchQuery.nomorRumah} namun data tidak ditemukan`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="
+                  inline-flex items-center justify-center gap-2 w-full
+                  bg-green text-white font-heading font-bold
+                  border-2 border-slate-dark rounded-full px-6 py-3
+                  shadow-hard
+                  hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg
+                  active:translate-x-0 active:translate-y-0 active:shadow-hard-sm
+                  transition-all duration-150
+                "
+              >
+                <MessageCircle size={18} strokeWidth={2.5} />
+                Hubungi via WhatsApp
               </a>
             </div>
 
