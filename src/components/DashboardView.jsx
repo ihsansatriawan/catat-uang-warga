@@ -137,8 +137,32 @@ export default function DashboardView({ resident, onBack }) {
             </div>
           </div>
 
+          {/* Help/Report Data section */}
+          <div className="animate-slide-up stagger-2 flex flex-col items-center bg-cream/50 rounded-2xl py-2 px-4 border-2 border-transparent">
+            <p className="font-body text-sm text-center text-slate-dark/60 mb-2 font-semibold">
+              Ada data yang tidak sesuai?
+            </p>
+            <a
+              href={`https://wa.me/628111719913?text=${encodeURIComponent(`Halo Pengurus, saya mengecek data IPL untuk Blok ${resident.blok} No. ${resident.nomorRumah} dan sepertinya ada data yang kurang sesuai. Mohon bantuannya untuk dilakukan pengecekan.`)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="
+                flex items-center justify-center gap-2 w-full max-w-[280px]
+                bg-green text-white font-heading font-bold
+                border-2 border-slate-dark rounded-full px-5 py-2.5
+                shadow-hard-sm text-sm
+                hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard
+                active:translate-x-0 active:translate-y-0 active:shadow-none
+                transition-all duration-150
+              "
+            >
+              <MessageCircle size={16} strokeWidth={2.5} />
+              Hubungi via WhatsApp
+            </a>
+          </div>
+
           {/* Summary pills */}
-          <div className="grid grid-cols-2 gap-3 animate-slide-up stagger-2">
+          <div className="grid grid-cols-2 gap-3 animate-slide-up stagger-3">
             <div className="bg-violet/10 border-2 border-slate-dark rounded-2xl shadow-hard-sm p-4">
               <Receipt size={18} strokeWidth={2.5} className="text-violet mb-2" />
               <p className="font-heading font-extrabold text-lg text-violet leading-tight">
@@ -162,7 +186,7 @@ export default function DashboardView({ resident, onBack }) {
           </div>
 
           {/* Transaction history */}
-          <div className="bg-white border-2 border-slate-dark rounded-3xl shadow-hard overflow-hidden animate-slide-up stagger-3">
+          <div className="bg-white border-2 border-slate-dark rounded-3xl shadow-hard overflow-hidden animate-slide-up stagger-4">
             <div className="px-5 py-4 border-b-2 border-slate-dark flex items-center gap-2">
               <Calendar size={18} strokeWidth={2.5} className="text-slate-dark/60" />
               <h2 className="font-heading font-bold text-base">Riwayat Pembayaran</h2>
@@ -223,29 +247,6 @@ export default function DashboardView({ resident, onBack }) {
             )}
           </div>
 
-          {/* Help/Report Data section */}
-          <div className="mt-6 mb-2 border-t-2 border-slate-dark/10 pt-6 animate-slide-up stagger-4">
-            <p className="font-body text-sm text-center text-slate-dark/60 mb-3">
-              Ada data yang tidak sesuai?
-            </p>
-            <a
-              href={`https://wa.me/628111719913?text=${encodeURIComponent(`Halo Pengurus, saya mengecek data IPL untuk Blok ${resident.blok} No. ${resident.nomorRumah} dan sepertinya ada data yang kurang sesuai. Mohon bantuannya untuk dilakukan pengecekan.`)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="
-                flex items-center justify-center gap-2 w-full
-                bg-green text-white font-heading font-bold
-                border-2 border-slate-dark rounded-full px-6 py-3
-                shadow-hard
-                hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg
-                active:translate-x-0 active:translate-y-0 active:shadow-hard-sm
-                transition-all duration-150
-              "
-            >
-              <MessageCircle size={18} strokeWidth={2.5} />
-              Hubungi via WhatsApp
-            </a>
-          </div>
 
         </div>
       </div>
