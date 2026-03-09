@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ArrowLeft, CheckCircle, XCircle, Receipt, Image, Calendar } from 'lucide-react'
+import { ArrowLeft, CheckCircle, XCircle, Receipt, Image, Calendar, MessageCircle } from 'lucide-react'
 import { formatRupiah, getLastUpdated } from '../data/helpers'
 import ProofModal from './ProofModal'
 
@@ -221,6 +221,30 @@ export default function DashboardView({ resident, onBack }) {
                 ))}
               </div>
             )}
+          </div>
+
+          {/* Help/Report Data section */}
+          <div className="mt-6 mb-2 border-t-2 border-slate-dark/10 pt-6 animate-slide-up stagger-4">
+            <p className="font-body text-sm text-center text-slate-dark/60 mb-3">
+              Ada data yang tidak sesuai?
+            </p>
+            <a
+              href={`https://wa.me/628111719913?text=${encodeURIComponent(`Halo Pengurus, saya mengecek data IPL untuk Blok ${resident.blok} No. ${resident.nomorRumah} dan sepertinya ada data yang kurang sesuai. Mohon bantuannya untuk dilakukan pengecekan.`)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="
+                flex items-center justify-center gap-2 w-full
+                bg-green text-white font-heading font-bold
+                border-2 border-slate-dark rounded-full px-6 py-3
+                shadow-hard
+                hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg
+                active:translate-x-0 active:translate-y-0 active:shadow-hard-sm
+                transition-all duration-150
+              "
+            >
+              <MessageCircle size={18} strokeWidth={2.5} />
+              Hubungi via WhatsApp
+            </a>
           </div>
 
         </div>
