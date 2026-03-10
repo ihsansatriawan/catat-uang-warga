@@ -1,24 +1,7 @@
 import { useState } from 'react'
 import { Search, Home, MapPin, Calendar } from 'lucide-react'
 import { getAvailableBlocks, getLastUpdated } from '../data/helpers'
-
-const BLOCK_COLORS = {
-  A: 'bg-violet text-white border-violet',
-  B: 'bg-pink text-white border-pink',
-  C: 'bg-yellow text-slate-dark border-yellow',
-  D: 'bg-green text-white border-green',
-  E: 'bg-orange text-white border-orange',
-  F: 'bg-slate-dark text-cream border-slate-dark',
-}
-
-const BLOCK_COLORS_UNSELECTED = {
-  A: 'bg-white text-slate-dark border-slate-dark hover:bg-violet/10',
-  B: 'bg-white text-slate-dark border-slate-dark hover:bg-pink/10',
-  C: 'bg-white text-slate-dark border-slate-dark hover:bg-yellow/10',
-  D: 'bg-white text-slate-dark border-slate-dark hover:bg-green/10',
-  E: 'bg-white text-slate-dark border-slate-dark hover:bg-orange/10',
-  F: 'bg-white text-slate-dark border-slate-dark hover:bg-slate-dark/10',
-}
+import { BLOCK_COLORS, BLOCK_COLORS_UNSELECTED } from '../data/constants'
 
 export default function SearchView({ onSearch }) {
   const [blok, setBlok] = useState('')
