@@ -98,12 +98,10 @@ function transform(rows) {
     }
     const item = {
       timestamp: toIsoWIBFromDDMMYYYY(r['Timestamp']),
-      email: r['Email address'] || '',
       blok,
       nomorRumah: String(nomor || ''),
       namaPemilik: r['Nama Pemilik'] || '',
-      jumlahPembayaran: toIntAmount(r['Jumlah Pembayaran']),
-      buktiTransfer: r['Unggah Bukti Transfer Pembayaran IPL-2026'] || ''
+      jumlahPembayaran: toIntAmount(r['Jumlah Pembayaran'])
     };
     if (item.blok && item.nomorRumah) out.push(item);
   }
