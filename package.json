@@ -8,12 +8,14 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "convert:validated": "node scripts/convert-validated.js"
+    "convert:validated": "node scripts/convert-validated.js",
+    "convert:residents": "node scripts/convert-residents.js"
   },
   "dependencies": {
     "lucide-react": "^0.469.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^7.13.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
