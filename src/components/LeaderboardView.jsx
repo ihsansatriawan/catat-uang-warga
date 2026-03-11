@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowLeft, Trophy, Home, ChevronDown, ChevronUp } from 'lucide-react'
+import { ArrowLeft, Trophy, Home, ChevronDown, ChevronUp, MessageCircle } from 'lucide-react'
 import { getBlockLeaderboard, getHouseLeaderboard, getAvailableBlocks, formatRupiah, getLastUpdated } from '../data/helpers'
 import { BLOCK_COLORS, BLOCK_COLORS_UNSELECTED, BLOCK_BAR_COLORS } from '../data/constants'
 
@@ -232,9 +232,33 @@ export default function LeaderboardView() {
                         )}
                     </div>
 
+                    {/* Help/Report Data section */}
+                    <div className="animate-fade-in stagger-3 flex flex-col items-center bg-cream/50 rounded-2xl py-4 px-4 border-2 border-transparent mt-4">
+                        <p className="font-body text-sm text-center text-slate-dark/60 mb-2 font-semibold">
+                            Ada data yang tidak sesuai?
+                        </p>
+                        <a
+                            href={`https://wa.me/628111719913?text=${encodeURIComponent('Halo Pengurus, saya mengecek data di Leaderboard IPL dan sepertinya ada data yang kurang sesuai. Mohon bantuannya untuk dilakukan pengecekan.')}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="
+                                flex items-center justify-center gap-2 w-full max-w-[280px]
+                                bg-green text-white font-heading font-bold
+                                border-2 border-slate-dark rounded-full px-5 py-2.5
+                                shadow-hard-sm text-sm
+                                hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard
+                                active:translate-x-0 active:translate-y-0 active:shadow-none
+                                transition-all duration-150
+                            "
+                        >
+                            <MessageCircle size={16} strokeWidth={2.5} />
+                            Hubungi via WhatsApp
+                        </a>
+                    </div>
+
                     {/* Last updated */}
                     {lastUpdateText && (
-                        <div className="text-center animate-fade-in stagger-3">
+                        <div className="text-center animate-fade-in stagger-4 mt-2">
                             <p className="font-body text-xs text-slate-dark/40">
                                 Data diperbarui: <span className="font-semibold text-slate-dark/60">{lastUpdateText}</span>
                             </p>
