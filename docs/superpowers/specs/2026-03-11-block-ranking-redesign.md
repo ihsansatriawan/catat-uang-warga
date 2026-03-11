@@ -1,7 +1,7 @@
 # Block Ranking Redesign — Design Spec
 
 **Date:** 2026-03-11
-**Status:** Approved
+**Status:** In Review
 
 ---
 
@@ -24,10 +24,12 @@ Rank blocks by **total payment collected vs total expected**, giving credit for 
 **Option 2 — Total paid / total target ratio:**
 
 ```
-collectionPct = Math.round(sum(totalPaid) / (totalHouses × ANNUAL_TARGET) × 100)
+collectionPct = Math.min(100, Math.round(sum(totalPaid) / (totalHouses × ANNUAL_TARGET) × 100))
 ```
 
-This is equivalent to averaging individual house completion percentages, but expressed as a single ratio. Simple, intuitive, and maps directly to "how much money has this block collected out of what's expected."
+Simple and intuitive — maps directly to "how much money has this block collected out of what's expected." The `Math.min(100)` cap prevents a single overpaying house from pushing the block score above 100%. This is equivalent to averaging per-house completion percentages only when no house has overpaid; in the overpay case, block-level capping is applied instead.
+
+`sumPaid` is accumulated from `r.totalPaid`, which is already computed by `getAllResidents()`. That function iterates `residents.json` — the canonical house roster (name + block + house number for all registered residents, separate from the payment transaction log in `validated.json`). Blocks not present in `residents.json` are naturally excluded from the result — they are not scored as 0%.
 
 ---
 
@@ -73,15 +75,16 @@ export function getBlockLeaderboard() {
       totalHouses: total,
       lunasCount: lunas,
       sumPaid,
-      collectionPct: total > 0 ? Math.round((sumPaid / (total * ANNUAL_TARGET)) * 100) : 0,
+      collectionPct: total > 0 ? Math.min(100, Math.round((sumPaid / (total * ANNUAL_TARGET)) * 100)) : 0,
     }))
     .sort((a, b) => b.collectionPct - a.collectionPct || a.blok.localeCompare(b.blok))
 }
 ```
 
 **Key changes:**
-- Accumulate `sumPaid` per block instead of only counting `lunas`
-- Compute `collectionPct` from `sumPaid / (total * ANNUAL_TARGET)`
+- Accumulate `sumPaid` per block from `r.totalPaid` (computed by `getAllResidents()`) instead of only counting `lunas`
+- Compute `collectionPct` from `Math.min(100, Math.round(sumPaid / (total * ANNUAL_TARGET) * 100))` — the `* 100` converts the ratio to a percentage; the cap prevents overpay inflation at the block level
+- `ANNUAL_TARGET` is already defined at module scope in `helpers.js` (line 8)
 - Sort by `collectionPct` instead of `lunasPct`
 - `lunasCount` is kept as supplementary data for the UI
 
@@ -89,12 +92,14 @@ export function getBlockLeaderboard() {
 
 ### `src/components/LeaderboardView.jsx` — Block Ranking UI
 
-| Element | Before | After |
-|--------|--------|-------|
-| Bar width | `block.lunasPct%` | `block.collectionPct%` |
-| Header label | `% rumah lunas` | `% terkumpul` |
-| Percentage display | `{block.lunasPct}%` | `{block.collectionPct}%` |
-| House count | `{block.lunasCount}/{block.totalHouses} 🏠` | unchanged |
+| Element | File location | Before | After |
+|--------|--------------|--------|-------|
+| CSS bar fill width (`--progress-width`) | line 85 | `\`${block.lunasPct}%\`` | `\`${block.collectionPct}%\`` |
+| Percentage label text | line 90 | `{block.lunasPct}%` | `{block.collectionPct}%` |
+| Header label text | line 61 | `% rumah lunas` | `% terkumpul` |
+| House count | unchanged | `{block.lunasCount}/{block.totalHouses} 🏠` | unchanged |
+
+Note: only the text content of the header label changes — surrounding element/class remains the same.
 
 ---
 
@@ -109,5 +114,8 @@ export function getBlockLeaderboard() {
 ## Success Criteria
 
 - A block where all houses paid partial amounts ranks higher than a block with only 1 fully-lunas house
-- The displayed percentage reflects total money collected vs total money expected
-- UI label clearly communicates the new metric (`% terkumpul`)
+- Given a block with 2 houses each paying Rp 1,500,000, `collectionPct` equals 50
+- `collectionPct` is capped at 100 at the block level: `Math.min(100, ...)` is applied after summing all house payments, so a single overpaying house cannot push the block score above 100%
+- Blocks absent from `residents.json` are excluded from the ranking (not scored as 0%)
+- UI label shows `% terkumpul` instead of `% rumah lunas`
+- The CSS progress bar fill (`--progress-width`) reflects the new `collectionPct` value
