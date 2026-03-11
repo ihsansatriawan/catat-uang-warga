@@ -1,4 +1,5 @@
 import validated from './validated.json'
+import residents from './residents.json'
 
 const { lastUpdate, data } = validated
 
@@ -43,4 +44,55 @@ export function formatRupiah(amount) {
     currency: 'IDR',
     minimumFractionDigits: 0,
   }).format(amount)
+}
+
+export function getAllResidents() {
+  return residents.map((r) => {
+    const records = data.filter(
+      (d) => d.blok === r.blok && d.nomorRumah === String(r.nomorRumah)
+    )
+    const totalPaid = records.reduce((sum, d) => sum + d.jumlahPembayaran, 0)
+    const completionPct = Math.min(100, Math.round((totalPaid / ANNUAL_TARGET) * 100))
+    return {
+      blok: r.blok,
+      nomorRumah: r.nomorRumah,
+      namaPemilik: r.namaPemilik,
+      totalPaid,
+      annualTarget: ANNUAL_TARGET,
+      isLunas: totalPaid >= ANNUAL_TARGET,
+      completionPct,
+      monthsPaid: Math.floor(totalPaid / MONTHLY_IPL),
+    }
+  })
+}
+
+export function getBlockLeaderboard() {
+  const all = getAllResidents()
+  const blocks = {}
+  for (const r of all) {
+    if (!blocks[r.blok]) blocks[r.blok] = { total: 0, lunas: 0 }
+    blocks[r.blok].total++
+    if (r.isLunas) blocks[r.blok].lunas++
+  }
+  return Object.entries(blocks)
+    .map(([blok, { total, lunas }]) => ({
+      blok,
+      totalHouses: total,
+      lunasCount: lunas,
+      lunasPct: total > 0 ? Math.round((lunas / total) * 100) : 0,
+    }))
+    .sort((a, b) => b.lunasPct - a.lunasPct || a.blok.localeCompare(b.blok))
+}
+
+export function getHouseLeaderboard(blok) {
+  let all = getAllResidents()
+  if (blok) {
+    all = all.filter((r) => r.blok === blok)
+  }
+  return all.sort(
+    (a, b) =>
+      b.completionPct - a.completionPct ||
+      a.blok.localeCompare(b.blok) ||
+      Number(a.nomorRumah) - Number(b.nomorRumah)
+  )
 }

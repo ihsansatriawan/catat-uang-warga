@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Search, Home, MapPin, Calendar } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { Search, Home, MapPin, Calendar, Trophy } from 'lucide-react'
 import { getAvailableBlocks, getLastUpdated } from '../data/helpers'
 import { BLOCK_COLORS, BLOCK_COLORS_UNSELECTED } from '../data/constants'
 
@@ -167,6 +168,20 @@ export default function SearchView({ onSearch }) {
           </div>
         </form>
 
+        {/* Leaderboard link */}
+        <div className="mt-4 animate-fade-in stagger-4">
+          <Link
+            to="/leaderboard"
+            className="
+              inline-flex items-center gap-2
+              font-heading font-bold text-sm text-slate-dark/60
+              hover:text-violet transition-colors
+            "
+          >
+            <Trophy size={16} strokeWidth={2.5} />
+            Lihat Leaderboard
+          </Link>
+        </div>
 
       </div>
 
