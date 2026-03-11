@@ -1,0 +1,252 @@
+[
+  {
+    "blok": "A",
+    "nomorRumah": "3",
+    "namaPemilik": "Agus Herianto"
+  },
+  {
+    "blok": "A",
+    "nomorRumah": "5",
+    "namaPemilik": "Iksan"
+  },
+  {
+    "blok": "A",
+    "nomorRumah": "7",
+    "namaPemilik": "Ashar"
+  },
+  {
+    "blok": "A",
+    "nomorRumah": "8",
+    "namaPemilik": "Fajar Harry Aji"
+  },
+  {
+    "blok": "A",
+    "nomorRumah": "9",
+    "namaPemilik": "Simon"
+  },
+  {
+    "blok": "B",
+    "nomorRumah": "1",
+    "namaPemilik": "Tommy"
+  },
+  {
+    "blok": "B",
+    "nomorRumah": "2",
+    "namaPemilik": "Budiarti Rahayu"
+  },
+  {
+    "blok": "B",
+    "nomorRumah": "3",
+    "namaPemilik": "Juwarno"
+  },
+  {
+    "blok": "B",
+    "nomorRumah": "5",
+    "namaPemilik": "Erland Tanjung"
+  },
+  {
+    "blok": "B",
+    "nomorRumah": "6",
+    "namaPemilik": "Danu Mega Winanto"
+  },
+  {
+    "blok": "B",
+    "nomorRumah": "7",
+    "namaPemilik": "Delfryanto Marola"
+  },
+  {
+    "blok": "B",
+    "nomorRumah": "8",
+    "namaPemilik": "Ryan"
+  },
+  {
+    "blok": "B",
+    "nomorRumah": "9",
+    "namaPemilik": "Ukky January Linzki"
+  },
+  {
+    "blok": "B",
+    "nomorRumah": "10",
+    "namaPemilik": "Kusumo"
+  },
+  {
+    "blok": "B",
+    "nomorRumah": "12",
+    "namaPemilik": "Hana Kristina Natalia"
+  },
+  {
+    "blok": "C",
+    "nomorRumah": "1",
+    "namaPemilik": "Bimo Andono"
+  },
+  {
+    "blok": "C",
+    "nomorRumah": "2",
+    "namaPemilik": "Siti Munifah"
+  },
+  {
+    "blok": "C",
+    "nomorRumah": "3",
+    "namaPemilik": "Bayu Priguna"
+  },
+  {
+    "blok": "C",
+    "nomorRumah": "5",
+    "namaPemilik": "Riza Ardiansyah"
+  },
+  {
+    "blok": "C",
+    "nomorRumah": "6",
+    "namaPemilik": "Andi Medika Satria"
+  },
+  {
+    "blok": "C",
+    "nomorRumah": "7",
+    "namaPemilik": "Sahrul"
+  },
+  {
+    "blok": "C",
+    "nomorRumah": "8",
+    "namaPemilik": "Bahri"
+  },
+  {
+    "blok": "C",
+    "nomorRumah": "9",
+    "namaPemilik": "Sunyata"
+  },
+  {
+    "blok": "C",
+    "nomorRumah": "10",
+    "namaPemilik": "Bambang"
+  },
+  {
+    "blok": "C",
+    "nomorRumah": "11",
+    "namaPemilik": "Fajar Sidiq"
+  },
+  {
+    "blok": "D",
+    "nomorRumah": "1",
+    "namaPemilik": "Luthfi Rianhar"
+  },
+  {
+    "blok": "D",
+    "nomorRumah": "2",
+    "namaPemilik": "Lutfi Agizal"
+  },
+  {
+    "blok": "D",
+    "nomorRumah": "3",
+    "namaPemilik": "Giyono"
+  },
+  {
+    "blok": "D",
+    "nomorRumah": "5",
+    "namaPemilik": "Ken Garda Pinilih"
+  },
+  {
+    "blok": "D",
+    "nomorRumah": "6",
+    "namaPemilik": "Andi Supandi"
+  },
+  {
+    "blok": "D",
+    "nomorRumah": "7",
+    "namaPemilik": "Mega Prasetyawan"
+  },
+  {
+    "blok": "D",
+    "nomorRumah": "8",
+    "namaPemilik": "Denny"
+  },
+  {
+    "blok": "D",
+    "nomorRumah": "10",
+    "namaPemilik": "Andika Amri"
+  },
+  {
+    "blok": "E",
+    "nomorRumah": "1",
+    "namaPemilik": "Mohammad Reshki Maulana"
+  },
+  {
+    "blok": "E",
+    "nomorRumah": "3",
+    "namaPemilik": "Deden P."
+  },
+  {
+    "blok": "E",
+    "nomorRumah": "5",
+    "namaPemilik": "Wiwi Dewi Murni"
+  },
+  {
+    "blok": "E",
+    "nomorRumah": "7",
+    "namaPemilik": "Arief Rahman Hakim"
+  },
+  {
+    "blok": "E",
+    "nomorRumah": "8",
+    "namaPemilik": "Fajar Dwi Bayu Aji"
+  },
+  {
+    "blok": "E",
+    "nomorRumah": "12",
+    "namaPemilik": "Ghozi Tsany Arifin"
+  },
+  {
+    "blok": "E",
+    "nomorRumah": "15",
+    "namaPemilik": "Eko Prastyawan"
+  },
+  {
+    "blok": "F",
+    "nomorRumah": "1",
+    "namaPemilik": "Widdesto Ari"
+  },
+  {
+    "blok": "F",
+    "nomorRumah": "2",
+    "namaPemilik": "Terry"
+  },
+  {
+    "blok": "F",
+    "nomorRumah": "3",
+    "namaPemilik": "Herdhana Prayana Dipura"
+  },
+  {
+    "blok": "F",
+    "nomorRumah": "5",
+    "namaPemilik": "Dhany Yanuar Hindriyanto"
+  },
+  {
+    "blok": "F",
+    "nomorRumah": "6",
+    "namaPemilik": "Thomas"
+  },
+  {
+    "blok": "F",
+    "nomorRumah": "7",
+    "namaPemilik": "Erlin"
+  },
+  {
+    "blok": "F",
+    "nomorRumah": "8",
+    "namaPemilik": "Ihsan Satriawan"
+  },
+  {
+    "blok": "F",
+    "nomorRumah": "9",
+    "namaPemilik": "Imam"
+  },
+  {
+    "blok": "F",
+    "nomorRumah": "10",
+    "namaPemilik": "Lili Deviani"
+  },
+  {
+    "blok": "F",
+    "nomorRumah": "11",
+    "namaPemilik": "Safrudin"
+  }
+]
