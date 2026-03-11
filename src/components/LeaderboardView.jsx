@@ -58,7 +58,7 @@ export default function LeaderboardView() {
                         <div className="px-5 py-4 border-b-2 border-slate-dark flex items-center gap-2">
                             <span className="text-lg">🏆</span>
                             <h2 className="font-heading font-bold text-base">Ranking Blok</h2>
-                            <span className="ml-auto font-body text-xs text-slate-dark/40">% rumah lunas</span>
+                            <span className="ml-auto font-body text-xs text-slate-dark/40">% terkumpul</span>
                         </div>
 
                         <div className="p-4 space-y-3">
@@ -82,12 +82,12 @@ export default function LeaderboardView() {
                                         <div
                                             className="h-full rounded-lg progress-bar"
                                             style={{
-                                                '--progress-width': `${block.lunasPct}%`,
+                                                '--progress-width': `${block.collectionPct}%`,
                                                 backgroundColor: BLOCK_BAR_COLORS[block.blok],
                                             }}
                                         />
                                         <span className="absolute right-2 top-1/2 -translate-y-1/2 font-heading font-bold text-xs text-slate-dark">
-                                            {block.lunasPct}%
+                                            {block.collectionPct}%
                                         </span>
                                     </div>
 
