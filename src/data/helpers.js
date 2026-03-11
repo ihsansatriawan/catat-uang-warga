@@ -70,18 +70,20 @@ export function getBlockLeaderboard() {
   const all = getAllResidents()
   const blocks = {}
   for (const r of all) {
-    if (!blocks[r.blok]) blocks[r.blok] = { total: 0, lunas: 0 }
+    if (!blocks[r.blok]) blocks[r.blok] = { total: 0, lunas: 0, sumPaid: 0 }
     blocks[r.blok].total++
+    blocks[r.blok].sumPaid += r.totalPaid
     if (r.isLunas) blocks[r.blok].lunas++
   }
   return Object.entries(blocks)
-    .map(([blok, { total, lunas }]) => ({
+    .map(([blok, { total, lunas, sumPaid }]) => ({
       blok,
       totalHouses: total,
       lunasCount: lunas,
-      lunasPct: total > 0 ? Math.round((lunas / total) * 100) : 0,
+      sumPaid,
+      collectionPct: total > 0 ? Math.min(100, Math.round((sumPaid / (total * ANNUAL_TARGET)) * 100)) : 0,
     }))
-    .sort((a, b) => b.lunasPct - a.lunasPct || a.blok.localeCompare(b.blok))
+    .sort((a, b) => b.collectionPct - a.collectionPct || a.blok.localeCompare(b.blok))
 }
 
 export function getHouseLeaderboard(blok) {
