@@ -1,10 +1,15 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ArrowLeft, CheckCircle, XCircle, Receipt, Image, Calendar, MessageCircle } from 'lucide-react'
 import { formatRupiah, getLastUpdated } from '../data/helpers'
+import { trackEvent } from '../utils/tracking'
 import ProofModal from './ProofModal'
 
 export default function DashboardView({ resident, onBack }) {
   const [showProof, setShowProof] = useState(false)
+
+  useEffect(() => {
+    trackEvent('view_dashboard', { blok: resident.blok, nomorRumah: resident.nomorRumah })
+  }, [resident.blok, resident.nomorRumah])
 
   const progressPct = Math.min(100, Math.round((resident.totalPaid / resident.annualTarget) * 100))
 

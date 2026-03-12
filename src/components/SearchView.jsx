@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Search, Home, MapPin, Calendar, Trophy } from 'lucide-react'
 import { getAvailableBlocks, getLastUpdated } from '../data/helpers'
+import { trackEvent } from '../utils/tracking'
 import { BLOCK_COLORS, BLOCK_COLORS_UNSELECTED } from '../data/constants'
 
 export default function SearchView({ onSearch }) {
@@ -11,6 +12,7 @@ export default function SearchView({ onSearch }) {
   const handleSubmit = (e) => {
     e.preventDefault()
     if (blok && nomorRumah) {
+      trackEvent('search_resident', { blok, nomorRumah })
       onSearch(blok, nomorRumah)
     }
   }
