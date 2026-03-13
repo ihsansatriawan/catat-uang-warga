@@ -136,6 +136,6 @@ export function generateBroadcastMessage() {
     }
   }
 
-  msg += `\n📱 Cek detail → cek-ipl.web.app`
+  msg += `\n📱 Cek detail → https://ipl-talago.netlify.app`
   return msg
 }
