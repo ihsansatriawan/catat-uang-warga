@@ -54,7 +54,13 @@ export default function BroadcastView() {
             Broadcast
           </span>
         </div>
-        <Send size={20} strokeWidth={2.5} className="text-green" />
+        <button
+          onClick={handleCopy}
+          className="hover:scale-110 active:scale-95 transition-transform"
+          aria-label="Salin pesan"
+        >
+          <Send size={20} strokeWidth={2.5} className="text-green" />
+        </button>
       </div>
 
       {/* Scrollable content */}
