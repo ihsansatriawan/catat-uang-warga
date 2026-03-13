@@ -10,6 +10,7 @@ export default function BroadcastView() {
   useEffect(() => {
     trackEvent('open_broadcast')
   }, [])
+
   const message = generateBroadcastMessage()
 
   async function handleCopy() {
