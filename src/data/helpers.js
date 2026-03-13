@@ -127,7 +127,7 @@ export function generateBroadcastMessage() {
     }
 
     if (unpaid.length > 0) {
-      const unpaidSorted = unpaid.sort((a, b) => Number(a.nomorRumah) - Number(b.nomorRumah))
+      const unpaidSorted = [...unpaid].sort((a, b) => Number(a.nomorRumah) - Number(b.nomorRumah))
       const unpaidLabels = unpaidSorted.map(h => `${h.blok}-${h.nomorRumah}`)
       // Group into lines of ~5 for readability
       for (let i = 0; i < unpaidLabels.length; i += 5) {
