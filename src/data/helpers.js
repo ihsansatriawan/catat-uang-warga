@@ -98,3 +98,44 @@ export function getHouseLeaderboard(blok) {
       Number(a.nomorRumah) - Number(b.nomorRumah)
   )
 }
+
+export function generateBroadcastMessage() {
+  const blocks = getBlockLeaderboard().sort((a, b) => a.blok.localeCompare(b.blok))
+  const lastUpdated = getLastUpdated()
+  const dateStr = lastUpdated
+    ? new Date(lastUpdated).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+    : new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+
+  let msg = `📊 *Laporan IPL 2026*\n📅 ${dateStr}\n`
+
+  for (const block of blocks) {
+    const houses = getHouseLeaderboard(block.blok)
+    const lunas = houses.filter(h => h.isLunas)
+    const partial = houses.filter(h => h.totalPaid > 0 && !h.isLunas)
+    const unpaid = houses.filter(h => h.totalPaid === 0)
+
+    msg += `\n*Blok ${block.blok} — ${block.collectionPct}%* (${block.lunasCount}/${block.totalHouses} rumah bayar penuh)\n`
+
+    for (const h of lunas) {
+      const months = Math.min(12, Math.floor(h.totalPaid / MONTHLY_IPL))
+      msg += `  ✅ ${h.blok}-${h.nomorRumah} ${h.namaPemilik} — ${months} bln\n`
+    }
+
+    for (const h of partial) {
+      const months = Math.floor(h.totalPaid / MONTHLY_IPL)
+      msg += `  🔵 ${h.blok}-${h.nomorRumah} ${h.namaPemilik} — ${months} bln\n`
+    }
+
+    if (unpaid.length > 0) {
+      const unpaidSorted = [...unpaid].sort((a, b) => Number(a.nomorRumah) - Number(b.nomorRumah))
+      const unpaidLabels = unpaidSorted.map(h => `${h.blok}-${h.nomorRumah}`)
+      // Group into lines of ~5 for readability
+      for (let i = 0; i < unpaidLabels.length; i += 5) {
+        msg += `  ⬜ ${unpaidLabels.slice(i, i + 5).join(', ')}\n`
+      }
+    }
+  }
+
+  msg += `\n📱 Cek detail → https://ipl-talago.netlify.app`
+  return msg
+}
