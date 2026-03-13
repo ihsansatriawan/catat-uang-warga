@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowLeft, Copy, Check, Send } from 'lucide-react'
 import { generateBroadcastMessage } from '../data/helpers'
@@ -11,7 +11,7 @@ export default function BroadcastView() {
     trackEvent('open_broadcast')
   }, [])
 
-  const message = generateBroadcastMessage()
+  const message = useMemo(() => generateBroadcastMessage(), [])
 
   async function handleCopy() {
     try {
@@ -27,6 +27,7 @@ export default function BroadcastView() {
       document.execCommand('copy')
       document.body.removeChild(textarea)
     }
+    trackEvent('copy_broadcast')
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
