@@ -1,6 +1,12 @@
+import { useEffect } from 'react'
 import { X, FileImage } from 'lucide-react'
+import { trackEvent } from '../utils/tracking'
 
 export default function ProofModal({ onClose }) {
+  useEffect(() => {
+    trackEvent('open_proof_modal')
+  }, [])
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-dark/60 backdrop-blur-sm animate-fade-in"

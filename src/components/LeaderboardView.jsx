@@ -1,12 +1,17 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowLeft, Trophy, Home, ChevronDown, ChevronUp, MessageCircle } from 'lucide-react'
 import { getBlockLeaderboard, getHouseLeaderboard, getAvailableBlocks, formatRupiah, getLastUpdated } from '../data/helpers'
+import { trackEvent } from '../utils/tracking'
 import { BLOCK_COLORS, BLOCK_COLORS_UNSELECTED, BLOCK_BAR_COLORS } from '../data/constants'
 
 export default function LeaderboardView() {
     const [selectedBlok, setSelectedBlok] = useState('')
     const [showBelumBayar, setShowBelumBayar] = useState(false)
+
+    useEffect(() => {
+        trackEvent('open_leaderboard')
+    }, [])
 
     const blockLeaderboard = getBlockLeaderboard()
     const houseLeaderboard = getHouseLeaderboard(selectedBlok || undefined)
