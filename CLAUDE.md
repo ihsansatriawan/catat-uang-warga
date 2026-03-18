@@ -8,15 +8,38 @@ Web app for residents to check their IPL (housing fee) payment status for 2026.
 - React 19 + Vite
 - Tailwind CSS v4
 - lucide-react for icons
+- react-router-dom v7 for routing
 - No backend — data is static JSON
+
+## Routes
+- `/` — HomePage: search by blok + house number, leads to DashboardView
+- `/leaderboard` — LeaderboardView: block ranking + house-level leaderboard
+- `/broadcast` — BroadcastView: generate WhatsApp broadcast message
 
 ## Key Files
 - `src/data/validated.json` — source of truth for all transactions (flat array under `data`, with top-level `lastUpdate`)
-- `src/data/helpers.js` — data access functions (`getResident`, `formatRupiah`, `getLastUpdated`)
+- `src/data/residents.json` — master registry of all residents (blok, nomorRumah, namaPemilik)
+- `src/data/helpers.js` — data access functions
+- `src/data/constants.js` — block colors (BLOCK_COLORS, BLOCK_COLORS_UNSELECTED, BLOCK_BAR_COLORS)
+- `src/utils/tracking.js` — Umami analytics wrapper (`trackEvent`)
+- `src/components/HomePage.jsx` — search form + result (SearchView + DashboardView combined)
 - `src/components/SearchView.jsx` — search form (select blok A–F + house number)
 - `src/components/DashboardView.jsx` — payment dashboard per resident
+- `src/components/LeaderboardView.jsx` — block & house leaderboards with bar charts
+- `src/components/BroadcastView.jsx` — WhatsApp broadcast message generator
 - `src/components/ProofModal.jsx` — placeholder modal for proof of transfer
 - `scripts/convert-validated.js` — converts raw CSV export to `validated.json`
+- `scripts/convert-residents.js` — converts resident CSV to `residents.json`
+
+## Helper Functions (`src/data/helpers.js`)
+- `getResident(blok, nomorRumah)` — single resident with transactions
+- `getAllResidents()` — all residents with payment stats from `residents.json`
+- `getBlockLeaderboard()` — blocks ranked by `collectionPct` (% of total expected revenue collected)
+- `getHouseLeaderboard(blok?)` — houses sorted by `completionPct`, optionally filtered by block
+- `generateBroadcastMessage()` — WhatsApp-formatted IPL report string
+- `getAvailableBlocks()` — returns `['A','B','C','D','E','F']`
+- `getLastUpdated()` — returns `lastUpdate` from `validated.json`
+- `formatRupiah(amount)` — formats number as IDR currency
 
 ## Data Schema (`validated.json`)
 Each record in `data[]`:
@@ -36,6 +59,7 @@ Fields `email` and `buktiTransfer` are intentionally excluded from the public JS
 npm run dev               # start dev server
 npm run build             # production build
 npm run convert:validated # convert raw_data/IPL 2026 - Validated.csv → src/data/validated.json
+npm run convert:residents # convert resident CSV → src/data/residents.json
 ```
 
 ## Constants
@@ -43,6 +67,13 @@ npm run convert:validated # convert raw_data/IPL 2026 - Validated.csv → src/da
 - Annual target: Rp 3,000,000 (12 months)
 - Blocks: A, B, C, D, E, F (up to 15 houses each)
 
+## Block Ranking Logic
+Blocks are ranked by **collection percentage** (`collectionPct`): ratio of total payments collected to total expected (totalHouses × ANNUAL_TARGET), capped at 100%. This rewards partial payments — a block where many residents pay partially ranks higher than one where only a few pay in full.
+
+## Analytics
+Umami analytics via `src/utils/tracking.js`. Call `trackEvent(name, data)` — no-ops if `window.umami` is undefined.
+
 ## Notes
 - `raw_data/` is gitignored — contains the original CSV with sensitive fields
 - ProofModal shows a static placeholder; it does not display actual transfer images
+- Deployed at: https://ipl-talago.netlify.app
