@@ -6,6 +6,12 @@
  *   1. Script Properties: GITHUB_TOKEN, GITHUB_REPO (e.g. "ihsansatriawan/catat-uang-warga")
  *   2. Installable onEdit trigger → onEditHandler
  *   3. Raw data tab needs a "validationStatus" column
+ *
+ * Raw tab columns:
+ *   Timestamp | Email address | Blok dan Nomor Rumah | Jumlah Pembayaran | Unggah Bukti Transfer Pembayaran IPL-2026 | validationStatus
+ *
+ * Validated tab columns:
+ *   Timestamp | Email address | Blok dan Nomor Rumah | Jumlah Pembayaran | Unggah Bukti Transfer Pembayaran IPL-2026 | B | Nomor rumah | Nama Pemilik
  */
 
 // ---------------------------------------------------------------------------
@@ -13,12 +19,24 @@
 // ---------------------------------------------------------------------------
 
 var CONFIG = {
-  RAW_TAB: 'Form Responses 1',       // adjust to your raw data tab name
+  RAW_TAB: 'Form_Responses',
   VALIDATED_TAB: 'Validated',
   STATUS_COLUMN_HEADER: 'validationStatus',
   VALID_STATUS: 'Valid',
-  // Columns to copy from raw → validated (must match header names exactly)
-  COPY_FIELDS: ['Timestamp', 'Blok', 'Nomor rumah', 'Nama Pemilik', 'Jumlah Pembayaran'],
+  // Raw tab columns to copy as-is to Validated tab
+  RAW_FIELDS: [
+    'Timestamp',
+    'Email address',
+    'Blok dan Nomor Rumah',
+    'Jumlah Pembayaran',
+    'Unggah Bukti Transfer Pembayaran IPL-2026'
+  ],
+  // Combined field that contains "B 5. Nama Pemilik"
+  COMBINED_FIELD: 'Blok dan Nomor Rumah',
+  // Validated tab column headers for reading JSON
+  VALIDATED_BLOK_HEADER: 'B',
+  VALIDATED_NOMOR_HEADER: 'Nomor rumah',
+  VALIDATED_NAMA_HEADER: 'Nama Pemilik',
   // GitHub target
   FILE_PATH: 'src/data/validated.json',
   BRANCH: 'main'
@@ -41,7 +59,8 @@ function onOpen() {
 
 /**
  * Installable onEdit trigger.
- * When validationStatus is set to "Valid", copies the row to Validated tab.
+ * When validationStatus is set to "Valid", copies the row to Validated tab
+ * with parsed Blok, Nomor rumah, and Nama Pemilik columns.
  */
 function onEditHandler(e) {
   if (!e || !e.range) return;
@@ -63,11 +82,21 @@ function onEditHandler(e) {
   var row = e.range.getRow();
   var rowData = sheet.getRange(row, 1, 1, sheet.getLastColumn()).getValues()[0];
 
-  // Build the values to copy (only the fields we want)
-  var copyValues = CONFIG.COPY_FIELDS.map(function(field) {
+  // Copy raw fields
+  var copyValues = CONFIG.RAW_FIELDS.map(function(field) {
     var idx = headers.indexOf(field);
     return idx !== -1 ? rowData[idx] : '';
   });
+
+  // Parse "Blok dan Nomor Rumah" → Blok, Nomor rumah, Nama Pemilik
+  var combinedIdx = headers.indexOf(CONFIG.COMBINED_FIELD);
+  var combined = combinedIdx !== -1 ? String(rowData[combinedIdx]) : '';
+  var parsed = parseBlokNomorNama(combined);
+
+  // Append parsed columns: B, Nomor rumah, Nama Pemilik
+  copyValues.push(parsed.blok);
+  copyValues.push(parsed.nomorRumah);
+  copyValues.push(parsed.namaPemilik);
 
   // Append to Validated tab
   var validatedSheet = e.range.getSheet().getParent().getSheetByName(CONFIG.VALIDATED_TAB);
@@ -130,20 +159,34 @@ function buildValidatedJson() {
   var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
   var rows = sheet.getRange(2, 1, lastRow - 1, sheet.getLastColumn()).getValues();
 
-  var colIdx = {};
-  CONFIG.COPY_FIELDS.forEach(function(field) {
-    colIdx[field] = headers.indexOf(field);
-  });
+  // Map column headers to indices
+  var colIdx = {
+    timestamp: headers.indexOf('Timestamp'),
+    blok: headers.indexOf(CONFIG.VALIDATED_BLOK_HEADER),
+    nomorRumah: headers.indexOf(CONFIG.VALIDATED_NOMOR_HEADER),
+    namaPemilik: headers.indexOf(CONFIG.VALIDATED_NAMA_HEADER),
+    jumlahPembayaran: headers.indexOf('Jumlah Pembayaran'),
+    combined: headers.indexOf(CONFIG.COMBINED_FIELD)
+  };
 
   var data = [];
   for (var i = 0; i < rows.length; i++) {
     var row = rows[i];
 
-    var blok = colIdx['Blok'] !== -1 ? String(row[colIdx['Blok']]).trim().toUpperCase() : '';
-    var nomorRumah = colIdx['Nomor rumah'] !== -1 ? String(parseInt(row[colIdx['Nomor rumah']], 10)) : '';
-    var namaPemilik = colIdx['Nama Pemilik'] !== -1 ? String(row[colIdx['Nama Pemilik']]).trim() : '';
-    var jumlahPembayaran = colIdx['Jumlah Pembayaran'] !== -1 ? toIntAmount(row[colIdx['Jumlah Pembayaran']]) : 0;
-    var timestamp = colIdx['Timestamp'] !== -1 ? toIsoWIB(row[colIdx['Timestamp']]) : null;
+    var blok = colIdx.blok !== -1 ? String(row[colIdx.blok]).trim().toUpperCase() : '';
+    var nomorRumah = colIdx.nomorRumah !== -1 ? String(parseInt(row[colIdx.nomorRumah], 10)) : '';
+    var namaPemilik = colIdx.namaPemilik !== -1 ? String(row[colIdx.namaPemilik]).trim() : '';
+
+    // Fallback: parse from combined field if parsed columns are empty
+    if ((!blok || !nomorRumah || nomorRumah === 'NaN') && colIdx.combined !== -1) {
+      var parsed = parseBlokNomorNama(String(row[colIdx.combined]));
+      blok = blok || parsed.blok;
+      nomorRumah = (nomorRumah && nomorRumah !== 'NaN') ? nomorRumah : parsed.nomorRumah;
+      namaPemilik = namaPemilik || parsed.namaPemilik;
+    }
+
+    var jumlahPembayaran = colIdx.jumlahPembayaran !== -1 ? toIntAmount(row[colIdx.jumlahPembayaran]) : 0;
+    var timestamp = colIdx.timestamp !== -1 ? toIsoWIB(row[colIdx.timestamp]) : null;
 
     if (!blok || !nomorRumah || nomorRumah === 'NaN') continue;
 
@@ -239,6 +282,30 @@ function getFileSha(apiUrl, token) {
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
+
+/**
+ * Parses "Blok dan Nomor Rumah" combined field.
+ * Format: "E 5. Wiwi Dewi Murni" → { blok: "E", nomorRumah: "5", namaPemilik: "Wiwi Dewi Murni" }
+ */
+function parseBlokNomorNama(combined) {
+  if (!combined) return { blok: '', nomorRumah: '', namaPemilik: '' };
+
+  // Match: letter, space, number, dot, space, name
+  // e.g. "E 5. Wiwi Dewi Murni" or "B 10. Kusumo"
+  var m = combined.match(/^([A-Za-z])\s*(\d+)\.\s*(.+)$/);
+  if (!m) {
+    // Fallback: try without name (just "E 5")
+    var m2 = combined.match(/([A-Za-z])\s*(\d+)/);
+    if (!m2) return { blok: '', nomorRumah: '', namaPemilik: '' };
+    return { blok: m2[1].toUpperCase(), nomorRumah: String(parseInt(m2[2], 10)), namaPemilik: '' };
+  }
+
+  return {
+    blok: m[1].toUpperCase(),
+    nomorRumah: String(parseInt(m[2], 10)),
+    namaPemilik: m[3].trim()
+  };
+}
 
 /**
  * Converts a Google Sheets Date object to ISO 8601 string with WIB (+07:00).

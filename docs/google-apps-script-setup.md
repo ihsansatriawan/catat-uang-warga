@@ -21,7 +21,7 @@ Automates the data pipeline: validation in Google Sheet → JSON push to GitHub 
 ## Step 2: Add validationStatus Column to Raw Tab
 
 1. Open your Google Sheet
-2. In the raw data tab (`Form Responses 1` or similar), add a new column at the end
+2. In the raw data tab (`Form_Responses`), add a new column at the end
 3. Set the header to: `validationStatus`
 4. Add data validation (dropdown) to the entire column:
    - Select the column → Data → Data validation → Dropdown
@@ -32,7 +32,7 @@ Automates the data pipeline: validation in Google Sheet → JSON push to GitHub 
 1. In Google Sheet → **Extensions** → **Apps Script**
 2. Delete any existing code in `Code.gs`
 3. Paste the contents of `scripts/google-apps-script/Code.gs` from this repo
-4. **Update `CONFIG.RAW_TAB`** at the top if your raw data tab has a different name
+4. The script is pre-configured for tab name `Form_Responses`. Update `CONFIG.RAW_TAB` if your tab has a different name
 
 ## Step 4: Store Credentials in Script Properties
 
@@ -62,7 +62,7 @@ The `onEditHandler` function needs an installable trigger (simple triggers can't
 ### Test auto-copy:
 1. Go to your raw data tab
 2. Find a row and set `validationStatus` to `Valid`
-3. Check the `Validated` tab — the row should appear at the bottom
+3. Check the `Validated` tab — the row should appear at the bottom with all raw columns + parsed `B`, `Nomor rumah`, `Nama Pemilik`
 
 ### Test deploy:
 1. Reload the Google Sheet (to load the custom menu)
