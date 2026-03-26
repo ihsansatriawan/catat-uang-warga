@@ -102,11 +102,11 @@ export function getHouseLeaderboard(blok) {
 export function generateBroadcastMessage() {
   const blocks = getBlockLeaderboard().sort((a, b) => a.blok.localeCompare(b.blok))
   const lastUpdated = getLastUpdated()
-  const dateStr = lastUpdated
-    ? new Date(lastUpdated).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
-    : new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+  const dateBase = lastUpdated ? new Date(lastUpdated) : new Date()
+  const dateStr = dateBase.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' })
+  const timeStr = dateBase.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })
 
-  let msg = `📊 *Laporan IPL 2026*\n📅 ${dateStr}\n`
+  let msg = `📊 *Laporan IPL 2026*\n📅 ${dateStr}\n🕐 Data per ${dateStr}, ${timeStr} WIB\n`
 
   for (const block of blocks) {
     const houses = getHouseLeaderboard(block.blok)

@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowLeft, Copy, Check, Send } from 'lucide-react'
-import { generateBroadcastMessage } from '../data/helpers'
+import { generateBroadcastMessage, getLastUpdated } from '../data/helpers'
 import { trackEvent } from '../utils/tracking'
 
 export default function BroadcastView() {
@@ -12,6 +12,15 @@ export default function BroadcastView() {
   }, [])
 
   const message = useMemo(() => generateBroadcastMessage(), [])
+  const lastUpdated = useMemo(() => {
+    const raw = getLastUpdated()
+    if (!raw) return null
+    return new Date(raw).toLocaleString('id-ID', {
+      day: 'numeric', month: 'long', year: 'numeric',
+      hour: '2-digit', minute: '2-digit',
+      timeZone: 'Asia/Jakarta',
+    })
+  }, [])
 
   async function handleCopy() {
     try {
@@ -71,7 +80,14 @@ export default function BroadcastView() {
           <div className="bg-white border-2 border-slate-dark rounded-3xl shadow-hard overflow-hidden animate-slide-up stagger-1">
             <div className="px-5 py-4 border-b-2 border-slate-dark flex items-center gap-2">
               <span className="text-lg">💬</span>
-              <h2 className="font-heading font-bold text-base">Preview Pesan</h2>
+              <div className="flex-1">
+                <h2 className="font-heading font-bold text-base">Preview Pesan</h2>
+                {lastUpdated && (
+                  <p className="text-xs text-slate-dark/50 font-body mt-0.5">
+                    Data per {lastUpdated}
+                  </p>
+                )}
+              </div>
             </div>
 
             <div
