@@ -86,6 +86,7 @@ function main() {
 
   // Parse Rutin (cols 0, 1, 2: Keterangan, Masuk, Keluar)
   const rutin = []
+  let rutinTotalMasuk = 0
   let rutinTotalKeluar = 0
 
   for (const row of dataRows) {
@@ -94,6 +95,7 @@ function main() {
     const masuk = toIntAmount(row[1])
     const keluar = toIntAmount(row[2])
     rutin.push({ keterangan, masuk: masuk || null, keluar: keluar || null })
+    rutinTotalMasuk += masuk
     rutinTotalKeluar += keluar
   }
 
@@ -115,7 +117,7 @@ function main() {
     insidentalTotalKeluar += keluar
   }
 
-  const totalMasuk = insidentalTotalMasuk
+  const totalMasuk = rutinTotalMasuk
   const totalKeluar = rutinTotalKeluar + insidentalTotalKeluar
   const sisaAnggaran = totalMasuk - totalKeluar
 
