@@ -153,7 +153,7 @@ export function getExpenseCategories() {
 }
 
 export function generateExpenseBroadcastMessage() {
-  const { summary, rutin, insidental } = expenses
+  const { summary, insidental } = expenses
   const lastUpdated = expenses.lastUpdate
   const dateBase = lastUpdated ? new Date(lastUpdated) : new Date()
   const dateStr = dateBase.toLocaleDateString('id-ID', {
@@ -170,13 +170,6 @@ export function generateExpenseBroadcastMessage() {
 
   // Aggregate by category
   const categoryTotals = {}
-
-  // Rutin: aggregate all keluar as "Security"
-  for (const item of rutin) {
-    if (item.keluar) {
-      categoryTotals['Security'] = (categoryTotals['Security'] || 0) + item.keluar
-    }
-  }
 
   // Insidental: aggregate by kategori
   for (const item of insidental) {
