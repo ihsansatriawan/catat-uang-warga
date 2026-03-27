@@ -155,19 +155,13 @@ export function getExpenseCategories() {
 export function generateExpenseBroadcastMessage() {
   const { summary, rutin, insidental } = expenses
   const lastUpdated = expenses.lastUpdate
-  const dateStr = lastUpdated
-    ? new Date(lastUpdated).toLocaleDateString('id-ID', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-        timeZone: 'Asia/Jakarta',
-      })
-    : new Date().toLocaleDateString('id-ID', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-        timeZone: 'Asia/Jakarta',
-      })
+  const dateBase = lastUpdated ? new Date(lastUpdated) : new Date()
+  const dateStr = dateBase.toLocaleDateString('id-ID', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'Asia/Jakarta',
+  })
 
   let msg = `*Laporan Pengeluaran IPL 2026*\nUpdate: ${dateStr}\n\n`
   msg += `Total Masuk: ${formatRupiah(summary.totalMasuk)}\n`
