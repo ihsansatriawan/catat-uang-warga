@@ -1,5 +1,6 @@
 import validated from './validated.json'
 import residents from './residents.json'
+import expenses from './expenses.json'
 
 const { lastUpdate, data } = validated
 
@@ -137,5 +138,62 @@ export function generateBroadcastMessage() {
   }
 
   msg += `\n📱 Cek detail → https://ipl-talago.netlify.app`
+  return msg
+}
+
+export function getExpenses() {
+  return expenses
+}
+
+export function getExpenseCategories() {
+  const categories = expenses.insidental
+    .map((item) => item.kategori)
+    .filter((k) => k && k.trim() !== '')
+  return [...new Set(categories)].sort()
+}
+
+export function generateExpenseBroadcastMessage() {
+  const { summary, rutin, insidental } = expenses
+  const lastUpdated = expenses.lastUpdate
+  const dateBase = lastUpdated ? new Date(lastUpdated) : new Date()
+  const dateStr = dateBase.toLocaleDateString('id-ID', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'Asia/Jakarta',
+  })
+
+  let msg = `*Laporan Pengeluaran IPL 2026*\nUpdate: ${dateStr}\n\n`
+  msg += `Total Masuk: ${formatRupiah(summary.totalMasuk)}\n`
+  msg += `Total Keluar: ${formatRupiah(summary.totalKeluar)}\n`
+  msg += `Sisa Anggaran: ${formatRupiah(summary.sisaAnggaran)}\n`
+
+  // Rutin: list each item
+  const rutinItems = rutin.filter((item) => item.keluar)
+  if (rutinItems.length > 0) {
+    msg += `\n*Pengeluaran Rutin:*\n`
+    for (const item of rutinItems) {
+      msg += `• ${item.keterangan}: ${formatRupiah(item.keluar)}\n`
+    }
+  }
+
+  // Insidental: aggregate by kategori
+  const categoryTotals = {}
+  for (const item of insidental) {
+    if (item.keluar && item.kategori) {
+      categoryTotals[item.kategori] = (categoryTotals[item.kategori] || 0) + item.keluar
+    }
+  }
+
+  const sortedCategories = Object.entries(categoryTotals).sort((a, b) => b[1] - a[1])
+
+  if (sortedCategories.length > 0) {
+    msg += `\n*Pengeluaran Insidental (per Kategori):*\n`
+    for (const [kategori, total] of sortedCategories) {
+      msg += `• ${kategori}: ${formatRupiah(total)}\n`
+    }
+  }
+
+  msg += `\nDetail lengkap: https://ipl-talago.netlify.app/pengeluaran`
   return msg
 }

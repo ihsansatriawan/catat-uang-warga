@@ -1,0 +1,236 @@
+{
+  "lastUpdate": "2026-03-27",
+  "rutin": [
+    {
+      "keterangan": "Sisa Kas 2025",
+      "masuk": 22408505,
+      "keluar": null
+    },
+    {
+      "keterangan": "Total Iuran Warga 2026",
+      "masuk": 39450000,
+      "keluar": null
+    },
+    {
+      "keterangan": "Security Januari",
+      "masuk": null,
+      "keluar": 2450000
+    },
+    {
+      "keterangan": "Security Februari",
+      "masuk": null,
+      "keluar": 2700000
+    },
+    {
+      "keterangan": "Security Maret",
+      "masuk": null,
+      "keluar": 1700000
+    },
+    {
+      "keterangan": "Security April",
+      "masuk": null,
+      "keluar": null
+    },
+    {
+      "keterangan": "Security Mei",
+      "masuk": null,
+      "keluar": null
+    },
+    {
+      "keterangan": "Security Juni",
+      "masuk": null,
+      "keluar": null
+    },
+    {
+      "keterangan": "Security Juli",
+      "masuk": null,
+      "keluar": null
+    },
+    {
+      "keterangan": "Security Agustus",
+      "masuk": null,
+      "keluar": null
+    },
+    {
+      "keterangan": "Security September",
+      "masuk": null,
+      "keluar": null
+    },
+    {
+      "keterangan": "Security October",
+      "masuk": null,
+      "keluar": null
+    },
+    {
+      "keterangan": "Security November",
+      "masuk": null,
+      "keluar": null
+    },
+    {
+      "keterangan": "Security December",
+      "masuk": null,
+      "keluar": null
+    }
+  ],
+  "insidental": [
+    {
+      "keterangan": "sisa uang (potong biaya rutin)",
+      "masuk": 55008505,
+      "keluar": null,
+      "tanggal": "2026-01-01",
+      "kategori": ""
+    },
+    {
+      "keterangan": "Bahan renovasi taman blok F",
+      "masuk": null,
+      "keluar": 1500000,
+      "tanggal": "2026-01-03",
+      "kategori": "Renovasi"
+    },
+    {
+      "keterangan": "pasir renovasi taman blok F",
+      "masuk": null,
+      "keluar": 5300000,
+      "tanggal": "2026-01-03",
+      "kategori": "Renovasi"
+    },
+    {
+      "keterangan": "semen 20 sak + deposit enovasi taman blok F",
+      "masuk": null,
+      "keluar": 1000000,
+      "tanggal": "2026-01-07",
+      "kategori": "Renovasi"
+    },
+    {
+      "keterangan": "kran pipa renovasi taman blok F",
+      "masuk": null,
+      "keluar": 50000,
+      "tanggal": "2026-01-08",
+      "kategori": "Renovasi"
+    },
+    {
+      "keterangan": "bahan semen renovasi taman blok F",
+      "masuk": null,
+      "keluar": 385000,
+      "tanggal": "2026-01-10",
+      "kategori": "Renovasi"
+    },
+    {
+      "keterangan": "pasir renovasi taman blok F",
+      "masuk": null,
+      "keluar": 2500000,
+      "tanggal": "2026-01-11",
+      "kategori": "Renovasi"
+    },
+    {
+      "keterangan": "tukang renovasi taman blok F",
+      "masuk": null,
+      "keluar": 1000000,
+      "tanggal": "2026-01-11",
+      "kategori": "Renovasi"
+    },
+    {
+      "keterangan": "pasir semen renovasi taman blok F",
+      "masuk": null,
+      "keluar": 900000,
+      "tanggal": "2026-01-16",
+      "kategori": "Renovasi"
+    },
+    {
+      "keterangan": "Bahan renovasi taman blok F",
+      "masuk": null,
+      "keluar": 900000,
+      "tanggal": "2026-01-20",
+      "kategori": "Renovasi"
+    },
+    {
+      "keterangan": "tukang renovasi taman blok F",
+      "masuk": null,
+      "keluar": 1000000,
+      "tanggal": "2026-01-23",
+      "kategori": "Renovasi"
+    },
+    {
+      "keterangan": "semen + paralon renovasi taman blok F",
+      "masuk": null,
+      "keluar": 602500,
+      "tanggal": "2026-01-24",
+      "kategori": "Renovasi"
+    },
+    {
+      "keterangan": "semen renovasi taman blok F",
+      "masuk": null,
+      "keluar": 722500,
+      "tanggal": "2026-01-27",
+      "kategori": "Renovasi"
+    },
+    {
+      "keterangan": "fogging + angkut sampah fasum",
+      "masuk": null,
+      "keluar": 452500,
+      "tanggal": "2026-01-31",
+      "kategori": "Operational"
+    },
+    {
+      "keterangan": "tukang renovasi taman blok F",
+      "masuk": null,
+      "keluar": 1000000,
+      "tanggal": "2026-02-02",
+      "kategori": "Renovasi"
+    },
+    {
+      "keterangan": "belanja taman renov blok F",
+      "masuk": null,
+      "keluar": 1500000,
+      "tanggal": "2026-02-15",
+      "kategori": "Renovasi"
+    },
+    {
+      "keterangan": "net dan jaring lapangan blok F",
+      "masuk": null,
+      "keluar": 266400,
+      "tanggal": "2026-02-21",
+      "kategori": "Renovasi"
+    },
+    {
+      "keterangan": "ngebor lubang pipa lapangan",
+      "masuk": null,
+      "keluar": 250000,
+      "tanggal": "2026-02-22",
+      "kategori": "Fasilitas"
+    },
+    {
+      "keterangan": "tukang 2 orang",
+      "masuk": null,
+      "keluar": 1800000,
+      "tanggal": "2026-02-28",
+      "kategori": "Renovasi"
+    },
+    {
+      "keterangan": "THR 2026",
+      "masuk": null,
+      "keluar": 2750000,
+      "tanggal": "2026-02-28",
+      "kategori": "THR"
+    },
+    {
+      "keterangan": "aksesoris bahan lapangan",
+      "masuk": null,
+      "keluar": 400000,
+      "tanggal": "2026-03-25",
+      "kategori": "Renovasi"
+    },
+    {
+      "keterangan": "satpam infal lebaran",
+      "masuk": null,
+      "keluar": 300000,
+      "tanggal": "2026-03-25",
+      "kategori": "Operational"
+    }
+  ],
+  "summary": {
+    "totalMasuk": 55008505,
+    "totalKeluar": 31428900,
+    "sisaAnggaran": 23579605
+  }
+}

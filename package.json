@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "convert:validated": "node scripts/convert-validated.js",
-    "convert:residents": "node scripts/convert-residents.js"
+    "convert:residents": "node scripts/convert-residents.js",
+    "convert:expenses": "node scripts/convert-expenses.js"
   },
   "dependencies": {
     "lucide-react": "^0.469.0",
