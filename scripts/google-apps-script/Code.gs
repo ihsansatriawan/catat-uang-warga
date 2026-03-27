@@ -43,13 +43,35 @@ var CONFIG = {
 };
 
 // ---------------------------------------------------------------------------
+// Expenses Configuration
+// ---------------------------------------------------------------------------
+
+var EXPENSES_CONFIG = {
+  TAB: 'Pengeluaran Rutin',
+  FILE_PATH: 'src/data/expenses.json',
+  // Tabel Rutin (left): columns A, B, C (Keterangan, Masuk, Keluar)
+  RUTIN_KETERANGAN_COL: 1,
+  RUTIN_MASUK_COL: 2,
+  RUTIN_KELUAR_COL: 3,
+  // Tabel Insidental (right): columns E, F, G, H, I (Keterangan, Masuk, Keluar, Tanggal, Kategori)
+  INSIDENTAL_KETERANGAN_COL: 5,
+  INSIDENTAL_MASUK_COL: 6,
+  INSIDENTAL_KELUAR_COL: 7,
+  INSIDENTAL_TANGGAL_COL: 8,
+  INSIDENTAL_KATEGORI_COL: 9,
+  DATA_START_ROW: 2 // Row 1 is header
+};
+
+// ---------------------------------------------------------------------------
 // Menu
 // ---------------------------------------------------------------------------
 
 function onOpen() {
   SpreadsheetApp.getUi()
     .createMenu('IPL Tools')
-    .addItem('Deploy to Site', 'deployToSite')
+    .addItem('Deploy Data ke Website', 'deployToSite')
+    .addSeparator()
+    .addItem('Deploy Pengeluaran ke Website', 'deployExpensesToSite')
     .addToUi();
 }
 
@@ -277,6 +299,183 @@ function getFileSha(apiUrl, token) {
     return json.sha;
   }
   return null; // file doesn't exist yet
+}
+
+// ---------------------------------------------------------------------------
+// Expenses — GitHub push (generic)
+// ---------------------------------------------------------------------------
+
+/**
+ * Pushes content to a specific file path in the GitHub repo.
+ * Generic version that accepts filePath parameter (unlike pushToGitHub which hardcodes CONFIG.FILE_PATH).
+ */
+function pushFileToGitHub(filePath, content) {
+  var props = PropertiesService.getScriptProperties();
+  var token = props.getProperty('GITHUB_TOKEN');
+  var repo = props.getProperty('GITHUB_REPO');
+
+  if (!token || !repo) {
+    throw new Error('Missing GITHUB_TOKEN or GITHUB_REPO in Script Properties.');
+  }
+
+  var apiUrl = 'https://api.github.com/repos/' + repo + '/contents/' + filePath;
+  var sha = getFileSha(apiUrl, token);
+
+  var payload = {
+    message: 'chore: update expense data',
+    content: Utilities.base64Encode(content, Utilities.Charset.UTF_8),
+    branch: CONFIG.BRANCH
+  };
+
+  if (sha) {
+    payload.sha = sha;
+  }
+
+  var options = {
+    method: 'put',
+    contentType: 'application/json',
+    headers: {
+      'Authorization': 'Bearer ' + token,
+      'Accept': 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28'
+    },
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true
+  };
+
+  var response = UrlFetchApp.fetch(apiUrl, options);
+  var code = response.getResponseCode();
+
+  if (code !== 200 && code !== 201) {
+    throw new Error('GitHub API error (' + code + '): ' + response.getContentText());
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Expenses — Build and deploy
+// ---------------------------------------------------------------------------
+
+/**
+ * Reads the "Pengeluaran Rutin" tab and builds the expenses JSON object.
+ * Parses two tables: Rutin (left, cols A-C) and Insidental (right, cols E-I).
+ */
+function buildExpensesJson() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(EXPENSES_CONFIG.TAB);
+  if (!sheet) throw new Error('Tab "' + EXPENSES_CONFIG.TAB + '" not found.');
+
+  var lastRow = sheet.getLastRow();
+  var lastCol = sheet.getLastColumn();
+  if (lastRow < 2) {
+    return { lastUpdate: getTodayISO(), rutin: [], insidental: [], summary: { totalMasuk: 0, totalKeluar: 0, sisaAnggaran: 0 } };
+  }
+
+  var allData = sheet.getRange(EXPENSES_CONFIG.DATA_START_ROW, 1, lastRow - 1, lastCol).getValues();
+
+  // Parse Rutin table (left: cols A, B, C)
+  var rutin = [];
+  var rutinTotalKeluar = 0;
+
+  for (var i = 0; i < allData.length; i++) {
+    var row = allData[i];
+    var keterangan = String(row[EXPENSES_CONFIG.RUTIN_KETERANGAN_COL - 1] || '').trim();
+
+    if (!keterangan || keterangan.toLowerCase() === 'total' || keterangan.toLowerCase() === 'sisa') break;
+
+    var masuk = toIntAmount(row[EXPENSES_CONFIG.RUTIN_MASUK_COL - 1]);
+    var keluar = toIntAmount(row[EXPENSES_CONFIG.RUTIN_KELUAR_COL - 1]);
+
+    rutin.push({
+      keterangan: keterangan,
+      masuk: masuk || null,
+      keluar: keluar || null
+    });
+
+    rutinTotalKeluar += keluar;
+  }
+
+  // Parse Insidental table (right: cols E, F, G, H, I)
+  var insidental = [];
+  var insidentalTotalMasuk = 0;
+  var insidentalTotalKeluar = 0;
+
+  for (var j = 0; j < allData.length; j++) {
+    var row2 = allData[j];
+    var ket2 = String(row2[EXPENSES_CONFIG.INSIDENTAL_KETERANGAN_COL - 1] || '').trim();
+
+    if (!ket2 || ket2.toLowerCase() === 'total') break;
+
+    var masuk2 = toIntAmount(row2[EXPENSES_CONFIG.INSIDENTAL_MASUK_COL - 1]);
+    var keluar2 = toIntAmount(row2[EXPENSES_CONFIG.INSIDENTAL_KELUAR_COL - 1]);
+    var tanggalRaw = row2[EXPENSES_CONFIG.INSIDENTAL_TANGGAL_COL - 1];
+    var kategori = String(row2[EXPENSES_CONFIG.INSIDENTAL_KATEGORI_COL - 1] || '').trim();
+
+    var tanggal = null;
+    if (tanggalRaw instanceof Date) {
+      tanggal = tanggalRaw.getFullYear() + '-' + pad2(tanggalRaw.getMonth() + 1) + '-' + pad2(tanggalRaw.getDate());
+    } else if (tanggalRaw) {
+      var parsed = new Date(tanggalRaw);
+      if (!isNaN(parsed.getTime())) {
+        tanggal = parsed.getFullYear() + '-' + pad2(parsed.getMonth() + 1) + '-' + pad2(parsed.getDate());
+      }
+    }
+
+    insidental.push({
+      keterangan: ket2,
+      masuk: masuk2 || null,
+      keluar: keluar2 || null,
+      tanggal: tanggal,
+      kategori: kategori
+    });
+
+    insidentalTotalMasuk += masuk2;
+    insidentalTotalKeluar += keluar2;
+  }
+
+  var totalMasuk = insidentalTotalMasuk;
+  var totalKeluar = rutinTotalKeluar + insidentalTotalKeluar;
+  var sisaAnggaran = totalMasuk - totalKeluar;
+
+  return {
+    lastUpdate: getTodayISO(),
+    rutin: rutin,
+    insidental: insidental,
+    summary: {
+      totalMasuk: totalMasuk,
+      totalKeluar: totalKeluar,
+      sisaAnggaran: sisaAnggaran
+    }
+  };
+}
+
+/**
+ * Reads expense data, converts to JSON, pushes to GitHub.
+ * Triggered from custom menu "IPL Tools > Deploy Pengeluaran ke Website".
+ */
+function deployExpensesToSite() {
+  var ui = SpreadsheetApp.getUi();
+
+  var response = ui.alert(
+    'Deploy Pengeluaran',
+    'This will update the live site with current expense data. Continue?',
+    ui.ButtonSet.YES_NO
+  );
+  if (response !== ui.Button.YES) return;
+
+  try {
+    var json = buildExpensesJson();
+    var jsonString = JSON.stringify(json, null, 2) + '\n';
+
+    pushFileToGitHub(EXPENSES_CONFIG.FILE_PATH, jsonString);
+
+    SpreadsheetApp.getActiveSpreadsheet().toast(
+      'Expense data deployed successfully! (' + json.rutin.length + ' rutin, ' + json.insidental.length + ' insidental)',
+      'Deploy Complete',
+      5
+    );
+  } catch (err) {
+    ui.alert('Deploy failed: ' + err.message);
+  }
 }
 
 // ---------------------------------------------------------------------------
