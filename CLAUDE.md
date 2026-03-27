@@ -15,6 +15,7 @@ Web app for residents to check their IPL (housing fee) payment status for 2026.
 - `/` — HomePage: search by blok + house number, leads to DashboardView
 - `/leaderboard` — LeaderboardView: block ranking + house-level leaderboard
 - `/broadcast` — BroadcastView: generate WhatsApp broadcast message
+- `/pengeluaran` — ExpensesView: expense transparency page with category filtering
 
 ## Key Files
 - `src/data/validated.json` — source of truth for all transactions (flat array under `data`, with top-level `lastUpdate`)
@@ -30,6 +31,9 @@ Web app for residents to check their IPL (housing fee) payment status for 2026.
 - `src/components/ProofModal.jsx` — placeholder modal for proof of transfer
 - `scripts/convert-validated.js` — converts raw CSV export to `validated.json`
 - `scripts/convert-residents.js` — converts resident CSV to `residents.json`
+- `src/data/expenses.json` — expense data (rutin + insidental, with summary)
+- `src/components/ExpensesView.jsx` — expense transparency page
+- `scripts/convert-expenses.js` — converts expense CSV to `expenses.json`
 
 ## Helper Functions (`src/data/helpers.js`)
 - `getResident(blok, nomorRumah)` — single resident with transactions
@@ -40,6 +44,9 @@ Web app for residents to check their IPL (housing fee) payment status for 2026.
 - `getAvailableBlocks()` — returns `['A','B','C','D','E','F']`
 - `getLastUpdated()` — returns `lastUpdate` from `validated.json`
 - `formatRupiah(amount)` — formats number as IDR currency
+- `getExpenses()` — returns parsed `expenses.json` (rutin, insidental, summary)
+- `getExpenseCategories()` — returns unique kategori list from insidental data
+- `generateExpenseBroadcastMessage()` — WhatsApp-formatted expense report string
 
 ## Data Schema (`validated.json`)
 Each record in `data[]`:
@@ -60,6 +67,7 @@ npm run dev               # start dev server
 npm run build             # production build
 npm run convert:validated # convert raw_data/IPL 2026 - Validated.csv → src/data/validated.json
 npm run convert:residents # convert resident CSV → src/data/residents.json
+npm run convert:expenses       # convert raw_data/IPL 2026 - Pengeluaran Rutin.csv → src/data/expenses.json
 ```
 
 ## Constants
