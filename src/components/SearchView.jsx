@@ -186,16 +186,14 @@ export default function SearchView({ onSearch }) {
         </div>
 
         {/* Pengeluaran link */}
-        <div className="mt-3 animate-fade-in stagger-4 w-full max-w-sm">
+        <div className="mt-3 animate-fade-in stagger-5">
           <Link
             to="/pengeluaran"
-            className="flex items-center justify-center gap-2 w-full
-              bg-white text-slate-dark font-heading font-bold
-              border-2 border-slate-dark rounded-full px-5 py-2.5
-              shadow-hard-sm text-sm
-              hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard
-              active:translate-x-0 active:translate-y-0 active:shadow-none
-              transition-all duration-150"
+            className="
+              inline-flex items-center gap-2
+              font-heading font-bold text-sm text-slate-dark/60
+              hover:text-violet transition-colors
+            "
           >
             <Wallet size={16} strokeWidth={2.5} />
             Pengeluaran
