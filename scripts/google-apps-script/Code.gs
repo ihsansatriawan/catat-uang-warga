@@ -59,7 +59,6 @@ var EXPENSES_CONFIG = {
   INSIDENTAL_KELUAR_COL: 7,
   INSIDENTAL_TANGGAL_COL: 8,
   INSIDENTAL_KATEGORI_COL: 9,
-  DATA_START_ROW: 2 // Row 1 is header
 };
 
 // ---------------------------------------------------------------------------
@@ -370,7 +369,17 @@ function buildExpensesJson() {
     return { lastUpdate: getTodayISO(), rutin: [], insidental: [], summary: { totalMasuk: 0, totalKeluar: 0, sisaAnggaran: 0 } };
   }
 
-  var allData = sheet.getRange(EXPENSES_CONFIG.DATA_START_ROW, 1, lastRow - 1, lastCol).getValues();
+  // Read all rows, then find header row dynamically (handles leading empty/title rows)
+  var allRows = sheet.getRange(1, 1, lastRow, lastCol).getValues();
+  var headerIdx = -1;
+  for (var h = 0; h < allRows.length; h++) {
+    if (String(allRows[h][0] || '').trim().toLowerCase() === 'keterangan') {
+      headerIdx = h;
+      break;
+    }
+  }
+  if (headerIdx === -1) throw new Error('Header row not found — expected a row with "Keterangan" in column A');
+  var allData = allRows.slice(headerIdx + 1);
 
   // Parse Rutin table (left: cols A, B, C)
   var rutin = [];

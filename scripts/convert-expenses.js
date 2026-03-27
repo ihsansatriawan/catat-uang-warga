@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-const DEFAULT_SRC = path.resolve(__dirname, '../raw_data/IPL 2026 - Pengeluaran Rutin.csv')
+const DEFAULT_SRC = path.resolve(__dirname, '../raw_data/IPL 2026 - Transaksi.csv')
 const DEFAULT_DEST = path.resolve(__dirname, '../src/data/expenses.json')
 
 function readFileUtf8(p) {
@@ -76,8 +76,13 @@ function main() {
     process.exit(1)
   }
 
-  // Skip header row (row 0)
-  const dataRows = rows.slice(1)
+  // Find header row dynamically (handles leading empty/title rows)
+  const headerIdx = rows.findIndex((r) => (r[0] || '').trim().toLowerCase() === 'keterangan')
+  if (headerIdx === -1) {
+    console.error('Header row not found — expected a row starting with "Keterangan"')
+    process.exit(1)
+  }
+  const dataRows = rows.slice(headerIdx + 1)
 
   // Parse Rutin (cols 0, 1, 2: Keterangan, Masuk, Keluar)
   const rutin = []
