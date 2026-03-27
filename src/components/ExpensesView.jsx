@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowLeft, Copy, Check, Wallet } from 'lucide-react'
+import { ArrowLeft, Copy, Check, Wallet, ChevronDown } from 'lucide-react'
 import {
   getExpenses,
   getExpenseCategories,
@@ -12,6 +12,8 @@ import { trackEvent } from '../utils/tracking'
 export default function ExpensesView() {
   const [selectedCategory, setSelectedCategory] = useState('')
   const [copied, setCopied] = useState(false)
+  const [rutinOpen, setRutinOpen] = useState(false)
+  const [insidentalOpen, setInsidentalOpen] = useState(false)
 
   useEffect(() => {
     trackEvent('open_expenses')
@@ -36,6 +38,16 @@ export default function ExpensesView() {
     if (!selectedCategory) return expenses.insidental
     return expenses.insidental.filter((item) => item.kategori === selectedCategory)
   }, [expenses.insidental, selectedCategory])
+
+  const rutinSubtotal = useMemo(
+    () => expenses.rutin.reduce((sum, item) => sum + (item.keluar || 0), 0),
+    [expenses.rutin]
+  )
+
+  const insidentalSubtotal = useMemo(
+    () => filteredInsidental.reduce((sum, item) => sum + (item.keluar || 0), 0),
+    [filteredInsidental]
+  )
 
   function handleCategoryFilter(kategori) {
     setSelectedCategory(kategori)
@@ -132,126 +144,156 @@ export default function ExpensesView() {
 
           {/* Pengeluaran Rutin Section */}
           <div className="bg-white border-2 border-slate-dark rounded-3xl shadow-hard overflow-hidden animate-slide-up stagger-2">
-            <div className="px-5 py-4 border-b-2 border-slate-dark flex items-center gap-2">
+            <button
+              onClick={() => setRutinOpen((v) => !v)}
+              className="w-full px-5 py-4 flex items-center gap-2 active:bg-slate-dark/5 transition-colors"
+            >
               <span className="text-lg">📋</span>
-              <h2 className="font-heading font-bold text-base">Pengeluaran Rutin</h2>
-            </div>
+              <h2 className="font-heading font-bold text-base flex-1 text-left">Pengeluaran Rutin</h2>
+              <div className="text-right mr-2">
+                <p className="font-heading font-bold text-sm text-red-500">-{formatRupiah(rutinSubtotal)}</p>
+                <p className="font-body text-xs text-slate-dark/40">{expenses.rutin.filter(i => i.keluar).length} item</p>
+              </div>
+              <ChevronDown
+                size={18}
+                strokeWidth={2.5}
+                className={`text-slate-dark/40 flex-shrink-0 transition-transform duration-200 ${rutinOpen ? 'rotate-180' : ''}`}
+              />
+            </button>
 
-            <div>
-              {expenses.rutin.map((item, i) => (
-                <div
-                  key={i}
-                  className={`
-                    flex items-center justify-between px-5 py-3
-                    ${i < expenses.rutin.length - 1 ? 'border-b border-slate-dark/10' : ''}
-                  `}
-                >
-                  <span className="font-body text-sm text-slate-dark flex-1 min-w-0 truncate pr-3">
-                    {item.keterangan}
-                  </span>
-                  {item.masuk && (
-                    <span className="font-heading font-bold text-sm text-green flex-shrink-0">
-                      +{formatRupiah(item.masuk)}
+            {rutinOpen && (
+              <div className="border-t-2 border-slate-dark">
+                {expenses.rutin.map((item, i) => (
+                  <div
+                    key={i}
+                    className={`
+                      flex items-center justify-between px-5 py-3
+                      ${i < expenses.rutin.length - 1 ? 'border-b border-slate-dark/10' : ''}
+                    `}
+                  >
+                    <span className="font-body text-sm text-slate-dark flex-1 min-w-0 truncate pr-3">
+                      {item.keterangan}
                     </span>
-                  )}
-                  {item.keluar && (
-                    <span className="font-heading font-bold text-sm text-red-500 flex-shrink-0">
-                      -{formatRupiah(item.keluar)}
-                    </span>
-                  )}
-                </div>
-              ))}
-            </div>
+                    {item.masuk && (
+                      <span className="font-heading font-bold text-sm text-green flex-shrink-0">
+                        +{formatRupiah(item.masuk)}
+                      </span>
+                    )}
+                    {item.keluar && (
+                      <span className="font-heading font-bold text-sm text-red-500 flex-shrink-0">
+                        -{formatRupiah(item.keluar)}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Pengeluaran Insidental Section */}
           <div className="bg-white border-2 border-slate-dark rounded-3xl shadow-hard overflow-hidden animate-slide-up stagger-3">
-            <div className="px-5 py-4 border-b-2 border-slate-dark flex items-center gap-2">
+            <button
+              onClick={() => setInsidentalOpen((v) => !v)}
+              className="w-full px-5 py-4 flex items-center gap-2 active:bg-slate-dark/5 transition-colors"
+            >
               <span className="text-lg">📊</span>
-              <h2 className="font-heading font-bold text-base">Pengeluaran Insidental</h2>
-            </div>
+              <h2 className="font-heading font-bold text-base flex-1 text-left">Pengeluaran Insidental</h2>
+              <div className="text-right mr-2">
+                <p className="font-heading font-bold text-sm text-red-500">-{formatRupiah(insidentalSubtotal)}</p>
+                <p className="font-body text-xs text-slate-dark/40">{expenses.insidental.filter(i => i.keluar).length} item</p>
+              </div>
+              <ChevronDown
+                size={18}
+                strokeWidth={2.5}
+                className={`text-slate-dark/40 flex-shrink-0 transition-transform duration-200 ${insidentalOpen ? 'rotate-180' : ''}`}
+              />
+            </button>
 
-            {/* Category filter chips */}
-            <div className="px-5 py-3 border-b border-slate-dark/10 flex gap-2 overflow-x-auto">
-              <button
-                onClick={() => handleCategoryFilter('')}
-                className={`
-                  flex-shrink-0 border-2 rounded-full px-3 py-1 font-heading font-bold text-xs
-                  transition-all duration-150
-                  ${!selectedCategory
-                    ? 'bg-violet text-white border-violet shadow-hard-sm'
-                    : 'bg-white text-slate-dark border-slate-dark hover:bg-violet/10'
-                  }
-                `}
-              >
-                Semua
-              </button>
-              {categories.map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => handleCategoryFilter(cat)}
-                  className={`
-                    flex-shrink-0 border-2 rounded-full px-3 py-1 font-heading font-bold text-xs
-                    transition-all duration-150
-                    ${selectedCategory === cat
-                      ? 'bg-violet text-white border-violet shadow-hard-sm'
-                      : 'bg-white text-slate-dark border-slate-dark hover:bg-violet/10'
-                    }
-                  `}
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
+            {insidentalOpen && (
+              <div className="border-t-2 border-slate-dark">
+                {/* Category filter chips */}
+                <div className="px-5 py-3 border-b border-slate-dark/10 flex gap-2 overflow-x-auto">
+                  <button
+                    onClick={() => handleCategoryFilter('')}
+                    className={`
+                      flex-shrink-0 border-2 rounded-full px-3 py-1 font-heading font-bold text-xs
+                      transition-all duration-150
+                      ${!selectedCategory
+                        ? 'bg-violet text-white border-violet shadow-hard-sm'
+                        : 'bg-white text-slate-dark border-slate-dark hover:bg-violet/10'
+                      }
+                    `}
+                  >
+                    Semua
+                  </button>
+                  {categories.map((cat) => (
+                    <button
+                      key={cat}
+                      onClick={() => handleCategoryFilter(cat)}
+                      className={`
+                        flex-shrink-0 border-2 rounded-full px-3 py-1 font-heading font-bold text-xs
+                        transition-all duration-150
+                        ${selectedCategory === cat
+                          ? 'bg-violet text-white border-violet shadow-hard-sm'
+                          : 'bg-white text-slate-dark border-slate-dark hover:bg-violet/10'
+                        }
+                      `}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
 
-            {/* Insidental items */}
-            <div>
-              {filteredInsidental.map((item, i) => (
-                <div
-                  key={i}
-                  className={`
-                    flex items-center px-5 py-3 gap-3
-                    ${i < filteredInsidental.length - 1 ? 'border-b border-slate-dark/10' : ''}
-                  `}
-                >
-                  <div className="flex-1 min-w-0">
-                    <p className="font-body text-sm text-slate-dark truncate">
-                      {item.keterangan}
-                    </p>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      {item.tanggal && (
-                        <span className="font-body text-xs text-slate-dark/40">
-                          {formatTanggal(item.tanggal)}
+                {/* Insidental items */}
+                <div>
+                  {filteredInsidental.map((item, i) => (
+                    <div
+                      key={i}
+                      className={`
+                        flex items-center px-5 py-3 gap-3
+                        ${i < filteredInsidental.length - 1 ? 'border-b border-slate-dark/10' : ''}
+                      `}
+                    >
+                      <div className="flex-1 min-w-0">
+                        <p className="font-body text-sm text-slate-dark truncate">
+                          {item.keterangan}
+                        </p>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          {item.tanggal && (
+                            <span className="font-body text-xs text-slate-dark/40">
+                              {formatTanggal(item.tanggal)}
+                            </span>
+                          )}
+                          {item.kategori && (
+                            <span className="font-body text-xs text-violet bg-violet/10 px-1.5 py-0.5 rounded">
+                              {item.kategori}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      {item.masuk && (
+                        <span className="font-heading font-bold text-sm text-green flex-shrink-0">
+                          +{formatRupiah(item.masuk)}
                         </span>
                       )}
-                      {item.kategori && (
-                        <span className="font-body text-xs text-violet bg-violet/10 px-1.5 py-0.5 rounded">
-                          {item.kategori}
+                      {item.keluar && (
+                        <span className="font-heading font-bold text-sm text-red-500 flex-shrink-0">
+                          -{formatRupiah(item.keluar)}
                         </span>
                       )}
                     </div>
-                  </div>
-                  {item.masuk && (
-                    <span className="font-heading font-bold text-sm text-green flex-shrink-0">
-                      +{formatRupiah(item.masuk)}
-                    </span>
-                  )}
-                  {item.keluar && (
-                    <span className="font-heading font-bold text-sm text-red-500 flex-shrink-0">
-                      -{formatRupiah(item.keluar)}
-                    </span>
-                  )}
-                </div>
-              ))}
+                  ))}
 
-              {filteredInsidental.length === 0 && (
-                <div className="px-5 py-8 text-center">
-                  <p className="font-body text-sm text-slate-dark/40">
-                    Tidak ada pengeluaran untuk kategori ini
-                  </p>
+                  {filteredInsidental.length === 0 && (
+                    <div className="px-5 py-8 text-center">
+                      <p className="font-body text-sm text-slate-dark/40">
+                        Tidak ada pengeluaran untuk kategori ini
+                      </p>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
 
           {/* Copy broadcast button */}
