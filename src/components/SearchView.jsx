@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Search, Home, MapPin, Calendar, Trophy } from 'lucide-react'
+import { Search, Home, MapPin, Calendar, Trophy, Wallet } from 'lucide-react'
 import { getAvailableBlocks, getLastUpdated } from '../data/helpers'
 import { trackEvent } from '../utils/tracking'
 import { BLOCK_COLORS, BLOCK_COLORS_UNSELECTED } from '../data/constants'
@@ -182,6 +182,23 @@ export default function SearchView({ onSearch }) {
           >
             <Trophy size={16} strokeWidth={2.5} />
             Lihat Leaderboard
+          </Link>
+        </div>
+
+        {/* Pengeluaran link */}
+        <div className="mt-3 animate-fade-in stagger-4 w-full max-w-sm">
+          <Link
+            to="/pengeluaran"
+            className="flex items-center justify-center gap-2 w-full
+              bg-white text-slate-dark font-heading font-bold
+              border-2 border-slate-dark rounded-full px-5 py-2.5
+              shadow-hard-sm text-sm
+              hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard
+              active:translate-x-0 active:translate-y-0 active:shadow-none
+              transition-all duration-150"
+          >
+            <Wallet size={16} strokeWidth={2.5} />
+            Pengeluaran
           </Link>
         </div>
 
