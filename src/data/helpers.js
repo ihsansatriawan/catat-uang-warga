@@ -153,7 +153,7 @@ export function getExpenseCategories() {
 }
 
 export function generateExpenseBroadcastMessage() {
-  const { summary, insidental } = expenses
+  const { summary, rutin, insidental } = expenses
   const lastUpdated = expenses.lastUpdate
   const dateBase = lastUpdated ? new Date(lastUpdated) : new Date()
   const dateStr = dateBase.toLocaleDateString('id-ID', {
@@ -168,10 +168,17 @@ export function generateExpenseBroadcastMessage() {
   msg += `Total Keluar: ${formatRupiah(summary.totalKeluar)}\n`
   msg += `Sisa Anggaran: ${formatRupiah(summary.sisaAnggaran)}\n`
 
-  // Aggregate by category
-  const categoryTotals = {}
+  // Rutin: list each item
+  const rutinItems = rutin.filter((item) => item.keluar)
+  if (rutinItems.length > 0) {
+    msg += `\n*Pengeluaran Rutin:*\n`
+    for (const item of rutinItems) {
+      msg += `• ${item.keterangan}: ${formatRupiah(item.keluar)}\n`
+    }
+  }
 
   // Insidental: aggregate by kategori
+  const categoryTotals = {}
   for (const item of insidental) {
     if (item.keluar && item.kategori) {
       categoryTotals[item.kategori] = (categoryTotals[item.kategori] || 0) + item.keluar
@@ -181,7 +188,7 @@ export function generateExpenseBroadcastMessage() {
   const sortedCategories = Object.entries(categoryTotals).sort((a, b) => b[1] - a[1])
 
   if (sortedCategories.length > 0) {
-    msg += `\n*Breakdown per Kategori:*\n`
+    msg += `\n*Pengeluaran Insidental (per Kategori):*\n`
     for (const [kategori, total] of sortedCategories) {
       msg += `• ${kategori}: ${formatRupiah(total)}\n`
     }
