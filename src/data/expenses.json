@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2026-03-27",
+  "lastUpdate": "2026-04-05",
   "rutin": [
     {
       "keterangan": "Sisa Kas 2025",
@@ -8,7 +8,7 @@
     },
     {
       "keterangan": "Total Iuran Warga 2026",
-      "masuk": 39450000,
+      "masuk": 44200000,
       "keluar": null
     },
     {
@@ -75,7 +75,7 @@
   "insidental": [
     {
       "keterangan": "sisa uang (potong biaya rutin)",
-      "masuk": 55008505,
+      "masuk": 59758505,
       "keluar": null,
       "tanggal": "2026-01-01",
       "kategori": ""
@@ -226,11 +226,39 @@
       "keluar": 300000,
       "tanggal": "2026-03-25",
       "kategori": "Operational"
+    },
+    {
+      "keterangan": "aqua 3 dus halbil",
+      "masuk": null,
+      "keluar": 179280,
+      "tanggal": "2026-04-04",
+      "kategori": "Halbil 2026"
+    },
+    {
+      "keterangan": "pylox tiang",
+      "masuk": null,
+      "keluar": 150100,
+      "tanggal": "2026-04-04",
+      "kategori": "Fasilitas"
+    },
+    {
+      "keterangan": "jeruk",
+      "masuk": null,
+      "keluar": 210000,
+      "tanggal": "2026-04-04",
+      "kategori": "Halbil 2026"
+    },
+    {
+      "keterangan": "sate",
+      "masuk": null,
+      "keluar": 440000,
+      "tanggal": "2026-04-04",
+      "kategori": "Halbil 2026"
     }
   ],
   "summary": {
-    "totalMasuk": 61858505,
-    "totalKeluar": 31428900,
-    "sisaAnggaran": 30429605
+    "totalMasuk": 66608505,
+    "totalKeluar": 32408280,
+    "sisaAnggaran": 34200225
   }
 }
