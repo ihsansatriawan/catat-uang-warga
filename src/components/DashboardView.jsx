@@ -1,11 +1,31 @@
 import { useState, useEffect } from 'react'
-import { ArrowLeft, CheckCircle, XCircle, Receipt, Image, Calendar, MessageCircle } from 'lucide-react'
+import { ArrowLeft, CheckCircle, XCircle, Receipt, Image, Calendar, MessageCircle, Share2 } from 'lucide-react'
 import { formatRupiah, getLastUpdated } from '../data/helpers'
 import { trackEvent } from '../utils/tracking'
 import ProofModal from './ProofModal'
 
 export default function DashboardView({ resident, onBack }) {
   const [showProof, setShowProof] = useState(false)
+  const [copied, setCopied] = useState(false)
+
+  const handleShare = async () => {
+    const shareData = {
+      title: `IPL ${resident.namaPemilik} - Blok ${resident.blok} No. ${resident.nomorRumah}`,
+      url: window.location.href,
+    }
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData)
+      } catch (err) {
+        // User cancelled share — ignore
+      }
+    } else {
+      await navigator.clipboard.writeText(shareData.url)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
+  }
 
   useEffect(() => {
     trackEvent('view_dashboard', { blok: resident.blok, nomorRumah: resident.nomorRumah })
@@ -38,6 +58,20 @@ export default function DashboardView({ resident, onBack }) {
         >
           <ArrowLeft size={16} strokeWidth={2.5} />
           Kembali
+        </button>
+        <button
+          onClick={handleShare}
+          className="
+            flex items-center gap-1.5 font-heading font-bold text-sm
+            bg-cream border-2 border-slate-dark rounded-full px-3 py-1.5
+            shadow-hard-sm
+            active:translate-x-[1px] active:translate-y-[1px] active:shadow-none
+            transition-all
+          "
+          aria-label="Bagikan"
+        >
+          <Share2 size={16} strokeWidth={2.5} />
+          {copied ? 'Disalin!' : 'Bagikan'}
         </button>
         <div className="flex-1 text-center">
           <span className="font-heading font-bold text-sm text-slate-dark/50">
