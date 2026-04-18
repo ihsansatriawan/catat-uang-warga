@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2026-04-05",
+  "lastUpdate": "2026-04-19",
   "rutin": [
     {
       "keterangan": "Sisa Kas 2025",
@@ -8,7 +8,7 @@
     },
     {
       "keterangan": "Total Iuran Warga 2026",
-      "masuk": 44200000,
+      "masuk": 45450000,
       "keluar": null
     },
     {
@@ -29,7 +29,7 @@
     {
       "keterangan": "Security April",
       "masuk": null,
-      "keluar": null
+      "keluar": 1700000
     },
     {
       "keterangan": "Security Mei",
@@ -75,7 +75,7 @@
   "insidental": [
     {
       "keterangan": "sisa uang (potong biaya rutin)",
-      "masuk": 59758505,
+      "masuk": 59308505,
       "keluar": null,
       "tanggal": "2026-01-01",
       "kategori": ""
@@ -254,11 +254,32 @@
       "keluar": 440000,
       "tanggal": "2026-04-04",
       "kategori": "Halbil 2026"
+    },
+    {
+      "keterangan": "pizza",
+      "masuk": null,
+      "keluar": 356000,
+      "tanggal": "2026-04-06",
+      "kategori": "Halbil 2026"
+    },
+    {
+      "keterangan": "beli lampu jalan blok F dan blok C",
+      "masuk": null,
+      "keluar": 808805,
+      "tanggal": "2026-04-14",
+      "kategori": "Fasilitas"
+    },
+    {
+      "keterangan": "jasa pasang lampu jalan blok C",
+      "masuk": null,
+      "keluar": 200000,
+      "tanggal": "2026-04-17",
+      "kategori": "Fasilitas"
     }
   ],
   "summary": {
-    "totalMasuk": 66608505,
-    "totalKeluar": 32408280,
-    "sisaAnggaran": 34200225
+    "totalMasuk": 67858505,
+    "totalKeluar": 35473085,
+    "sisaAnggaran": 32385420
   }
 }
