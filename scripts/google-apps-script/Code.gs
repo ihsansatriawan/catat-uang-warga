@@ -383,6 +383,7 @@ function buildExpensesJson() {
 
   // Parse Rutin table (left: cols A, B, C)
   var rutin = [];
+  var rutinTotalMasuk = 0;
   var rutinTotalKeluar = 0;
 
   for (var i = 0; i < allData.length; i++) {
@@ -400,6 +401,7 @@ function buildExpensesJson() {
       keluar: keluar || null
     });
 
+    rutinTotalMasuk += masuk;
     rutinTotalKeluar += keluar;
   }
 
