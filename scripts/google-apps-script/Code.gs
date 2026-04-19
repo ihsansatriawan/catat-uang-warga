@@ -47,7 +47,7 @@ var CONFIG = {
 // ---------------------------------------------------------------------------
 
 var EXPENSES_CONFIG = {
-  TAB: 'Pengeluaran Rutin',
+  TAB: 'Transaksi',
   FILE_PATH: 'src/data/expenses.json',
   // Tabel Rutin (left): columns A, B, C (Keterangan, Masuk, Keluar)
   RUTIN_KETERANGAN_COL: 1,
@@ -383,6 +383,7 @@ function buildExpensesJson() {
 
   // Parse Rutin table (left: cols A, B, C)
   var rutin = [];
+  var rutinTotalMasuk = 0;
   var rutinTotalKeluar = 0;
 
   for (var i = 0; i < allData.length; i++) {
@@ -400,6 +401,7 @@ function buildExpensesJson() {
       keluar: keluar || null
     });
 
+    rutinTotalMasuk += masuk;
     rutinTotalKeluar += keluar;
   }
 
@@ -441,7 +443,7 @@ function buildExpensesJson() {
     insidentalTotalKeluar += keluar2;
   }
 
-  var totalMasuk = insidentalTotalMasuk;
+  var totalMasuk = rutinTotalMasuk;
   var totalKeluar = rutinTotalKeluar + insidentalTotalKeluar;
   var sisaAnggaran = totalMasuk - totalKeluar;
 
