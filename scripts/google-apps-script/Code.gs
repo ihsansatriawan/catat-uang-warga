@@ -443,7 +443,7 @@ function buildExpensesJson() {
     insidentalTotalKeluar += keluar2;
   }
 
-  var totalMasuk = insidentalTotalMasuk;
+  var totalMasuk = rutinTotalMasuk;
   var totalKeluar = rutinTotalKeluar + insidentalTotalKeluar;
   var sisaAnggaran = totalMasuk - totalKeluar;
 
