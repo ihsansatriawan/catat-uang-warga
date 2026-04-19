@@ -47,7 +47,7 @@ var CONFIG = {
 // ---------------------------------------------------------------------------
 
 var EXPENSES_CONFIG = {
-  TAB: 'Pengeluaran Rutin',
+  TAB: 'Transaksi',
   FILE_PATH: 'src/data/expenses.json',
   // Tabel Rutin (left): columns A, B, C (Keterangan, Masuk, Keluar)
   RUTIN_KETERANGAN_COL: 1,
