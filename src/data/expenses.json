@@ -275,11 +275,18 @@
       "keluar": 200000,
       "tanggal": "2026-04-17",
       "kategori": "Fasilitas"
+    },
+    {
+      "keterangan": "dummy data",
+      "masuk": null,
+      "keluar": 10000,
+      "tanggal": "2026-04-19",
+      "kategori": "Operational"
     }
   ],
   "summary": {
     "totalMasuk": 67858505,
-    "totalKeluar": 35473085,
-    "sisaAnggaran": 32385420
+    "totalKeluar": 35483085,
+    "sisaAnggaran": 32375420
   }
 }
