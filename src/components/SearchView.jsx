@@ -1,13 +1,15 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Search, Home, MapPin, Calendar, Trophy, Wallet } from 'lucide-react'
+import { Search, Home, MapPin, Calendar, Trophy, Wallet, CreditCard } from 'lucide-react'
 import { getAvailableBlocks, getLastUpdated } from '../data/helpers'
 import { trackEvent } from '../utils/tracking'
 import { BLOCK_COLORS, BLOCK_COLORS_UNSELECTED } from '../data/constants'
+import PaymentInfoModal from './PaymentInfoModal'
 
 export default function SearchView({ onSearch }) {
   const [blok, setBlok] = useState('')
   const [nomorRumah, setNomorRumah] = useState('')
+  const [showPaymentInfo, setShowPaymentInfo] = useState(false)
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -87,10 +89,53 @@ export default function SearchView({ onSearch }) {
           </div>
         </div>
 
+        {/* Quick nav chips */}
+        <div className="mb-4 flex items-center gap-2 animate-fade-in stagger-3 flex-wrap justify-center">
+          <button
+            onClick={() => setShowPaymentInfo(true)}
+            className="
+              inline-flex items-center gap-1.5
+              bg-white border-2 border-slate-dark rounded-full px-3 py-1.5
+              font-heading font-bold text-xs shadow-hard-sm
+              hover:bg-yellow active:translate-x-[1px] active:translate-y-[1px] active:shadow-none
+              transition-all
+            "
+          >
+            <CreditCard size={13} strokeWidth={2.5} />
+            Cara Bayar
+          </button>
+          <Link
+            to="/leaderboard"
+            className="
+              inline-flex items-center gap-1.5
+              bg-white border-2 border-slate-dark rounded-full px-3 py-1.5
+              font-heading font-bold text-xs shadow-hard-sm
+              hover:bg-yellow active:translate-x-[1px] active:translate-y-[1px] active:shadow-none
+              transition-all
+            "
+          >
+            <Trophy size={13} strokeWidth={2.5} />
+            Leaderboard
+          </Link>
+          <Link
+            to="/pengeluaran"
+            className="
+              inline-flex items-center gap-1.5
+              bg-white border-2 border-slate-dark rounded-full px-3 py-1.5
+              font-heading font-bold text-xs shadow-hard-sm
+              hover:bg-yellow active:translate-x-[1px] active:translate-y-[1px] active:shadow-none
+              transition-all
+            "
+          >
+            <Wallet size={13} strokeWidth={2.5} />
+            Pengeluaran
+          </Link>
+        </div>
+
         {/* Search Card */}
         <form
           onSubmit={handleSubmit}
-          className="bg-white border-2 border-slate-dark rounded-3xl shadow-hard w-full max-w-sm animate-slide-up stagger-3"
+          className="bg-white border-2 border-slate-dark rounded-3xl shadow-hard w-full max-w-sm animate-slide-up stagger-4"
         >
           {/* Card header */}
           <div className="flex items-center gap-2 px-5 pt-5 pb-3 border-b-2 border-slate-dark/10">
@@ -170,40 +215,15 @@ export default function SearchView({ onSearch }) {
           </div>
         </form>
 
-        {/* Leaderboard link */}
-        <div className="mt-4 animate-fade-in stagger-4">
-          <Link
-            to="/leaderboard"
-            className="
-              inline-flex items-center gap-2
-              font-heading font-bold text-sm text-slate-dark/60
-              hover:text-violet transition-colors
-            "
-          >
-            <Trophy size={16} strokeWidth={2.5} />
-            Lihat Leaderboard
-          </Link>
-        </div>
-
-        {/* Pengeluaran link */}
-        <div className="mt-3 animate-fade-in stagger-5">
-          <Link
-            to="/pengeluaran"
-            className="
-              inline-flex items-center gap-2
-              font-heading font-bold text-sm text-slate-dark/60
-              hover:text-violet transition-colors
-            "
-          >
-            <Wallet size={16} strokeWidth={2.5} />
-            Pengeluaran
-          </Link>
-        </div>
 
       </div>
 
       {/* Bottom safe area spacer */}
       <div className="safe-bottom" />
+
+      {showPaymentInfo && (
+        <PaymentInfoModal onClose={() => setShowPaymentInfo(false)} />
+      )}
     </div>
   )
 }
