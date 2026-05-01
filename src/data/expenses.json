@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2026-04-19",
+  "lastUpdate": "2026-05-02",
   "rutin": [
     {
       "keterangan": "Sisa Kas 2025",
@@ -8,7 +8,7 @@
     },
     {
       "keterangan": "Total Iuran Warga 2026",
-      "masuk": 45450000,
+      "masuk": 47950000,
       "keluar": null
     },
     {
@@ -75,7 +75,7 @@
   "insidental": [
     {
       "keterangan": "sisa uang (potong biaya rutin)",
-      "masuk": 59308505,
+      "masuk": 61808505,
       "keluar": null,
       "tanggal": "2026-01-01",
       "kategori": ""
@@ -275,11 +275,25 @@
       "keluar": 200000,
       "tanggal": "2026-04-17",
       "kategori": "Fasilitas"
+    },
+    {
+      "keterangan": "jasa pasang lampu jalan blok F (2 buah)",
+      "masuk": null,
+      "keluar": 800000,
+      "tanggal": "2026-04-21",
+      "kategori": "Fasilitas"
+    },
+    {
+      "keterangan": "check bak kontrol komplek",
+      "masuk": null,
+      "keluar": 100000,
+      "tanggal": "2026-05-01",
+      "kategori": "Operational"
     }
   ],
   "summary": {
-    "totalMasuk": 67858505,
-    "totalKeluar": 35473085,
-    "sisaAnggaran": 32385420
+    "totalMasuk": 70358505,
+    "totalKeluar": 36373085,
+    "sisaAnggaran": 33985420
   }
 }
