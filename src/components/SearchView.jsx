@@ -90,46 +90,52 @@ export default function SearchView({ onSearch }) {
         </div>
 
         {/* Quick nav chips */}
-        <div className="mb-4 flex items-center gap-2 animate-fade-in stagger-3 flex-wrap justify-center">
+        <div className="mb-4 w-full max-w-sm flex flex-col items-center gap-2 animate-fade-in stagger-3">
+          {/* Cara Bayar — prominent full-width chip */}
           <button
             onClick={() => setShowPaymentInfo(true)}
             className="
-              inline-flex items-center gap-1.5
-              bg-white border-2 border-slate-dark rounded-full px-3 py-1.5
-              font-heading font-bold text-xs shadow-hard-sm
-              hover:bg-yellow active:translate-x-[1px] active:translate-y-[1px] active:shadow-none
+              w-full inline-flex items-center justify-center gap-2
+              bg-yellow border-2 border-slate-dark rounded-full px-5 py-2.5
+              font-heading font-extrabold text-sm shadow-hard
+              hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg
+              active:translate-x-0 active:translate-y-0 active:shadow-hard-sm
               transition-all
             "
           >
-            <CreditCard size={13} strokeWidth={2.5} />
-            Cara Bayar
+            <CreditCard size={15} strokeWidth={2.5} />
+            Cara Bayar IPL
           </button>
-          <Link
-            to="/leaderboard"
-            className="
-              inline-flex items-center gap-1.5
-              bg-white border-2 border-slate-dark rounded-full px-3 py-1.5
-              font-heading font-bold text-xs shadow-hard-sm
-              hover:bg-yellow active:translate-x-[1px] active:translate-y-[1px] active:shadow-none
-              transition-all
-            "
-          >
-            <Trophy size={13} strokeWidth={2.5} />
-            Leaderboard
-          </Link>
-          <Link
-            to="/pengeluaran"
-            className="
-              inline-flex items-center gap-1.5
-              bg-white border-2 border-slate-dark rounded-full px-3 py-1.5
-              font-heading font-bold text-xs shadow-hard-sm
-              hover:bg-yellow active:translate-x-[1px] active:translate-y-[1px] active:shadow-none
-              transition-all
-            "
-          >
-            <Wallet size={13} strokeWidth={2.5} />
-            Pengeluaran
-          </Link>
+
+          {/* Secondary chips row */}
+          <div className="flex items-center gap-2 w-full">
+            <Link
+              to="/leaderboard"
+              className="
+                flex-1 inline-flex items-center justify-center gap-1.5
+                bg-white border-2 border-slate-dark rounded-full px-3 py-1.5
+                font-heading font-bold text-xs shadow-hard-sm
+                hover:bg-cream active:translate-x-[1px] active:translate-y-[1px] active:shadow-none
+                transition-all
+              "
+            >
+              <Trophy size={13} strokeWidth={2.5} />
+              Leaderboard
+            </Link>
+            <Link
+              to="/pengeluaran"
+              className="
+                flex-1 inline-flex items-center justify-center gap-1.5
+                bg-white border-2 border-slate-dark rounded-full px-3 py-1.5
+                font-heading font-bold text-xs shadow-hard-sm
+                hover:bg-cream active:translate-x-[1px] active:translate-y-[1px] active:shadow-none
+                transition-all
+              "
+            >
+              <Wallet size={13} strokeWidth={2.5} />
+              Pengeluaran
+            </Link>
+          </div>
         </div>
 
         {/* Search Card */}
