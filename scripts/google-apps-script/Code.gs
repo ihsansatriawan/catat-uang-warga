@@ -19,7 +19,7 @@
 // ---------------------------------------------------------------------------
 
 var CONFIG = {
-  RAW_TAB: 'Form_Responses',
+  RAW_TAB: 'Raw Data',
   VALIDATED_TAB: 'Validated',
   STATUS_COLUMN_HEADER: 'validationStatus',
   VALID_STATUS: 'Valid',
