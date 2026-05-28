@@ -8,7 +8,7 @@
     },
     {
       "keterangan": "Total Iuran Warga 2026",
-      "masuk": 61200000,
+      "masuk": 62200000,
       "keluar": null
     },
     {
@@ -75,7 +75,7 @@
   "insidental": [
     {
       "keterangan": "sisa uang (potong biaya rutin)",
-      "masuk": 73358505,
+      "masuk": 74358505,
       "keluar": null,
       "tanggal": "2026-01-01",
       "kategori": ""
@@ -306,8 +306,8 @@
     }
   ],
   "summary": {
-    "totalMasuk": 83608505,
+    "totalMasuk": 84608505,
     "totalKeluar": 38880085,
-    "sisaAnggaran": 44728420
+    "sisaAnggaran": 45728420
   }
 }
