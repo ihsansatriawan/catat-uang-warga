@@ -148,10 +148,12 @@ export default function LeaderboardView() {
                         {/* Paid houses list */}
                         <div>
                             {paidHouses.map((house, i) => (
-                                <div
+                                <Link
+                                    to={`/warga/${house.blok}/${house.nomorRumah}`}
                                     key={`${house.blok}-${house.nomorRumah}`}
                                     className={`
-                    flex items-center gap-3 px-5 py-3
+                    flex items-center gap-3 px-5 py-3 cursor-pointer
+                    hover:bg-cream/60 active:bg-cream transition-colors
                     ${i < paidHouses.length - 1 || unpaidHouses.length > 0 ? 'border-b border-slate-dark/10' : ''}
                   `}
                                 >
@@ -190,7 +192,7 @@ export default function LeaderboardView() {
                                     <span className={`font-heading font-bold text-xs w-10 text-right flex-shrink-0 ${house.isLunas ? 'text-green' : 'text-violet'}`}>
                                         {house.completionPct}%
                                     </span>
-                                </div>
+                                </Link>
                             ))}
                         </div>
 
@@ -213,10 +215,12 @@ export default function LeaderboardView() {
                                 {showBelumBayar && (
                                     <div>
                                         {unpaidHouses.map((house, i) => (
-                                            <div
+                                            <Link
+                                                to={`/warga/${house.blok}/${house.nomorRumah}`}
                                                 key={`${house.blok}-${house.nomorRumah}`}
                                                 className={`
-                          flex items-center gap-3 px-5 py-2.5
+                          flex items-center gap-3 px-5 py-2.5 cursor-pointer
+                          hover:bg-cream/60 active:bg-cream transition-colors
                           ${i < unpaidHouses.length - 1 ? 'border-b border-slate-dark/5' : ''}
                         `}
                                             >
@@ -229,7 +233,7 @@ export default function LeaderboardView() {
                                                 <p className="font-body text-sm text-slate-dark/40 truncate">
                                                     {house.namaPemilik}
                                                 </p>
-                                            </div>
+                                            </Link>
                                         ))}
                                     </div>
                                 )}
