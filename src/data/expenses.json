@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2026-05-02",
+  "lastUpdate": "2026-05-28",
   "rutin": [
     {
       "keterangan": "Sisa Kas 2025",
@@ -8,7 +8,7 @@
     },
     {
       "keterangan": "Total Iuran Warga 2026",
-      "masuk": 47950000,
+      "masuk": 55950000,
       "keluar": null
     },
     {
@@ -34,7 +34,7 @@
     {
       "keterangan": "Security Mei",
       "masuk": null,
-      "keluar": null
+      "keluar": 1700000
     },
     {
       "keterangan": "Security Juni",
@@ -75,7 +75,7 @@
   "insidental": [
     {
       "keterangan": "sisa uang (potong biaya rutin)",
-      "masuk": 61808505,
+      "masuk": 68108505,
       "keluar": null,
       "tanggal": "2026-01-01",
       "kategori": ""
@@ -289,11 +289,25 @@
       "keluar": 100000,
       "tanggal": "2026-05-01",
       "kategori": "Operational"
+    },
+    {
+      "keterangan": "tukang bersih2 borongan",
+      "masuk": null,
+      "keluar": 750000,
+      "tanggal": "2026-05-10",
+      "kategori": "Operational"
+    },
+    {
+      "keterangan": "roof drain taman",
+      "masuk": null,
+      "keluar": 57000,
+      "tanggal": "2026-05-24",
+      "kategori": "Fasilitas"
     }
   ],
   "summary": {
-    "totalMasuk": 70358505,
-    "totalKeluar": 36373085,
-    "sisaAnggaran": 33985420
+    "totalMasuk": 78358505,
+    "totalKeluar": 38880085,
+    "sisaAnggaran": 39478420
   }
 }
