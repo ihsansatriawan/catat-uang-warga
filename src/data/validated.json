@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2026-05-28",
+  "lastUpdate": "2026-05-30",
   "data": [
     {
       "timestamp": "2025-12-31T19:16:46+07:00",
@@ -769,6 +769,20 @@
       "blok": "A",
       "nomorRumah": "8",
       "namaPemilik": "Fajar Harry Aji",
+      "jumlahPembayaran": 1000000
+    },
+    {
+      "timestamp": "2026-05-29T20:55:07+07:00",
+      "blok": "E",
+      "nomorRumah": "1",
+      "namaPemilik": "Mohammad Reshki Maulana",
+      "jumlahPembayaran": 1000000
+    },
+    {
+      "timestamp": "2026-05-29T21:03:20+07:00",
+      "blok": "A",
+      "nomorRumah": "3",
+      "namaPemilik": "Agus Herianto",
       "jumlahPembayaran": 1000000
     }
   ]
