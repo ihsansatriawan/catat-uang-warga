@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2026-05-31",
+  "lastUpdate": "2026-06-15",
   "data": [
     {
       "timestamp": "2025-12-31T19:16:46+07:00",
@@ -805,6 +805,76 @@
       "nomorRumah": "5",
       "namaPemilik": "Dhany Yanuar Hindriyanto",
       "jumlahPembayaran": 2000000
+    },
+    {
+      "timestamp": "2026-06-01T08:36:23+07:00",
+      "blok": "B",
+      "nomorRumah": "9",
+      "namaPemilik": "Ukky January Linzki",
+      "jumlahPembayaran": 250000
+    },
+    {
+      "timestamp": "2026-06-01T09:35:11+07:00",
+      "blok": "C",
+      "nomorRumah": "2",
+      "namaPemilik": "Siti Munifah",
+      "jumlahPembayaran": 250000
+    },
+    {
+      "timestamp": "2026-06-02T13:04:17+07:00",
+      "blok": "D",
+      "nomorRumah": "3",
+      "namaPemilik": "Giyono",
+      "jumlahPembayaran": 250000
+    },
+    {
+      "timestamp": "2026-06-03T08:54:36+07:00",
+      "blok": "D",
+      "nomorRumah": "7",
+      "namaPemilik": "Mega Prasetyawan",
+      "jumlahPembayaran": 500000
+    },
+    {
+      "timestamp": "2026-06-03T12:27:39+07:00",
+      "blok": "D",
+      "nomorRumah": "6",
+      "namaPemilik": "Andi Supandi",
+      "jumlahPembayaran": 250000
+    },
+    {
+      "timestamp": "2026-06-03T21:13:12+07:00",
+      "blok": "D",
+      "nomorRumah": "5",
+      "namaPemilik": "Ken Garda Pinilih",
+      "jumlahPembayaran": 250000
+    },
+    {
+      "timestamp": "2026-06-08T15:12:01+07:00",
+      "blok": "F",
+      "nomorRumah": "7",
+      "namaPemilik": "Erlin",
+      "jumlahPembayaran": 250000
+    },
+    {
+      "timestamp": "2026-06-10T14:44:07+07:00",
+      "blok": "E",
+      "nomorRumah": "15",
+      "namaPemilik": "Eko Prastyawan",
+      "jumlahPembayaran": 250000
+    },
+    {
+      "timestamp": "2026-06-11T10:53:44+07:00",
+      "blok": "F",
+      "nomorRumah": "7",
+      "namaPemilik": "Erlin",
+      "jumlahPembayaran": 250000
+    },
+    {
+      "timestamp": "2026-06-13T14:47:48+07:00",
+      "blok": "F",
+      "nomorRumah": "6",
+      "namaPemilik": "Thomas",
+      "jumlahPembayaran": 250000
     }
   ]
 }
