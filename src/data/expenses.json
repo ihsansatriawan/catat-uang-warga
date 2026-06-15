@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2026-05-31",
+  "lastUpdate": "2026-06-15",
   "rutin": [
     {
       "keterangan": "Sisa Kas 2025",
@@ -8,7 +8,7 @@
     },
     {
       "keterangan": "Total Iuran Warga 2026",
-      "masuk": 66950000,
+      "masuk": 69700000,
       "keluar": null
     },
     {
@@ -39,7 +39,7 @@
     {
       "keterangan": "Security Juni",
       "masuk": null,
-      "keluar": null
+      "keluar": 1700000
     },
     {
       "keterangan": "Security Juli",
@@ -75,7 +75,7 @@
   "insidental": [
     {
       "keterangan": "sisa uang (potong biaya rutin)",
-      "masuk": 79108505,
+      "masuk": 80158505,
       "keluar": null,
       "tanggal": "2026-01-01",
       "kategori": ""
@@ -303,11 +303,32 @@
       "keluar": 57000,
       "tanggal": "2026-05-24",
       "kategori": "Fasilitas"
+    },
+    {
+      "keterangan": "kabel cctv",
+      "masuk": null,
+      "keluar": 17704,
+      "tanggal": "2026-06-05",
+      "kategori": "Operational"
+    },
+    {
+      "keterangan": "jasa kebersihan komplek",
+      "masuk": null,
+      "keluar": 400000,
+      "tanggal": "2026-06-07",
+      "kategori": "Operational"
+    },
+    {
+      "keterangan": "jasa angkut sampah",
+      "masuk": null,
+      "keluar": 50000,
+      "tanggal": "2026-06-14",
+      "kategori": "Operational"
     }
   ],
   "summary": {
-    "totalMasuk": 89358505,
-    "totalKeluar": 38880085,
-    "sisaAnggaran": 50478420
+    "totalMasuk": 92108505,
+    "totalKeluar": 41047789,
+    "sisaAnggaran": 51060716
   }
 }
