@@ -4,6 +4,9 @@ import { formatRupiah, getLastUpdated } from '../data/helpers'
 import { trackEvent } from '../utils/tracking'
 import ProofModal from './ProofModal'
 
+const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des']
+const MONTH_FULL = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember']
+
 export default function DashboardView({ resident, onBack }) {
   const [showProof, setShowProof] = useState(false)
   const [copied, setCopied] = useState(false)
@@ -32,6 +35,10 @@ export default function DashboardView({ resident, onBack }) {
   }, [resident.blok, resident.nomorRumah])
 
   const progressPct = Math.min(100, Math.round((resident.totalPaid / resident.annualTarget) * 100))
+
+  const monthsTotal = resident.monthsTotal ?? 12
+  const monthsPaid = resident.monthsPaid ?? Math.min(monthsTotal, Math.floor(resident.totalPaid / (resident.monthlyIpl ?? 250000)))
+  const remainingMonths = MONTH_LABELS.slice(monthsPaid, monthsTotal)
 
   const lastUpdatedRaw = getLastUpdated()
   const lastUpdateText = lastUpdatedRaw
@@ -81,9 +88,9 @@ export default function DashboardView({ resident, onBack }) {
         {/* Status badge in top bar */}
         <span className={`
           font-heading font-extrabold text-xs px-2.5 py-1 rounded-full border-2 border-slate-dark shadow-hard-sm
-          ${resident.isLunas ? 'bg-green text-white' : 'bg-pink text-white'}
+          ${resident.isLunas ? 'bg-green text-white' : monthsPaid > 0 ? 'bg-violet text-white' : 'bg-pink text-white'}
         `}>
-          {resident.isLunas ? 'LUNAS' : 'BELUM'}
+          {resident.isLunas ? 'LUNAS' : monthsPaid > 0 ? `${monthsPaid}/${monthsTotal} BLN` : 'BELUM'}
         </span>
       </div>
 
@@ -154,14 +161,62 @@ export default function DashboardView({ resident, onBack }) {
                 />
               </div>
 
-              {!resident.isLunas && (
-                <p className="font-body text-xs text-pink font-semibold mt-2">
-                  Kurang {formatRupiah(resident.annualTarget - resident.totalPaid)} lagi untuk lunas
+              {/* 12-month status strip */}
+              <div className="mt-4 pt-3 border-t border-slate-dark/10">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-heading font-bold text-xs text-slate-dark/60">
+                    Status per bulan
+                  </span>
+                  <span className={`
+                    font-heading font-extrabold text-xs
+                    ${resident.isLunas ? 'text-green' : 'text-violet'}
+                  `}>
+                    {monthsPaid}/{monthsTotal} bln
+                  </span>
+                </div>
+                <div className="grid grid-cols-6 gap-1.5">
+                  {MONTH_LABELS.map((label, i) => {
+                    const paid = i < monthsPaid
+                    return (
+                      <div
+                        key={i}
+                        className={`
+                          flex flex-col items-center justify-center gap-0.5 py-1.5 rounded-lg
+                          font-heading font-bold text-[11px] leading-none
+                          ${paid
+                            ? `border-2 border-slate-dark shadow-hard-sm text-white ${resident.isLunas ? 'bg-green' : 'bg-violet'}`
+                            : 'border-2 border-dashed border-slate-dark/25 bg-cream text-slate-dark/40'
+                          }
+                        `}
+                      >
+                        <span className="h-3 flex items-center">
+                          {paid
+                            ? <CheckCircle size={11} strokeWidth={3} />
+                            : <span className="block w-[5px] h-[5px] rounded-full bg-slate-dark/25" />
+                          }
+                        </span>
+                        {label}
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+
+              {resident.isLunas && (
+                <p className="font-body text-xs text-green font-semibold mt-3">
+                  🎉 Lunas penuh — Januari s/d Desember 2026
                 </p>
               )}
-              {resident.isLunas && (
-                <p className="font-body text-xs text-green font-semibold mt-2">
-                  Pembayaran tahun 2026 sudah lengkap! 🎉
+              {!resident.isLunas && monthsPaid > 0 && (
+                <p className="font-body text-xs font-semibold mt-3">
+                  <span className="text-green">✅ Lunas s/d {MONTH_FULL[monthsPaid - 1]}</span>
+                  <span className="text-slate-dark/40"> · </span>
+                  <span className="text-pink">sisa {remainingMonths.join(', ')}</span>
+                </p>
+              )}
+              {!resident.isLunas && monthsPaid === 0 && (
+                <p className="font-body text-xs text-pink font-semibold mt-3">
+                  Belum ada bulan yang terbayar untuk 2026
                 </p>
               )}
 
@@ -211,16 +266,20 @@ export default function DashboardView({ resident, onBack }) {
             </div>
             <div className={`
               border-2 border-slate-dark rounded-2xl shadow-hard-sm p-4
-              ${resident.isLunas ? 'bg-green/10' : 'bg-pink/10'}
+              ${resident.isLunas ? 'bg-green/10' : monthsPaid > 0 ? 'bg-violet/10' : 'bg-pink/10'}
             `}>
               {resident.isLunas
                 ? <CheckCircle size={18} strokeWidth={2.5} className="text-green mb-2" />
-                : <XCircle size={18} strokeWidth={2.5} className="text-pink mb-2" />
+                : monthsPaid > 0
+                  ? <Calendar size={18} strokeWidth={2.5} className="text-violet mb-2" />
+                  : <XCircle size={18} strokeWidth={2.5} className="text-pink mb-2" />
               }
-              <p className={`font-heading font-extrabold text-lg leading-tight ${resident.isLunas ? 'text-green' : 'text-pink'}`}>
-                {resident.isLunas ? 'LUNAS' : 'BELUM'}
+              <p className={`font-heading font-extrabold text-lg leading-tight ${resident.isLunas ? 'text-green' : monthsPaid > 0 ? 'text-violet' : 'text-pink'}`}>
+                {resident.isLunas ? 'LUNAS' : monthsPaid > 0 ? `${monthsPaid}/${monthsTotal} bln` : 'BELUM'}
               </p>
-              <p className="font-body text-xs text-slate-dark/50 mt-0.5">status IPL</p>
+              <p className="font-body text-xs text-slate-dark/50 mt-0.5">
+                {resident.isLunas ? 'status IPL' : monthsPaid > 0 ? 'sudah terbayar' : 'status IPL'}
+              </p>
             </div>
           </div>
 

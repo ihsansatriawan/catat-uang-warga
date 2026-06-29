@@ -17,6 +17,7 @@ export function getResident(blok, nomorRumah) {
   const namaPemilik = records[0].namaPemilik
   const totalPaid = records.reduce((sum, r) => sum + r.jumlahPembayaran, 0)
   const isLunas = totalPaid >= ANNUAL_TARGET
+  const monthsPaid = Math.min(MONTHS_PER_YEAR, Math.floor(totalPaid / MONTHLY_IPL))
 
   return {
     namaPemilik,
@@ -24,6 +25,9 @@ export function getResident(blok, nomorRumah) {
     nomorRumah,
     totalPaid,
     annualTarget: ANNUAL_TARGET,
+    monthlyIpl: MONTHLY_IPL,
+    monthsTotal: MONTHS_PER_YEAR,
+    monthsPaid,
     isLunas,
     transactions: records.sort(
       (a, b) => new Date(a.timestamp) - new Date(b.timestamp)
