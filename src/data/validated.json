@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2026-06-29",
+  "lastUpdate": "2026-07-12",
   "data": [
     {
       "timestamp": "2025-12-31T19:16:46+07:00",
@@ -910,6 +910,55 @@
       "nomorRumah": "8",
       "namaPemilik": "Denny",
       "jumlahPembayaran": 750000
+    },
+    {
+      "timestamp": "2026-06-30T16:59:17+07:00",
+      "blok": "D",
+      "nomorRumah": "3",
+      "namaPemilik": "Giyono",
+      "jumlahPembayaran": 250000
+    },
+    {
+      "timestamp": "2026-07-02T18:00:34+07:00",
+      "blok": "D",
+      "nomorRumah": "6",
+      "namaPemilik": "Andi Supandi",
+      "jumlahPembayaran": 250000
+    },
+    {
+      "timestamp": "2026-07-02T18:31:17+07:00",
+      "blok": "B",
+      "nomorRumah": "7",
+      "namaPemilik": "Delfryanto Marola",
+      "jumlahPembayaran": 250000
+    },
+    {
+      "timestamp": "2026-07-06T05:24:26+07:00",
+      "blok": "A",
+      "nomorRumah": "5",
+      "namaPemilik": "Iksan",
+      "jumlahPembayaran": 1500000
+    },
+    {
+      "timestamp": "2026-07-08T07:23:42+07:00",
+      "blok": "B",
+      "nomorRumah": "9",
+      "namaPemilik": "Ukky January Linzki",
+      "jumlahPembayaran": 250000
+    },
+    {
+      "timestamp": "2026-07-09T15:51:59+07:00",
+      "blok": "C",
+      "nomorRumah": "1",
+      "namaPemilik": "Bimo Andono",
+      "jumlahPembayaran": 4250000
+    },
+    {
+      "timestamp": "2026-07-12T14:19:36+07:00",
+      "blok": "E",
+      "nomorRumah": "15",
+      "namaPemilik": "Eko Prastyawan",
+      "jumlahPembayaran": 250000
     }
   ]
 }
