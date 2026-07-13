@@ -5,6 +5,7 @@ import {
   getExpenses,
   getExpenseCategories,
   generateExpenseBroadcastMessage,
+  getAdvancePayment,
   formatRupiah,
 } from '../data/helpers'
 import { trackEvent } from '../utils/tracking'
@@ -12,6 +13,7 @@ import { trackEvent } from '../utils/tracking'
 export default function ExpensesView() {
   const [selectedCategory, setSelectedCategory] = useState('')
   const [copied, setCopied] = useState(false)
+  const [pemasukanOpen, setPemasukanOpen] = useState(false)
   const [rutinOpen, setRutinOpen] = useState(false)
   const [insidentalOpen, setInsidentalOpen] = useState(false)
 
@@ -34,14 +36,31 @@ export default function ExpensesView() {
     })
   }, [expenses.lastUpdate])
 
+  // Pemasukan = baris rutin yang punya nilai "masuk" (mis. Sisa Kas, Iuran Warga)
+  const incomeItems = useMemo(
+    () => expenses.rutin.filter((item) => item.masuk),
+    [expenses.rutin]
+  )
+  const incomeTotal = useMemo(
+    () => incomeItems.reduce((sum, item) => sum + item.masuk, 0),
+    [incomeItems]
+  )
+  const advance = useMemo(() => getAdvancePayment(), [])
+
+  // Item pengeluaran rutin (tanpa baris pemasukan)
+  const rutinItems = useMemo(
+    () => expenses.rutin.filter((item) => !item.masuk),
+    [expenses.rutin]
+  )
+
   const filteredInsidental = useMemo(() => {
     if (!selectedCategory) return expenses.insidental
     return expenses.insidental.filter((item) => item.kategori === selectedCategory)
   }, [expenses.insidental, selectedCategory])
 
   const rutinSubtotal = useMemo(
-    () => expenses.rutin.reduce((sum, item) => sum + (item.keluar || 0), 0),
-    [expenses.rutin]
+    () => rutinItems.reduce((sum, item) => sum + (item.keluar || 0), 0),
+    [rutinItems]
   )
 
   const insidentalSubtotal = useMemo(
@@ -142,8 +161,87 @@ export default function ExpensesView() {
             )}
           </div>
 
-          {/* Pengeluaran Rutin Section */}
+          {/* Pemasukan Section */}
           <div className="bg-white border-2 border-slate-dark rounded-3xl shadow-hard overflow-hidden animate-slide-up stagger-2">
+            <button
+              onClick={() => {
+                setPemasukanOpen((v) => !v)
+                if (!pemasukanOpen) trackEvent('open_income_detail')
+              }}
+              className="w-full px-5 py-4 flex items-center gap-2 active:bg-slate-dark/5 transition-colors"
+            >
+              <span className="text-lg">💰</span>
+              <h2 className="font-heading font-bold text-base flex-1 text-left">Pemasukan</h2>
+              <div className="text-right mr-2">
+                <p className="font-heading font-bold text-sm text-green">+{formatRupiah(incomeTotal)}</p>
+                <p className="font-body text-xs text-slate-dark/40">{incomeItems.length} sumber</p>
+              </div>
+              <ChevronDown
+                size={18}
+                strokeWidth={2.5}
+                className={`text-slate-dark/40 flex-shrink-0 transition-transform duration-200 ${pemasukanOpen ? 'rotate-180' : ''}`}
+              />
+            </button>
+
+            {pemasukanOpen && (
+              <div className="border-t-2 border-slate-dark">
+                {/* Composition bar */}
+                {incomeTotal > 0 && (
+                  <div className="px-5 py-4 border-b border-slate-dark/10">
+                    <div className="flex h-3 rounded-full overflow-hidden border-2 border-slate-dark">
+                      {incomeItems.map((item, i) => (
+                        <div
+                          key={i}
+                          className={i % 2 === 0 ? 'bg-green' : 'bg-yellow'}
+                          style={{ width: `${(item.masuk / incomeTotal) * 100}%` }}
+                          title={item.keterangan}
+                        />
+                      ))}
+                    </div>
+                    <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2">
+                      {incomeItems.map((item, i) => (
+                        <div key={i} className="flex items-center gap-1.5">
+                          <span className={`w-2.5 h-2.5 rounded-full border border-slate-dark ${i % 2 === 0 ? 'bg-green' : 'bg-yellow'}`} />
+                          <span className="font-body text-xs text-slate-dark/60">
+                            {item.keterangan} · {Math.round((item.masuk / incomeTotal) * 100)}%
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Income items */}
+                {incomeItems.map((item, i) => {
+                  const isIuran = item.keterangan.toLowerCase().includes('iuran')
+                  const showAdvance = isIuran && advance.totalAdvance > 0
+                  return (
+                    <div
+                      key={i}
+                      className={i < incomeItems.length - 1 ? 'border-b border-slate-dark/10' : ''}
+                    >
+                      <div className="flex items-center justify-between px-5 py-3">
+                        <span className="font-body text-sm text-slate-dark flex-1 min-w-0 truncate pr-3">
+                          {item.keterangan}
+                        </span>
+                        <span className="font-heading font-bold text-sm text-green flex-shrink-0">
+                          +{formatRupiah(item.masuk)}
+                        </span>
+                      </div>
+                      {showAdvance && (
+                        <p className="px-5 pb-3 -mt-1 font-body text-xs text-slate-dark/50">
+                          ↳ termasuk <span className="font-semibold text-slate-dark/70">{formatRupiah(advance.totalAdvance)}</span> titipan IPL 2027 ({advance.count} warga)
+                        </p>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Pengeluaran Rutin Section */}
+          <div className="bg-white border-2 border-slate-dark rounded-3xl shadow-hard overflow-hidden animate-slide-up stagger-3">
             <button
               onClick={() => setRutinOpen((v) => !v)}
               className="w-full px-5 py-4 flex items-center gap-2 active:bg-slate-dark/5 transition-colors"
@@ -152,7 +250,7 @@ export default function ExpensesView() {
               <h2 className="font-heading font-bold text-base flex-1 text-left">Pengeluaran Rutin</h2>
               <div className="text-right mr-2">
                 <p className="font-heading font-bold text-sm text-red-500">-{formatRupiah(rutinSubtotal)}</p>
-                <p className="font-body text-xs text-slate-dark/40">{expenses.rutin.filter(i => i.keluar).length} item</p>
+                <p className="font-body text-xs text-slate-dark/40">{rutinItems.filter(i => i.keluar).length} item</p>
               </div>
               <ChevronDown
                 size={18}
@@ -163,22 +261,17 @@ export default function ExpensesView() {
 
             {rutinOpen && (
               <div className="border-t-2 border-slate-dark">
-                {expenses.rutin.map((item, i) => (
+                {rutinItems.map((item, i) => (
                   <div
                     key={i}
                     className={`
                       flex items-center justify-between px-5 py-3
-                      ${i < expenses.rutin.length - 1 ? 'border-b border-slate-dark/10' : ''}
+                      ${i < rutinItems.length - 1 ? 'border-b border-slate-dark/10' : ''}
                     `}
                   >
                     <span className="font-body text-sm text-slate-dark flex-1 min-w-0 truncate pr-3">
                       {item.keterangan}
                     </span>
-                    {item.masuk && (
-                      <span className="font-heading font-bold text-sm text-green flex-shrink-0">
-                        +{formatRupiah(item.masuk)}
-                      </span>
-                    )}
                     {item.keluar && (
                       <span className="font-heading font-bold text-sm text-red-500 flex-shrink-0">
                         -{formatRupiah(item.keluar)}
@@ -191,7 +284,7 @@ export default function ExpensesView() {
           </div>
 
           {/* Pengeluaran Insidental Section */}
-          <div className="bg-white border-2 border-slate-dark rounded-3xl shadow-hard overflow-hidden animate-slide-up stagger-3">
+          <div className="bg-white border-2 border-slate-dark rounded-3xl shadow-hard overflow-hidden animate-slide-up stagger-4">
             <button
               onClick={() => setInsidentalOpen((v) => !v)}
               className="w-full px-5 py-4 flex items-center gap-2 active:bg-slate-dark/5 transition-colors"
@@ -297,7 +390,7 @@ export default function ExpensesView() {
           </div>
 
           {/* Copy broadcast button */}
-          <div className="animate-slide-up stagger-4 flex flex-col items-center gap-3">
+          <div className="animate-slide-up stagger-5 flex flex-col items-center gap-3">
             <button
               onClick={handleCopy}
               className={`

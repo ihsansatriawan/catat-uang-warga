@@ -71,7 +71,9 @@ export function getAllResidents() {
       annualTarget: ANNUAL_TARGET,
       isLunas: totalPaid >= ANNUAL_TARGET,
       completionPct,
-      monthsPaid: Math.floor(totalPaid / MONTHLY_IPL),
+      // Cap di 12 bulan agar konsisten dengan dashboard; kelebihan bayar
+      // (bayar maju ke tahun berikutnya) tidak dihitung sebagai bulan 2026
+      monthsPaid: Math.min(MONTHS_PER_YEAR, Math.floor(totalPaid / MONTHLY_IPL)),
     }
   })
 }
@@ -154,6 +156,27 @@ export function generateBroadcastMessage() {
 
 export function getExpenses() {
   return expenses
+}
+
+// Total kelebihan bayar di atas target tahunan — uang yang sudah masuk kas
+// tapi merupakan titipan IPL untuk tahun berikutnya (mis. warga bayar > 12 bln).
+// Dipakai untuk catatan transparansi di rincian pemasukan.
+export function getAdvancePayment() {
+  const totals = {}
+  for (const r of data) {
+    const key = `${r.blok}-${r.nomorRumah}`
+    totals[key] = (totals[key] || 0) + r.jumlahPembayaran
+  }
+  let totalAdvance = 0
+  let count = 0
+  for (const total of Object.values(totals)) {
+    const over = Math.max(0, total - ANNUAL_TARGET)
+    if (over > 0) {
+      totalAdvance += over
+      count++
+    }
+  }
+  return { totalAdvance, count }
 }
 
 export function getExpenseCategories() {
