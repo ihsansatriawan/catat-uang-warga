@@ -18,6 +18,9 @@ export function getResident(blok, nomorRumah) {
   const totalPaid = records.reduce((sum, r) => sum + r.jumlahPembayaran, 0)
   const isLunas = totalPaid >= ANNUAL_TARGET
   const monthsPaid = Math.min(MONTHS_PER_YEAR, Math.floor(totalPaid / MONTHLY_IPL))
+  // Kelebihan bayar di atas target tahunan (mis. bayar untuk tahun berikutnya)
+  const saldoLebih = Math.max(0, totalPaid - ANNUAL_TARGET)
+  const bulanMaju = Math.floor(saldoLebih / MONTHLY_IPL)
 
   return {
     namaPemilik,
@@ -29,6 +32,8 @@ export function getResident(blok, nomorRumah) {
     monthsTotal: MONTHS_PER_YEAR,
     monthsPaid,
     isLunas,
+    saldoLebih,
+    bulanMaju,
     transactions: records.sort(
       (a, b) => new Date(a.timestamp) - new Date(b.timestamp)
     ),
@@ -77,7 +82,9 @@ export function getBlockLeaderboard() {
   for (const r of all) {
     if (!blocks[r.blok]) blocks[r.blok] = { total: 0, lunas: 0, sumPaid: 0 }
     blocks[r.blok].total++
-    blocks[r.blok].sumPaid += r.totalPaid
+    // Cap kontribusi tiap rumah di target tahunan agar kelebihan bayar satu
+    // rumah tidak menutupi rumah lain yang belum bayar dalam ranking blok
+    blocks[r.blok].sumPaid += Math.min(r.totalPaid, ANNUAL_TARGET)
     if (r.isLunas) blocks[r.blok].lunas++
   }
   return Object.entries(blocks)
