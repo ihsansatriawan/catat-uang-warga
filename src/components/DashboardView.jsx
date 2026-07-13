@@ -207,6 +207,17 @@ export default function DashboardView({ resident, onBack }) {
                   🎉 Lunas penuh — Januari s/d Desember 2026
                 </p>
               )}
+              {resident.isLunas && resident.saldoLebih > 0 && (
+                <div className="mt-2 flex items-start gap-2 bg-green/10 border-2 border-green/30 rounded-xl px-3 py-2">
+                  <span className="text-base leading-none mt-0.5">💰</span>
+                  <p className="font-body text-xs text-slate-dark/70 font-semibold">
+                    Kelebihan bayar <span className="text-green font-extrabold">{formatRupiah(resident.saldoLebih)}</span>
+                    {resident.bulanMaju > 0 && (
+                      <> — jadi saldo ± <span className="text-green font-extrabold">{resident.bulanMaju} bulan</span> untuk IPL 2027</>
+                    )}
+                  </p>
+                </div>
+              )}
               {!resident.isLunas && monthsPaid > 0 && (
                 <p className="font-body text-xs font-semibold mt-3">
                   <span className="text-green">✅ Lunas s/d {MONTH_FULL[monthsPaid - 1]}</span>
