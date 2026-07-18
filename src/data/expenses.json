@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2026-07-12",
+  "lastUpdate": "2026-07-19",
   "rutin": [
     {
       "keterangan": "Sisa Kas 2025",
@@ -8,7 +8,7 @@
     },
     {
       "keterangan": "Total Iuran Warga 2026",
-      "masuk": 79950000,
+      "masuk": 82200000,
       "keluar": null
     },
     {
@@ -44,7 +44,7 @@
     {
       "keterangan": "Security Juli",
       "masuk": null,
-      "keluar": null
+      "keluar": 1500000
     },
     {
       "keterangan": "Security Agustus",
@@ -75,7 +75,7 @@
   "insidental": [
     {
       "keterangan": "sisa uang (potong biaya rutin)",
-      "masuk": 90408505,
+      "masuk": 91158505,
       "keluar": null,
       "tanggal": "2026-01-01",
       "kategori": ""
@@ -331,11 +331,25 @@
       "keluar": 200000,
       "tanggal": "2026-07-08",
       "kategori": "Operational"
+    },
+    {
+      "keterangan": "tukang bersih panggilan",
+      "masuk": null,
+      "keluar": 300000,
+      "tanggal": "2026-07-14",
+      "kategori": "Operational"
+    },
+    {
+      "keterangan": "konsumsi kumpul warga",
+      "masuk": null,
+      "keluar": 190000,
+      "tanggal": "2026-07-18",
+      "kategori": "Operational"
     }
   ],
   "summary": {
-    "totalMasuk": 102358505,
-    "totalKeluar": 41247789,
-    "sisaAnggaran": 61110716
+    "totalMasuk": 104608505,
+    "totalKeluar": 43237789,
+    "sisaAnggaran": 61370716
   }
 }
