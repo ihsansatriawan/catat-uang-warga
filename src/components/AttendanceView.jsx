@@ -26,7 +26,7 @@ import { BLOCK_COLORS, BLOCK_COLORS_UNSELECTED } from '../data/constants'
 // Info acara
 const EVENT_TITLE = 'Kumpul Warga D’talago Regency'
 const EVENT_DATE_LABEL = 'Minggu, 2 Agustus 2026'
-const EVENT_TIME_LABEL = '19.30 WITA'
+const EVENT_TIME_LABEL = '19.30 WIB'
 const EVENT_PLACE_LABEL = 'Depan Musola'
 const EVENT_AGENDA = [
   'Acara 17 Agustusan 2026',
@@ -182,8 +182,7 @@ export default function AttendanceView() {
                 {EVENT_TITLE}
               </h1>
               <p className="font-body text-sm text-white/80">
-                Pengumuman untuk seluruh warga D’Talago Regency. Diharapkan
-                kehadirannya untuk pembahasan:
+                Mohon kehadirannya untuk pembahasan:
               </p>
             </div>
 
