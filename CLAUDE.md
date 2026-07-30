@@ -16,6 +16,7 @@ Web app for residents to check their IPL (housing fee) payment status for 2026.
 - `/leaderboard` — LeaderboardView: block ranking + house-level leaderboard
 - `/broadcast` — BroadcastView: generate WhatsApp broadcast message
 - `/pengeluaran` — ExpensesView: expense transparency page with category filtering
+- `/kehadiran` — AttendanceView: RSVP form for the Kumpul Warga event (2 Aug 2026), submits to Google Sheet via Apps Script
 
 ## Key Files
 - `src/data/validated.json` — source of truth for all transactions (flat array under `data`, with top-level `lastUpdate`)
@@ -29,6 +30,7 @@ Web app for residents to check their IPL (housing fee) payment status for 2026.
 - `src/components/LeaderboardView.jsx` — block & house leaderboards with bar charts
 - `src/components/BroadcastView.jsx` — WhatsApp broadcast message generator
 - `src/components/ProofModal.jsx` — placeholder modal for proof of transfer
+- `src/components/AttendanceView.jsx` — event RSVP form; posts to Google Sheet (`Kehadiran` tab) via Apps Script Web App (`VITE_ATTENDANCE_ENDPOINT`), setup in `docs/attendance-apps-script.md`
 - `scripts/convert-validated.js` — converts raw CSV export to `validated.json`
 - `scripts/convert-residents.js` — converts resident CSV to `residents.json`
 - `src/data/expenses.json` — expense data (rutin + insidental, with summary)
