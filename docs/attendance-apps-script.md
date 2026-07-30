@@ -13,8 +13,8 @@ Web App** sebagai jembatan. Ikuti langkah berikut satu kali saja.
 2. Tambahkan sheet/tab baru, beri nama persis: **`Kehadiran`**.
 3. Isi baris pertama (header) dengan kolom berikut:
 
-   | Timestamp | Blok | Nomor Rumah | Nama | Status | Jumlah |
-   | --------- | ---- | ----------- | ---- | ------ | ------ |
+   | Timestamp | Blok | Nomor Rumah | Nama | WhatsApp | Email | Status | Jumlah |
+   | --------- | ---- | ----------- | ---- | -------- | ----- | ------ | ------ |
 
 ## 2. Tambahkan Apps Script
 
@@ -38,6 +38,8 @@ function doPost(e) {
       p.blok || '',
       p.nomorRumah || '',
       p.nama || '',
+      p.whatsapp || '',
+      p.email || '',
       p.status || '',
       p.jumlah || '',
     ])

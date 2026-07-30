@@ -12,6 +12,8 @@ import {
   PartyPopper,
   Clock,
   Megaphone,
+  Phone,
+  Mail,
 } from 'lucide-react'
 import {
   getAvailableBlocks,
@@ -45,6 +47,8 @@ export default function AttendanceView() {
   const [blok, setBlok] = useState('')
   const [nomorRumah, setNomorRumah] = useState('')
   const [nama, setNama] = useState('')
+  const [whatsapp, setWhatsapp] = useState('')
+  const [email, setEmail] = useState('')
   const [status, setStatus] = useState('')
   const [jumlah, setJumlah] = useState('1')
   const [submitting, setSubmitting] = useState(false)
@@ -74,12 +78,18 @@ export default function AttendanceView() {
     setNama('')
   }
 
-  const canSubmit = blok && nomorRumah && nama.trim() && status && !submitting
+  const canSubmit =
+    blok && nomorRumah && nama.trim() && whatsapp.trim() && status && !submitting
 
   async function handleSubmit(e) {
     e.preventDefault()
     if (!canSubmit) return
     setError('')
+
+    if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      setError('Format email belum benar. Cek lagi ya.')
+      return
+    }
 
     if (!ENDPOINT) {
       setError(
@@ -97,6 +107,8 @@ export default function AttendanceView() {
         blok,
         nomorRumah: String(nomorRumah),
         nama: nama.trim(),
+        whatsapp: whatsapp.trim(),
+        email: email.trim(),
         status,
         jumlah: String(jumlah || 1),
       })
@@ -119,6 +131,8 @@ export default function AttendanceView() {
     setBlok('')
     setNomorRumah('')
     setNama('')
+    setWhatsapp('')
+    setEmail('')
     setStatus('')
     setJumlah('1')
     setSubmitted(false)
@@ -335,6 +349,48 @@ export default function AttendanceView() {
                       Terisi otomatis dari data warga — boleh diubah bila perlu.
                     </p>
                   )}
+                </div>
+
+                {/* Nomor WhatsApp */}
+                <div>
+                  <label className="font-heading font-bold text-xs uppercase tracking-wider text-slate-dark/50 mb-2 flex items-center gap-1.5">
+                    <Phone size={13} strokeWidth={2.5} />
+                    Nomor WhatsApp
+                  </label>
+                  <input
+                    type="tel"
+                    inputMode="numeric"
+                    value={whatsapp}
+                    onChange={(e) => setWhatsapp(e.target.value)}
+                    placeholder="08xxxxxxxxxx"
+                    className="
+                      w-full border-2 border-slate-dark rounded-xl px-4 py-3
+                      font-heading text-base font-bold bg-cream
+                      focus:outline-none focus:ring-2 focus:ring-violet focus:ring-offset-2
+                      placeholder:text-slate-dark/20 placeholder:font-normal
+                    "
+                  />
+                </div>
+
+                {/* Email */}
+                <div>
+                  <label className="font-heading font-bold text-xs uppercase tracking-wider text-slate-dark/50 mb-2 flex items-center gap-1.5">
+                    <Mail size={13} strokeWidth={2.5} />
+                    Email <span className="text-slate-dark/30 normal-case">(opsional)</span>
+                  </label>
+                  <input
+                    type="email"
+                    inputMode="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="nama@email.com"
+                    className="
+                      w-full border-2 border-slate-dark rounded-xl px-4 py-3
+                      font-heading text-base font-bold bg-cream
+                      focus:outline-none focus:ring-2 focus:ring-violet focus:ring-offset-2
+                      placeholder:text-slate-dark/20 placeholder:font-normal
+                    "
+                  />
                 </div>
 
                 {/* Status Kehadiran — dropdown */}
