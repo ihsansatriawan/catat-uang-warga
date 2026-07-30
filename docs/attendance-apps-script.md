@@ -82,7 +82,38 @@ function doPost(e) {
 > dobel)? Ganti seluruh blok upsert di atas dengan satu baris:
 > `sheet.appendRow(row)`.
 
-3. Simpan (ikon disket).
+3. **Untuk halaman rekap di web** (`/rekap-kehadiran`), tambahkan juga fungsi
+   `doGet` berikut di bawah `doPost`. Fungsi ini sengaja **tidak** mengembalikan
+   nomor WhatsApp & email agar data pribadi tidak bocor ke publik:
+
+```javascript
+function doGet(e) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet()
+  const sheet = ss.getSheetByName(SHEET_NAME)
+  const values = sheet.getDataRange().getValues()
+
+  const out = []
+  for (let i = 1; i < values.length; i++) {
+    const r = values[i]
+    if (!r[1] && !r[2]) continue // lewati baris kosong
+    out.push({
+      blok: String(r[1]),
+      nomorRumah: String(r[2]),
+      nama: String(r[3]),
+      // r[4] = WhatsApp & r[5] = Email TIDAK disertakan (privasi)
+      status: String(r[6]),
+      jumlah: r[7],
+      timestamp: r[0],
+    })
+  }
+
+  return ContentService
+    .createTextOutput(JSON.stringify({ ok: true, data: out }))
+    .setMimeType(ContentService.MimeType.JSON)
+}
+```
+
+4. Simpan (ikon disket).
 
 ## 3. Deploy sebagai Web App
 
@@ -191,6 +222,17 @@ klik ikon filter pada kolom **Status Isi** lalu pilih hanya "❌ Belum".
 
 > Angka baris (D2:D51) mengikuti 50 rumah di atas. Kalau jumlah rumah
 > berubah, sesuaikan sampai baris terakhir daftar.
+
+## 6. Halaman rekap di web (`/rekap-kehadiran`)
+
+Selain tab `Rekap` di Google Sheet (langkah 5), aplikasi punya halaman
+**`/rekap-kehadiran`** yang menampilkan rekap langsung di web: jumlah rumah
+yang sudah/belum konfirmasi, rincian Hadir / Tidak Hadir / Masih Ragu, serta
+daftar per blok. Halaman ini membaca data lewat fungsi `doGet` (langkah 2.3),
+jadi pastikan `doGet` sudah ditempel dan deployment sudah **New version**.
+
+Halaman ini **tidak menampilkan** nomor WhatsApp & email karena `doGet` memang
+tidak mengirim kolom tersebut — data pribadi tetap hanya ada di Google Sheet.
 
 ## Catatan
 

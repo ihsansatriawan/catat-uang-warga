@@ -14,6 +14,7 @@ import {
   Megaphone,
   Phone,
   Mail,
+  ClipboardList,
 } from 'lucide-react'
 import {
   getAvailableBlocks,
@@ -238,6 +239,21 @@ export default function AttendanceView() {
               </p>
             </div>
           </div>
+
+          {/* Link ke rekap */}
+          <Link
+            to="/rekap-kehadiran"
+            className="
+              w-full inline-flex items-center justify-center gap-2
+              bg-white border-2 border-slate-dark rounded-full px-5 py-2.5
+              font-heading font-bold text-sm shadow-hard-sm
+              hover:bg-cream active:translate-x-[1px] active:translate-y-[1px] active:shadow-none
+              transition-all animate-fade-in stagger-2
+            "
+          >
+            <ClipboardList size={15} strokeWidth={2.5} className="text-violet" />
+            Lihat Rekap Kehadiran
+          </Link>
 
           {submitted ? (
             /* Success card */
