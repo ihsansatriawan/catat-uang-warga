@@ -236,30 +236,8 @@ export default function RekapKehadiranView() {
                 ))}
               </div>
 
-              {/* Belum konfirmasi */}
-              <div className="bg-white border-2 border-slate-dark rounded-3xl shadow-hard overflow-hidden animate-slide-up stagger-3">
-                <div className="flex items-center gap-2 px-5 py-3 border-b-2 border-slate-dark/10">
-                  <Circle size={16} strokeWidth={2.5} className="text-slate-dark/40" />
-                  <span className="font-heading font-bold text-sm">Belum Konfirmasi</span>
-                  <span className="ml-auto font-heading font-black text-sm text-slate-dark/40">
-                    {belumHouses.length}
-                  </span>
-                </div>
-                {belumHouses.length > 0 ? (
-                  <div className="divide-y-2 divide-slate-dark/5">
-                    {belumHouses.map((h) => (
-                      <HouseRow key={`${h.blok}-${h.nomorRumah}`} h={h} />
-                    ))}
-                  </div>
-                ) : (
-                  <p className="px-5 py-4 font-body text-sm text-slate-dark/50 text-center">
-                    Semua rumah sudah konfirmasi 🎉
-                  </p>
-                )}
-              </div>
-
               {/* Sudah konfirmasi */}
-              <div className="bg-white border-2 border-slate-dark rounded-3xl shadow-hard overflow-hidden animate-slide-up stagger-4">
+              <div className="bg-white border-2 border-slate-dark rounded-3xl shadow-hard overflow-hidden animate-slide-up stagger-3">
                 <div className="flex items-center gap-2 px-5 py-3 border-b-2 border-slate-dark/10">
                   <CheckCircle2 size={16} strokeWidth={2.5} className="text-green" />
                   <span className="font-heading font-bold text-sm">Sudah Konfirmasi</span>
@@ -276,6 +254,28 @@ export default function RekapKehadiranView() {
                 ) : (
                   <p className="px-5 py-4 font-body text-sm text-slate-dark/50 text-center">
                     Belum ada yang konfirmasi.
+                  </p>
+                )}
+              </div>
+
+              {/* Belum konfirmasi */}
+              <div className="bg-white border-2 border-slate-dark rounded-3xl shadow-hard overflow-hidden animate-slide-up stagger-4">
+                <div className="flex items-center gap-2 px-5 py-3 border-b-2 border-slate-dark/10">
+                  <Circle size={16} strokeWidth={2.5} className="text-slate-dark/40" />
+                  <span className="font-heading font-bold text-sm">Belum Konfirmasi</span>
+                  <span className="ml-auto font-heading font-black text-sm text-slate-dark/40">
+                    {belumHouses.length}
+                  </span>
+                </div>
+                {belumHouses.length > 0 ? (
+                  <div className="divide-y-2 divide-slate-dark/5">
+                    {belumHouses.map((h) => (
+                      <HouseRow key={`${h.blok}-${h.nomorRumah}`} h={h} />
+                    ))}
+                  </div>
+                ) : (
+                  <p className="px-5 py-4 font-body text-sm text-slate-dark/50 text-center">
+                    Semua rumah sudah konfirmasi 🎉
                   </p>
                 )}
               </div>
