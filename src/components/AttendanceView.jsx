@@ -10,6 +10,8 @@ import {
   CheckCircle2,
   Loader2,
   PartyPopper,
+  Clock,
+  Megaphone,
 } from 'lucide-react'
 import {
   getAvailableBlocks,
@@ -22,6 +24,12 @@ import { BLOCK_COLORS, BLOCK_COLORS_UNSELECTED } from '../data/constants'
 // Info acara
 const EVENT_TITLE = 'Kumpul Warga D’talago Regency'
 const EVENT_DATE_LABEL = 'Minggu, 2 Agustus 2026'
+const EVENT_TIME_LABEL = '19.30 WITA'
+const EVENT_PLACE_LABEL = 'Depan Musola'
+const EVENT_AGENDA = [
+  'Acara 17 Agustusan 2026',
+  'Kelanjutan pengurusan Paguyuban D’Talago Regency',
+]
 
 // Endpoint Google Apps Script Web App (lihat docs/attendance-apps-script.md).
 // Diisi lewat .env.local: VITE_ATTENDANCE_ENDPOINT=...
@@ -150,19 +158,62 @@ export default function AttendanceView() {
           <div className="bg-violet border-2 border-slate-dark rounded-3xl shadow-hard overflow-hidden animate-slide-up stagger-1">
             <div className="px-5 pt-5 pb-4">
               <span className="inline-flex items-center gap-1.5 bg-yellow border-2 border-slate-dark rounded-full px-3 py-1 font-heading font-bold text-xs shadow-hard-sm text-slate-dark mb-3">
-                <PartyPopper size={13} strokeWidth={2.5} />
-                Undangan Kumpul Warga
+                <Megaphone size={13} strokeWidth={2.5} />
+                Pengumuman Warga
               </span>
               <h1 className="font-heading font-black text-2xl text-white leading-tight mb-1">
                 {EVENT_TITLE}
               </h1>
-              <p className="font-body text-sm text-white/80 flex items-center gap-1.5">
-                <CalendarCheck size={15} strokeWidth={2.5} />
-                {EVENT_DATE_LABEL}
+              <p className="font-body text-sm text-white/80">
+                Pengumuman untuk seluruh warga D’Talago Regency. Diharapkan
+                kehadirannya untuk pembahasan:
               </p>
             </div>
-            <div className="bg-white/10 border-t-2 border-slate-dark px-5 py-3">
-              <p className="font-body text-xs text-white/90">
+
+            {/* Agenda */}
+            <div className="bg-white/10 border-t-2 border-slate-dark px-5 py-4">
+              <p className="font-heading font-bold text-xs uppercase tracking-wider text-white/60 mb-2">
+                Agenda
+              </p>
+              <ol className="space-y-2">
+                {EVENT_AGENDA.map((item, i) => (
+                  <li key={i} className="flex items-start gap-2.5">
+                    <span className="flex-shrink-0 inline-flex items-center justify-center w-5 h-5 rounded-full bg-yellow border-2 border-slate-dark font-heading font-black text-[11px] text-slate-dark">
+                      {i + 1}
+                    </span>
+                    <span className="font-body text-sm text-white leading-snug">
+                      {item}
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+
+            {/* Waktu & tempat */}
+            <div className="bg-white border-t-2 border-slate-dark px-5 py-4 space-y-2.5">
+              <div className="flex items-center gap-2.5">
+                <CalendarCheck size={16} strokeWidth={2.5} className="text-violet flex-shrink-0" />
+                <span className="font-heading font-bold text-sm text-slate-dark">
+                  {EVENT_DATE_LABEL}
+                </span>
+              </div>
+              <div className="flex items-center gap-2.5">
+                <Clock size={16} strokeWidth={2.5} className="text-violet flex-shrink-0" />
+                <span className="font-heading font-bold text-sm text-slate-dark">
+                  Pukul {EVENT_TIME_LABEL}
+                </span>
+              </div>
+              <div className="flex items-center gap-2.5">
+                <MapPin size={16} strokeWidth={2.5} className="text-violet flex-shrink-0" />
+                <span className="font-heading font-bold text-sm text-slate-dark">
+                  {EVENT_PLACE_LABEL}
+                </span>
+              </div>
+            </div>
+
+            <div className="bg-yellow border-t-2 border-slate-dark px-5 py-3">
+              <p className="font-body text-xs text-slate-dark font-semibold flex items-center gap-1.5">
+                <PartyPopper size={14} strokeWidth={2.5} />
                 Yuk konfirmasi kehadiranmu di bawah ini 👇
               </p>
             </div>
