@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Search, Home, MapPin, Calendar, Trophy, Wallet, CreditCard } from 'lucide-react'
+import { Search, Home, MapPin, Calendar, Trophy, Wallet, CreditCard, CalendarCheck } from 'lucide-react'
 import { getAvailableBlocks, getLastUpdated } from '../data/helpers'
 import { trackEvent } from '../utils/tracking'
 import { BLOCK_COLORS, BLOCK_COLORS_UNSELECTED } from '../data/constants'
@@ -106,6 +106,22 @@ export default function SearchView({ onSearch }) {
             <CreditCard size={15} strokeWidth={2.5} />
             Cara Bayar IPL
           </button>
+
+          {/* Event kehadiran — full-width chip */}
+          <Link
+            to="/kehadiran"
+            className="
+              w-full inline-flex items-center justify-center gap-2
+              bg-green text-white border-2 border-slate-dark rounded-full px-5 py-2.5
+              font-heading font-extrabold text-sm shadow-hard
+              hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg
+              active:translate-x-0 active:translate-y-0 active:shadow-hard-sm
+              transition-all
+            "
+          >
+            <CalendarCheck size={15} strokeWidth={2.5} />
+            Konfirmasi Kehadiran Kumpul Warga
+          </Link>
 
           {/* Secondary chips row */}
           <div className="flex items-center gap-2 w-full">

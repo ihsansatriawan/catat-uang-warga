@@ -152,6 +152,23 @@ export function generateBroadcastMessage() {
   return msg
 }
 
+export function getAttendanceHouses(blok) {
+  let list = residents
+  if (blok) list = list.filter((r) => r.blok === blok)
+  return [...list].sort(
+    (a, b) =>
+      a.blok.localeCompare(b.blok) ||
+      Number(a.nomorRumah) - Number(b.nomorRumah)
+  )
+}
+
+export function getResidentName(blok, nomorRumah) {
+  const r = residents.find(
+    (x) => x.blok === blok && x.nomorRumah === String(nomorRumah)
+  )
+  return r ? r.namaPemilik : null
+}
+
 export function getExpenses() {
   return expenses
 }

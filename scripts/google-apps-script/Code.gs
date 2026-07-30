@@ -75,6 +75,101 @@ function onOpen() {
 }
 
 // ---------------------------------------------------------------------------
+// Attendance (Kehadiran) — Web App endpoint
+// ---------------------------------------------------------------------------
+//
+// Form kehadiran acara di halaman /kehadiran POST ke Web App ini; halaman
+// /rekap-kehadiran membacanya lewat doGet. Data masuk ke tab terpisah
+// (ATTENDANCE_SHEET), tidak mengganggu tab Raw Data / Validated / Transaksi.
+//
+// Kolom tab "Kehadiran":
+//   Timestamp | Blok | Nomor Rumah | Nama | WhatsApp | Email | Status
+
+var ATTENDANCE_SHEET = 'Kehadiran';
+
+/**
+ * Menerima submit form kehadiran.
+ * Upsert: kalau Blok + Nomor Rumah yang sama sudah pernah mengisi, baris
+ * lamanya ditimpa (bukan menambah baris baru) — jadi 1 rumah = 1 baris.
+ */
+function doPost(e) {
+  var lock = LockService.getScriptLock();
+  lock.waitLock(30000);
+  try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getSheetByName(ATTENDANCE_SHEET);
+    var p = (e && e.parameter) ? e.parameter : {};
+
+    var row = [
+      p.timestamp || new Date().toISOString(),
+      p.blok || '',
+      p.nomorRumah || '',
+      p.nama || '',
+      p.whatsapp || '',
+      p.email || '',
+      p.status || ''
+    ];
+
+    var values = sheet.getDataRange().getValues();
+    var targetRow = 0; // 0 = tidak ketemu
+    for (var i = 1; i < values.length; i++) {
+      // kolom B = Blok (index 1), kolom C = Nomor Rumah (index 2)
+      if (
+        String(values[i][1]) === String(p.blok) &&
+        String(values[i][2]) === String(p.nomorRumah)
+      ) {
+        targetRow = i + 1; // nomor baris di sheet (1-based, header di baris 1)
+        break;
+      }
+    }
+
+    if (targetRow > 0) {
+      sheet.getRange(targetRow, 1, 1, row.length).setValues([row]);
+    } else {
+      sheet.appendRow(row);
+    }
+
+    return ContentService
+      .createTextOutput(JSON.stringify({ ok: true }))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch (err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ ok: false, error: String(err) }))
+      .setMimeType(ContentService.MimeType.JSON);
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/**
+ * Mengembalikan data kehadiran untuk halaman rekap.
+ * Sengaja TIDAK mengirim WhatsApp & Email agar data pribadi tidak bocor ke publik.
+ */
+function doGet(e) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(ATTENDANCE_SHEET);
+  var values = sheet.getDataRange().getValues();
+
+  var out = [];
+  for (var i = 1; i < values.length; i++) {
+    var r = values[i];
+    if (!r[1] && !r[2]) continue; // lewati baris kosong
+    out.push({
+      blok: String(r[1]),
+      nomorRumah: String(r[2]),
+      nama: String(r[3]),
+      // r[4] = WhatsApp & r[5] = Email TIDAK disertakan (privasi)
+      status: String(r[6]),
+      timestamp: r[0]
+    });
+  }
+
+  return ContentService
+    .createTextOutput(JSON.stringify({ ok: true, data: out }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+// ---------------------------------------------------------------------------
 // Auto-copy on validation
 // ---------------------------------------------------------------------------
 
