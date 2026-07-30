@@ -79,14 +79,20 @@ export default function AttendanceView() {
   }
 
   const canSubmit =
-    blok && nomorRumah && nama.trim() && whatsapp.trim() && status && !submitting
+    blok &&
+    nomorRumah &&
+    nama.trim() &&
+    whatsapp.trim() &&
+    email.trim() &&
+    status &&
+    !submitting
 
   async function handleSubmit(e) {
     e.preventDefault()
     if (!canSubmit) return
     setError('')
 
-    if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
       setError('Format email belum benar. Cek lagi ya.')
       return
     }
@@ -376,7 +382,7 @@ export default function AttendanceView() {
                 <div>
                   <label className="font-heading font-bold text-xs uppercase tracking-wider text-slate-dark/50 mb-2 flex items-center gap-1.5">
                     <Mail size={13} strokeWidth={2.5} />
-                    Email <span className="text-slate-dark/30 normal-case">(opsional)</span>
+                    Email
                   </label>
                   <input
                     type="email"
