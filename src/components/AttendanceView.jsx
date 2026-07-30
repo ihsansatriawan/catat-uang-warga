@@ -6,7 +6,6 @@ import {
   MapPin,
   Home,
   User,
-  Users,
   CheckCircle2,
   Loader2,
   PartyPopper,
@@ -51,7 +50,6 @@ export default function AttendanceView() {
   const [whatsapp, setWhatsapp] = useState('')
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState('')
-  const [jumlah, setJumlah] = useState('1')
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState('')
@@ -117,7 +115,6 @@ export default function AttendanceView() {
         whatsapp: whatsapp.trim(),
         email: email.trim(),
         status,
-        jumlah: String(jumlah || 1),
       })
       // Apps Script Web App tidak mengirim header CORS, jadi pakai no-cors.
       // Respons tidak bisa dibaca — kita anggap sukses bila fetch tidak error.
@@ -141,7 +138,6 @@ export default function AttendanceView() {
     setWhatsapp('')
     setEmail('')
     setStatus('')
-    setJumlah('1')
     setSubmitted(false)
     setError('')
   }
@@ -438,29 +434,6 @@ export default function AttendanceView() {
                     ))}
                   </select>
                 </div>
-
-                {/* Jumlah yang hadir — opsional, hanya bila Hadir */}
-                {status === 'Hadir' && (
-                  <div className="animate-fade-in">
-                    <label className="font-heading font-bold text-xs uppercase tracking-wider text-slate-dark/50 mb-2 flex items-center gap-1.5">
-                      <Users size={13} strokeWidth={2.5} />
-                      Jumlah yang Hadir
-                    </label>
-                    <input
-                      type="number"
-                      inputMode="numeric"
-                      min="1"
-                      max="20"
-                      value={jumlah}
-                      onChange={(e) => setJumlah(e.target.value)}
-                      className="
-                        w-full border-2 border-slate-dark rounded-xl px-4 py-3
-                        font-heading text-base font-bold bg-cream
-                        focus:outline-none focus:ring-2 focus:ring-violet focus:ring-offset-2
-                      "
-                    />
-                  </div>
-                )}
 
                 {error && (
                   <p className="font-body text-sm text-red-500 bg-red-50 border-2 border-red-200 rounded-xl px-3 py-2">

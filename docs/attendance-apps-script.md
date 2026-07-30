@@ -13,8 +13,8 @@ Web App** sebagai jembatan. Ikuti langkah berikut satu kali saja.
 2. Tambahkan sheet/tab baru, beri nama persis: **`Kehadiran`**.
 3. Isi baris pertama (header) dengan kolom berikut:
 
-   | Timestamp | Blok | Nomor Rumah | Nama | WhatsApp | Email | Status | Jumlah |
-   | --------- | ---- | ----------- | ---- | -------- | ----- | ------ | ------ |
+   | Timestamp | Blok | Nomor Rumah | Nama | WhatsApp | Email | Status |
+   | --------- | ---- | ----------- | ---- | -------- | ----- | ------ |
 
 ## 2. Tambahkan Apps Script
 
@@ -41,7 +41,6 @@ function doPost(e) {
       p.whatsapp || '',
       p.email || '',
       p.status || '',
-      p.jumlah || '',
     ]
 
     // Upsert: kalau Blok + Nomor Rumah yang sama sudah pernah mengisi,
@@ -102,7 +101,6 @@ function doGet(e) {
       nama: String(r[3]),
       // r[4] = WhatsApp & r[5] = Email TIDAK disertakan (privasi)
       status: String(r[6]),
-      jumlah: r[7],
       timestamp: r[0],
     })
   }
