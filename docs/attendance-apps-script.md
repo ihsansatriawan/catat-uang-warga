@@ -16,102 +16,33 @@ Web App** sebagai jembatan. Ikuti langkah berikut satu kali saja.
    | Timestamp | Blok | Nomor Rumah | Nama | WhatsApp | Email | Status |
    | --------- | ---- | ----------- | ---- | -------- | ----- | ------ |
 
-## 2. Tambahkan Apps Script
+## 2. Tambahkan fungsi kehadiran ke Apps Script
+
+Kode Apps Script proyek ini adalah satu file: **`scripts/google-apps-script/Code.gs`**
+(berisi validasi pembayaran + deploy JSON ke GitHub). Fungsi untuk form
+kehadiran — `ATTENDANCE_SHEET`, `doPost`, dan `doGet` — sudah **ditambahkan**
+ke file itu (lihat section "Attendance (Kehadiran) — Web App endpoint").
+
+> **Penting: tambahkan, jangan hapus/ganti kode lama.** Fungsi kehadiran
+> tidak bentrok dengan fungsi yang sudah ada, dan tab tujuannya terpisah.
+
+Cara menerapkannya ke Google Sheet:
 
 1. Di Google Sheet, buka menu **Extensions → Apps Script**.
-2. Hapus kode contoh, tempel kode berikut:
-
-```javascript
-// Nama tab tujuan
-const SHEET_NAME = 'Kehadiran'
-
-function doPost(e) {
-  const lock = LockService.getScriptLock()
-  lock.waitLock(30000)
-  try {
-    const ss = SpreadsheetApp.getActiveSpreadsheet()
-    const sheet = ss.getSheetByName(SHEET_NAME)
-    const p = e.parameter
-
-    const row = [
-      p.timestamp || new Date().toISOString(),
-      p.blok || '',
-      p.nomorRumah || '',
-      p.nama || '',
-      p.whatsapp || '',
-      p.email || '',
-      p.status || '',
-    ]
-
-    // Upsert: kalau Blok + Nomor Rumah yang sama sudah pernah mengisi,
-    // baris lamanya ditimpa (bukan menambah baris baru). Jadi 1 rumah = 1 baris.
-    const values = sheet.getDataRange().getValues()
-    let targetRow = 0 // 0 = tidak ketemu
-    for (let i = 1; i < values.length; i++) {
-      // kolom B = Blok (index 1), kolom C = Nomor Rumah (index 2)
-      if (
-        String(values[i][1]) === String(p.blok) &&
-        String(values[i][2]) === String(p.nomorRumah)
-      ) {
-        targetRow = i + 1 // nomor baris di sheet (1-based, header di baris 1)
-        break
-      }
-    }
-
-    if (targetRow > 0) {
-      sheet.getRange(targetRow, 1, 1, row.length).setValues([row])
-    } else {
-      sheet.appendRow(row)
-    }
-
-    return ContentService
-      .createTextOutput(JSON.stringify({ ok: true }))
-      .setMimeType(ContentService.MimeType.JSON)
-  } catch (err) {
-    return ContentService
-      .createTextOutput(JSON.stringify({ ok: false, error: String(err) }))
-      .setMimeType(ContentService.MimeType.JSON)
-  } finally {
-    lock.releaseLock()
-  }
-}
-```
+2. Cara termudah agar selalu sinkron dengan repo: **salin seluruh isi**
+   `scripts/google-apps-script/Code.gs` (versi terbaru) lalu **tempel menimpa**
+   isi editor Apps Script. (Aman karena file di repo ini memang sudah memuat
+   semua fungsi lama + fungsi kehadiran.)
+   Alternatif, jika kamu punya perubahan lokal di Apps Script yang belum ada di
+   repo: **tempel hanya** blok `ATTENDANCE_SHEET` + `doPost` + `doGet` di akhir
+   script yang sudah ada.
+3. `doGet` sengaja **tidak** mengembalikan nomor WhatsApp & email agar data
+   pribadi tidak bocor ke halaman rekap publik.
+4. Simpan (ikon disket).
 
 > Ingin menyimpan **semua riwayat** (setiap submit jadi baris baru, boleh
-> dobel)? Ganti seluruh blok upsert di atas dengan satu baris:
+> dobel)? Di `doPost`, ganti seluruh blok upsert dengan satu baris:
 > `sheet.appendRow(row)`.
-
-3. **Untuk halaman rekap di web** (`/rekap-kehadiran`), tambahkan juga fungsi
-   `doGet` berikut di bawah `doPost`. Fungsi ini sengaja **tidak** mengembalikan
-   nomor WhatsApp & email agar data pribadi tidak bocor ke publik:
-
-```javascript
-function doGet(e) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet()
-  const sheet = ss.getSheetByName(SHEET_NAME)
-  const values = sheet.getDataRange().getValues()
-
-  const out = []
-  for (let i = 1; i < values.length; i++) {
-    const r = values[i]
-    if (!r[1] && !r[2]) continue // lewati baris kosong
-    out.push({
-      blok: String(r[1]),
-      nomorRumah: String(r[2]),
-      nama: String(r[3]),
-      // r[4] = WhatsApp & r[5] = Email TIDAK disertakan (privasi)
-      status: String(r[6]),
-      timestamp: r[0],
-    })
-  }
-
-  return ContentService
-    .createTextOutput(JSON.stringify({ ok: true, data: out }))
-    .setMimeType(ContentService.MimeType.JSON)
-}
-```
-
-4. Simpan (ikon disket).
 
 ## 3. Deploy sebagai Web App
 
@@ -226,8 +157,8 @@ klik ikon filter pada kolom **Status Isi** lalu pilih hanya "❌ Belum".
 Selain tab `Rekap` di Google Sheet (langkah 5), aplikasi punya halaman
 **`/rekap-kehadiran`** yang menampilkan rekap langsung di web: jumlah rumah
 yang sudah/belum konfirmasi, rincian Hadir / Tidak Hadir / Masih Ragu, serta
-daftar per blok. Halaman ini membaca data lewat fungsi `doGet` (langkah 2.3),
-jadi pastikan `doGet` sudah ditempel dan deployment sudah **New version**.
+daftar per blok. Halaman ini membaca data lewat fungsi `doGet` (bagian 2),
+jadi pastikan `doGet` sudah ada di Apps Script dan deployment sudah **New version**.
 
 Halaman ini **tidak menampilkan** nomor WhatsApp & email karena `doGet` memang
 tidak mengirim kolom tersebut — data pribadi tetap hanya ada di Google Sheet.
