@@ -9,12 +9,14 @@ import {
   XCircle,
   HelpCircle,
   Circle,
+  Share2,
 } from 'lucide-react'
 import { getAvailableBlocks, getAttendanceHouses } from '../data/helpers'
 import { trackEvent } from '../utils/tracking'
 import { BLOCK_COLORS, BLOCK_COLORS_UNSELECTED } from '../data/constants'
 
 const ENDPOINT = import.meta.env.VITE_ATTENDANCE_ENDPOINT || ''
+const EVENT_DATE_LABEL = 'Minggu, 2 Agustus 2026'
 
 // Status → tampilan
 const STATUS_META = {
@@ -100,6 +102,21 @@ export default function RekapKehadiranView() {
   const sudahHouses = houses.filter((h) => h.filled)
   const belumHouses = houses.filter((h) => !h.filled)
 
+  function handleShare() {
+    const msg =
+      `📋 *Rekap Kehadiran Kumpul Warga*\n` +
+      `📅 ${EVENT_DATE_LABEL}\n\n` +
+      `✅ Sudah konfirmasi: ${stats.filled}/${stats.total} rumah\n` +
+      `   • Hadir: ${stats.hadir}\n` +
+      `   • Tidak Hadir: ${stats.tidak}\n` +
+      `   • Masih Ragu: ${stats.ragu}\n` +
+      `⬜ Belum konfirmasi: ${stats.belum} rumah\n\n` +
+      `Yuk konfirmasi kehadiran di:\n` +
+      `https://ipl-talago.netlify.app/kehadiran`
+    trackEvent('share_rekap_kehadiran')
+    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer')
+  }
+
   function StatusBadge({ status }) {
     const meta = status ? STATUS_META[status] || BELUM : BELUM
     const { Icon } = meta
@@ -151,6 +168,14 @@ export default function RekapKehadiranView() {
             Rekap Kehadiran
           </span>
         </div>
+        <button
+          onClick={handleShare}
+          disabled={loading || !!error}
+          aria-label="Share ke WhatsApp"
+          className="text-green disabled:opacity-40 active:scale-90 transition-transform"
+        >
+          <Share2 size={20} strokeWidth={2.5} />
+        </button>
         <button
           onClick={load}
           disabled={loading}
@@ -206,6 +231,23 @@ export default function RekapKehadiranView() {
                   </div>
                 </div>
               </div>
+
+              {/* Share button */}
+              <button
+                onClick={handleShare}
+                className="
+                  w-full flex items-center justify-center gap-2
+                  font-heading font-bold text-sm text-white bg-green
+                  border-2 border-slate-dark rounded-full px-5 py-2.5
+                  shadow-hard-sm
+                  hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard
+                  active:translate-x-0 active:translate-y-0 active:shadow-none
+                  transition-all duration-150 animate-fade-in stagger-2
+                "
+              >
+                <Share2 size={16} strokeWidth={2.5} />
+                Share Rekap ke WhatsApp
+              </button>
 
               {/* Block filter */}
               <div className="flex flex-wrap gap-2 animate-fade-in stagger-2">
