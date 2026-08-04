@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2026-07-19",
+  "lastUpdate": "2026-08-04",
   "rutin": [
     {
       "keterangan": "Sisa Kas 2025",
@@ -8,7 +8,7 @@
     },
     {
       "keterangan": "Total Iuran Warga 2026",
-      "masuk": 82200000,
+      "masuk": 89450000,
       "keluar": null
     },
     {
@@ -75,7 +75,7 @@
   "insidental": [
     {
       "keterangan": "sisa uang (potong biaya rutin)",
-      "masuk": 91158505,
+      "masuk": 98408505,
       "keluar": null,
       "tanggal": "2026-01-01",
       "kategori": ""
@@ -345,11 +345,32 @@
       "keluar": 190000,
       "tanggal": "2026-07-18",
       "kategori": "Operational"
+    },
+    {
+      "keterangan": "sumbangan RT17-an",
+      "masuk": null,
+      "keluar": 500000,
+      "tanggal": "2026-07-27",
+      "kategori": "Operational"
+    },
+    {
+      "keterangan": "biaya kirim surat ke compok",
+      "masuk": null,
+      "keluar": 42000,
+      "tanggal": "2026-07-27",
+      "kategori": "Operational"
+    },
+    {
+      "keterangan": "konsumsi kumpul warga",
+      "masuk": null,
+      "keluar": 60000,
+      "tanggal": "2026-08-02",
+      "kategori": "Operational"
     }
   ],
   "summary": {
-    "totalMasuk": 104608505,
-    "totalKeluar": 43237789,
-    "sisaAnggaran": 61370716
+    "totalMasuk": 111858505,
+    "totalKeluar": 43839789,
+    "sisaAnggaran": 68018716
   }
 }
