@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2026-08-04",
+  "lastUpdate": "2026-08-08",
   "rutin": [
     {
       "keterangan": "Sisa Kas 2025",
@@ -8,7 +8,7 @@
     },
     {
       "keterangan": "Total Iuran Warga 2026",
-      "masuk": 89450000,
+      "masuk": 89700000,
       "keluar": null
     },
     {
@@ -75,7 +75,7 @@
   "insidental": [
     {
       "keterangan": "sisa uang (potong biaya rutin)",
-      "masuk": 98408505,
+      "masuk": 98658505,
       "keluar": null,
       "tanggal": "2026-01-01",
       "kategori": ""
@@ -366,11 +366,32 @@
       "keluar": 60000,
       "tanggal": "2026-08-02",
       "kategori": "Operational"
+    },
+    {
+      "keterangan": "kebersihan komplek",
+      "masuk": null,
+      "keluar": 175000,
+      "tanggal": "2026-08-06",
+      "kategori": "Operational"
+    },
+    {
+      "keterangan": "tukang potong phon2 bwt kebersihan",
+      "masuk": null,
+      "keluar": 50000,
+      "tanggal": "2026-08-08",
+      "kategori": "Operational"
+    },
+    {
+      "keterangan": "konsumsi kerja bakti warga",
+      "masuk": null,
+      "keluar": 659000,
+      "tanggal": "2026-08-08",
+      "kategori": "Operational"
     }
   ],
   "summary": {
-    "totalMasuk": 111858505,
-    "totalKeluar": 43839789,
-    "sisaAnggaran": 68018716
+    "totalMasuk": 112108505,
+    "totalKeluar": 44723789,
+    "sisaAnggaran": 67384716
   }
 }
