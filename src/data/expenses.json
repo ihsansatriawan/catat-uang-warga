@@ -387,11 +387,18 @@
       "keluar": 659000,
       "tanggal": "2026-08-08",
       "kategori": "Operational"
+    },
+    {
+      "keterangan": "kebersihan komplek",
+      "masuk": null,
+      "keluar": 20000,
+      "tanggal": "2026-08-08",
+      "kategori": "Operational"
     }
   ],
   "summary": {
     "totalMasuk": 112108505,
-    "totalKeluar": 44723789,
-    "sisaAnggaran": 67384716
+    "totalKeluar": 44743789,
+    "sisaAnggaran": 67364716
   }
 }
