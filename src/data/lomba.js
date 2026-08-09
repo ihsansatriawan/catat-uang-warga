@@ -22,7 +22,7 @@ export const LOMBA_LIST = [
   { key: 'paku', label: 'Masukin paku ke dalam botol', kategori: 'KU-7 ke atas' },
   { key: 'karung', label: 'Balap karung', kategori: 'KU-7 ke atas' },
   { key: 'kelereng', label: 'Balap kelereng', kategori: 'KU-7 ke atas' },
-  { key: 'tepung', label: 'Memindahkan tepung terigu', kategori: 'KU-7 ke atas', tim: true },
+  { key: 'tepung', label: 'Memindahkan tepung terigu', kategori: 'KU-7 ke atas' },
   { key: 'pentas', label: 'Pentas seni', kategori: 'Semua Umur' },
 ]
 

@@ -367,11 +367,6 @@ export default function LombaView() {
                       <li key={k} className="font-body text-sm text-slate-dark flex items-start gap-2">
                         <span className="text-orange font-bold">•</span>
                         {LOMBA_BY_KEY[k].label}
-                        {LOMBA_BY_KEY[k].tim && (
-                          <span className="font-heading font-bold text-[10px] bg-violet text-white border border-slate-dark rounded px-1.5 py-0.5">
-                            TIM
-                          </span>
-                        )}
                       </li>
                     ))}
                   </ul>
@@ -730,11 +725,6 @@ export default function LombaView() {
                                             <span className="flex-1 font-body text-sm leading-snug">
                                               {l.label}
                                             </span>
-                                            {l.tim && (
-                                              <span className="font-heading font-bold text-[9px] bg-violet text-white border border-slate-dark rounded px-1.5 py-0.5 flex-shrink-0">
-                                                TIM
-                                              </span>
-                                            )}
                                           </button>
                                         )
                                       })}
