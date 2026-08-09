@@ -18,6 +18,8 @@ Web app for residents to check their IPL (housing fee) payment status for 2026.
 - `/pengeluaran` — ExpensesView: expense transparency page with category filtering
 - `/kehadiran` — AttendanceView: RSVP form for the Kumpul Warga event (2 Aug 2026), submits to Google Sheet via Apps Script
 - `/rekap-kehadiran` — RekapKehadiranView: reads RSVP data back via Apps Script `doGet` (no WhatsApp/email), shows who has/hasn't confirmed
+- `/lomba` — LombaView: registration form for the 17 Agustus games; one submit per house, many peserta, writes one row per peserta
+- `/rekap-lomba` — RekapLombaView: reads lomba data back via Apps Script `doGet?form=lomba` (no WhatsApp), per-lomba and per-house breakdown
 
 ## Key Files
 - `src/data/validated.json` — source of truth for all transactions (flat array under `data`, with top-level `lastUpdate`)
@@ -33,6 +35,9 @@ Web app for residents to check their IPL (housing fee) payment status for 2026.
 - `src/components/ProofModal.jsx` — placeholder modal for proof of transfer
 - `src/components/AttendanceView.jsx` — event RSVP form; posts to Google Sheet (`Kehadiran` tab) via Apps Script Web App (`VITE_ATTENDANCE_ENDPOINT`), setup in `docs/attendance-apps-script.md`
 - `src/components/RekapKehadiranView.jsx` — reads RSVP data via Apps Script `doGet` (GET, no WhatsApp/email) and shows sudah/belum konfirmasi per block
+- `src/data/lomba.js` — lomba config: `LOMBA_EVENT` (date/time/place/deadline), `LOMBA_LIST`, `LOMBA_GROUPS`, deadline helpers
+- `src/components/LombaView.jsx` — lomba registration form; posts to the same Apps Script Web App with `form=lomba`, setup in `docs/lomba-apps-script.md`
+- `src/components/RekapLombaView.jsx` — lomba recap: peserta per lomba, per rumah, belum daftar, and the pentas seni rundown
 - `scripts/convert-validated.js` — converts raw CSV export to `validated.json`
 - `scripts/convert-residents.js` — converts resident CSV to `residents.json`
 - `src/data/expenses.json` — expense data (rutin + insidental, with summary)
@@ -85,7 +90,19 @@ Blocks are ranked by **collection percentage** (`collectionPct`): ratio of total
 ## Analytics
 Umami analytics via `src/utils/tracking.js`. Call `trackEvent(name, data)` — no-ops if `window.umami` is undefined.
 
+## Apps Script Web App
+One Apps Script project can only define a single `doPost` and a single `doGet`,
+but the app has two forms. Both are routed on the `form` parameter:
+`form=lomba` → tab `Lomba`; no `form` param → tab `Kehadiran` (legacy behaviour,
+so the attendance form keeps working untouched). The `Lomba` tab is created
+automatically on first submit. Column order in the sheet is positional —
+`LOMBA_KEYS` in `Code.gs` must stay in the same order as `LOMBA_LIST` in
+`src/data/lomba.js`.
+
 ## Notes
 - `raw_data/` is gitignored — contains the original CSV with sensitive fields
+- Dev without `.env.local`: `index.html` keeps the literal `%VITE_UMAMI_SCRIPT_URL%`
+  placeholder, which makes the Vite dev server return 500 (`URI malformed`) and
+  show an error overlay. Copy `.env.example` to `.env.local` before `npm run dev`.
 - ProofModal shows a static placeholder; it does not display actual transfer images
 - Deployed at: https://ipl-talago.netlify.app
