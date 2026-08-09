@@ -91,11 +91,22 @@ Bendera · Air · Kerupuk · Paku · Karung · Kelereng · Tepung · Pentas.
 ### Submit ulang = menimpa
 
 Kalau rumah yang sama mendaftar lagi, semua baris lama rumah itu **dihapus**
-lalu daftar peserta yang baru ditulis ulang. Jadi warga bisa membuka form lagi
-untuk menambah/mengurangi peserta tanpa jadi dobel.
+lalu daftar peserta yang baru ditulis ulang. Jadi tidak akan pernah ada entri
+dobel untuk satu rumah di tab `Lomba`.
+
+Konsekuensinya: kalau warga mengirim daftar yang hanya berisi satu peserta baru,
+peserta yang sudah terdaftar sebelumnya ikut terhapus. Supaya itu tidak terjadi
+diam-diam, halaman `/lomba` menarik data lewat `doGet` saat blok + nomor rumah
+dipilih. Bila rumah itu sudah terdaftar, form menampilkan peringatan berisi nama
+peserta yang sudah ada beserta tombol **"Muat & edit data yang sudah ada"**,
+yang mengisi ulang form dengan daftar peserta lama untuk ditambah/diubah.
+
+Nomor WhatsApp sengaja tidak ikut termuat karena `doGet` memang tidak
+mengirimkannya (privasi) — warga mengisinya ulang.
 
 Ingin menyimpan semua riwayat (setiap submit jadi baris baru, boleh dobel)?
-Di `handleLombaPost_`, hapus blok "Hapus baris lama rumah ini".
+Di `handleLombaPost_`, hapus blok "Hapus baris lama rumah ini". Kalau itu
+dilakukan, matikan juga peringatan di form karena asumsinya berubah.
 
 ## 4. Tab `Rekap Lomba` (opsional, buat panitia)
 

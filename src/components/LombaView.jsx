@@ -95,12 +95,36 @@ export default function LombaView() {
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(null)
   const [error, setError] = useState('')
+  // Data yang sudah tercatat di Google Sheet, dipakai untuk memperingatkan
+  // warga yang rumahnya sudah pernah didaftarkan (lihat catatan di bawah).
+  const [tercatat, setTercatat] = useState([])
+  const [sudahDimuat, setSudahDimuat] = useState(false)
 
   const closed = isRegistrationClosed()
   const daysLeft = getDaysLeft()
 
   useEffect(() => {
     trackEvent('open_lomba')
+  }, [])
+
+  // Submit menimpa seluruh baris rumah yang bersangkutan. Tanpa ini, warga yang
+  // membuka form lagi untuk menambah satu anak akan menghapus peserta yang sudah
+  // terdaftar sebelumnya tanpa sadar. Jadi data lama ditarik lebih dulu supaya
+  // bisa ditawarkan untuk dimuat & diedit.
+  useEffect(() => {
+    if (!ENDPOINT) return
+    let batal = false
+    fetch(`${ENDPOINT}?form=lomba`, { method: 'GET' })
+      .then((r) => r.json())
+      .then((json) => {
+        if (!batal && Array.isArray(json?.data)) setTercatat(json.data)
+      })
+      .catch(() => {
+        // Gagal menarik data lama bukan alasan untuk memblokir pendaftaran baru.
+      })
+    return () => {
+      batal = true
+    }
   }, [])
 
   // Simpan draft supaya isian tidak hilang kalau halaman kepencet back / reload
@@ -128,9 +152,44 @@ export default function LombaView() {
     [blok, nomorRumah]
   )
 
+  // Peserta rumah ini yang sudah tercatat sebelumnya
+  const pesertaTercatat = useMemo(() => {
+    if (!blok || !nomorRumah) return []
+    return tercatat.filter(
+      (r) => r.blok === blok && String(r.nomorRumah) === String(nomorRumah)
+    )
+  }, [tercatat, blok, nomorRumah])
+
   function handleSelectBlok(b) {
     setBlok(b)
     setNomorRumah('')
+    setSudahDimuat(false)
+  }
+
+  function handleSelectRumah(n) {
+    setNomorRumah(n)
+    setSudahDimuat(false)
+  }
+
+  /** Tarik peserta yang sudah terdaftar ke dalam form supaya bisa diedit. */
+  function handleMuatDataLama() {
+    if (pesertaTercatat.length === 0) return
+    const pertama = pesertaTercatat[0]
+    if (pertama.namaAyah) setNamaAyah(pertama.namaAyah)
+    if (pertama.namaIbu) setNamaIbu(pertama.namaIbu)
+    setPeserta(
+      pesertaTercatat.map((r) => ({
+        id: newId(),
+        nama: r.nama || '',
+        peran: PERAN_OPTIONS.includes(r.peran) ? r.peran : 'Anak',
+        umur: r.umur === null || r.umur === undefined ? '' : String(r.umur),
+        lomba: Array.isArray(r.lomba) ? r.lomba : [],
+        detailPentas: r.detailPentas || '',
+      }))
+    )
+    setSudahDimuat(true)
+    setOpenId(null)
+    trackEvent('lomba_muat_data_lama', { blok, nomorRumah, peserta: pesertaTercatat.length })
   }
 
   const updatePeserta = useCallback((id, patch) => {
@@ -230,6 +289,25 @@ export default function LombaView() {
       // Apps Script Web App tidak mengirim header CORS, jadi pakai no-cors.
       // Respons tidak bisa dibaca — kita anggap sukses bila fetch tidak error.
       await fetch(ENDPOINT, { method: 'POST', mode: 'no-cors', body: params })
+
+      // Perbarui salinan lokal supaya peringatan "rumah ini sudah terdaftar"
+      // tetap akurat kalau warga langsung mendaftarkan rumah lain lalu balik lagi.
+      setTercatat((lama) => [
+        ...lama.filter(
+          (r) => !(r.blok === blok && String(r.nomorRumah) === String(nomorRumah))
+        ),
+        ...peserta.map((p) => ({
+          blok,
+          nomorRumah: String(nomorRumah),
+          namaAyah: namaAyah.trim(),
+          namaIbu: namaIbu.trim(),
+          nama: p.nama.trim(),
+          peran: p.peran,
+          umur: p.umur === '' ? '' : String(p.umur),
+          lomba: p.lomba,
+          detailPentas: p.lomba.includes('pentas') ? p.detailPentas.trim() : '',
+        })),
+      ])
 
       setSubmitted({ blok, nomorRumah, jumlahPeserta: peserta.length, totalPendaftaran })
       try {
@@ -447,8 +525,9 @@ export default function LombaView() {
                 </button>
               </div>
               <p className="font-body text-[11px] text-slate-dark/50 mt-4">
-                Salah isi? Buka form ini lagi dan daftarin ulang rumah yang sama — data lama otomatis
-                diganti.
+                Mau nambah atau ubah peserta? Buka form ini lagi, pilih rumah yang sama, lalu klik
+                <span className="font-bold"> “Muat &amp; edit data yang sudah ada”</span> supaya
+                peserta yang tadi tidak hilang.
               </p>
             </div>
           ) : (
@@ -491,7 +570,7 @@ export default function LombaView() {
                     </label>
                     <select
                       value={nomorRumah}
-                      onChange={(e) => setNomorRumah(e.target.value)}
+                      onChange={(e) => handleSelectRumah(e.target.value)}
                       disabled={!blok}
                       className={`${inputCls} disabled:opacity-40 disabled:cursor-not-allowed`}
                     >
@@ -505,6 +584,48 @@ export default function LombaView() {
                     {registryName && (
                       <p className="mt-1.5 font-body text-[11px] text-slate-dark/50">
                         Rumah atas nama <span className="font-bold">{registryName}</span>.
+                      </p>
+                    )}
+
+                    {/* Rumah ini sudah pernah didaftarkan — kirim ulang akan
+                        menimpa, jadi tawarkan memuat data lamanya dulu. */}
+                    {pesertaTercatat.length > 0 && !sudahDimuat && (
+                      <div className="mt-3 bg-yellow border-2 border-slate-dark rounded-xl p-3 shadow-hard-sm">
+                        <p className="font-heading font-bold text-xs flex items-start gap-1.5 mb-1.5">
+                          <AlertTriangle size={14} strokeWidth={2.5} className="flex-shrink-0 mt-0.5" />
+                          Rumah ini sudah terdaftar
+                        </p>
+                        <p className="font-body text-[11px] text-slate-dark leading-relaxed mb-2.5">
+                          Sudah ada{' '}
+                          <span className="font-bold">
+                            {pesertaTercatat.length} peserta
+                          </span>{' '}
+                          ({pesertaTercatat.map((r) => r.nama).filter(Boolean).join(', ')}).
+                          Kalau kamu kirim tanpa memuat data ini, daftar yang lama akan{' '}
+                          <span className="font-bold">terganti</span>.
+                        </p>
+                        <button
+                          type="button"
+                          onClick={handleMuatDataLama}
+                          className="
+                            w-full inline-flex items-center justify-center gap-1.5
+                            bg-slate-dark text-cream border-2 border-slate-dark rounded-xl px-3 py-2
+                            font-heading font-bold text-xs
+                            active:translate-x-[1px] active:translate-y-[1px]
+                            transition-all
+                          "
+                        >
+                          <Users size={13} strokeWidth={2.5} />
+                          Muat & edit data yang sudah ada
+                        </button>
+                      </div>
+                    )}
+
+                    {sudahDimuat && (
+                      <p className="mt-3 font-body text-[11px] text-slate-dark bg-green/15 border-2 border-green rounded-xl px-3 py-2 flex items-start gap-1.5">
+                        <CheckCircle2 size={13} strokeWidth={2.5} className="text-green flex-shrink-0 mt-0.5" />
+                        Data lama sudah dimuat. Tambah, ubah, atau hapus peserta sesuai kebutuhan —
+                        nomor WhatsApp perlu diisi ulang.
                       </p>
                     )}
                   </div>
