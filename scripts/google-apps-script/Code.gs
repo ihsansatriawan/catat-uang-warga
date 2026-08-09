@@ -87,49 +87,18 @@ function onOpen() {
 
 var ATTENDANCE_SHEET = 'Kehadiran';
 
-// ---------------------------------------------------------------------------
-// Router Web App
-// ---------------------------------------------------------------------------
-//
-// Apps Script hanya boleh punya SATU doPost dan SATU doGet per project,
-// sementara proyek ini punya dua form (Kehadiran & Lomba). Karena itu keduanya
-// dirutekan lewat parameter `form`:
-//
-//   form=lomba  → tab "Lomba"      (halaman /lomba & /rekap-lomba)
-//   selain itu  → tab "Kehadiran"  (halaman /kehadiran & /rekap-kehadiran)
-//
-// Form kehadiran versi lama tidak mengirim parameter `form` sama sekali, jadi
-// tetap jatuh ke handler kehadiran — aman, tidak perlu diubah.
-
-function doPost(e) {
-  var p = (e && e.parameter) ? e.parameter : {};
-  if (p.form === 'lomba') return handleLombaPost_(p);
-  return handleAttendancePost_(p);
-}
-
-function doGet(e) {
-  var p = (e && e.parameter) ? e.parameter : {};
-  if (p.form === 'lomba') return handleLombaGet_();
-  return handleAttendanceGet_();
-}
-
-function jsonOutput_(obj) {
-  return ContentService
-    .createTextOutput(JSON.stringify(obj))
-    .setMimeType(ContentService.MimeType.JSON);
-}
-
 /**
  * Menerima submit form kehadiran.
  * Upsert: kalau Blok + Nomor Rumah yang sama sudah pernah mengisi, baris
  * lamanya ditimpa (bukan menambah baris baru) — jadi 1 rumah = 1 baris.
  */
-function handleAttendancePost_(p) {
+function doPost(e) {
   var lock = LockService.getScriptLock();
   lock.waitLock(30000);
   try {
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     var sheet = ss.getSheetByName(ATTENDANCE_SHEET);
+    var p = (e && e.parameter) ? e.parameter : {};
 
     var row = [
       p.timestamp || new Date().toISOString(),
@@ -160,9 +129,13 @@ function handleAttendancePost_(p) {
       sheet.appendRow(row);
     }
 
-    return jsonOutput_({ ok: true });
+    return ContentService
+      .createTextOutput(JSON.stringify({ ok: true }))
+      .setMimeType(ContentService.MimeType.JSON);
   } catch (err) {
-    return jsonOutput_({ ok: false, error: String(err) });
+    return ContentService
+      .createTextOutput(JSON.stringify({ ok: false, error: String(err) }))
+      .setMimeType(ContentService.MimeType.JSON);
   } finally {
     lock.releaseLock();
   }
@@ -172,7 +145,7 @@ function handleAttendancePost_(p) {
  * Mengembalikan data kehadiran untuk halaman rekap.
  * Sengaja TIDAK mengirim WhatsApp & Email agar data pribadi tidak bocor ke publik.
  */
-function handleAttendanceGet_() {
+function doGet(e) {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = ss.getSheetByName(ATTENDANCE_SHEET);
   var values = sheet.getDataRange().getValues();
@@ -191,202 +164,9 @@ function handleAttendanceGet_() {
     });
   }
 
-  return jsonOutput_({ ok: true, data: out });
-}
-
-// ---------------------------------------------------------------------------
-// Lomba 17-an — Web App endpoint
-// ---------------------------------------------------------------------------
-//
-// Halaman /lomba POST ke sini (form=lomba); /rekap-lomba membacanya lewat
-// doGet?form=lomba. Tab "Lomba" DIBUAT OTOMATIS beserta header-nya pada submit
-// pertama — tidak perlu bikin tab manual.
-//
-// Satu submit = satu rumah, tapi ditulis SATU BARIS PER PESERTA. Semua baris
-// dari submit yang sama berbagi Timestamp + Submit ID.
-
-var LOMBA_SHEET = 'Lomba';
-
-// Urutan harus sama dengan LOMBA_LIST di src/data/lomba.js
-var LOMBA_KEYS = ['bendera', 'air', 'kerupuk', 'paku', 'karung', 'kelereng', 'tepung', 'pentas'];
-
-var LOMBA_HEADERS = [
-  'Timestamp', 'Submit ID', 'Blok', 'Nomor Rumah', 'Rumah',
-  'Nama Ayah', 'Nama Ibu', 'WhatsApp',
-  'Nama Peserta', 'Peran', 'Umur',
-  'Bendera', 'Air', 'Kerupuk', 'Paku', 'Karung', 'Kelereng', 'Tepung', 'Pentas',
-  'Detail Pentas', 'Total'
-];
-
-// Posisi kolom (0-based) di dalam satu baris
-var LOMBA_COL_BLOK = 2;
-var LOMBA_COL_NOMOR = 3;
-var LOMBA_COL_FIRST_LOMBA = 11;
-
-/**
- * Ambil tab "Lomba", bikin dulu kalau belum ada (lengkap dengan header,
- * freeze pane, dan lebar kolom yang enak dibaca).
- */
-function ensureLombaSheet_(ss) {
-  var sheet = ss.getSheetByName(LOMBA_SHEET);
-  var isNew = false;
-  if (!sheet) {
-    sheet = ss.insertSheet(LOMBA_SHEET);
-    isNew = true;
-  }
-
-  if (isNew || sheet.getLastRow() === 0) {
-    sheet.getRange(1, 1, 1, LOMBA_HEADERS.length).setValues([LOMBA_HEADERS]);
-    sheet.getRange(1, 1, 1, LOMBA_HEADERS.length)
-      .setFontWeight('bold')
-      .setBackground('#F1F5F9')
-      .setWrap(true);
-    sheet.setFrozenRows(1);
-    // Kunci kolom A–I supaya nama peserta tetap terlihat saat scroll ke kanan
-    sheet.setFrozenColumns(9);
-    sheet.setColumnWidth(1, 150); // Timestamp
-    sheet.setColumnWidth(2, 130); // Submit ID
-    // Kolom lomba dibikin sempit — isinya cuma angka 1
-    for (var c = 0; c < LOMBA_KEYS.length; c++) {
-      sheet.setColumnWidth(LOMBA_COL_FIRST_LOMBA + 1 + c, 70);
-    }
-  }
-
-  return sheet;
-}
-
-/**
- * Menerima submit pendaftaran lomba (satu rumah, banyak peserta).
- *
- * Upsert per rumah: semua baris lama dengan Blok + Nomor Rumah yang sama
- * dihapus lebih dulu, lalu daftar peserta yang baru ditulis ulang. Jadi warga
- * bisa membuka form lagi untuk menambah/mengurangi peserta tanpa jadi dobel.
- */
-function handleLombaPost_(p) {
-  var lock = LockService.getScriptLock();
-  lock.waitLock(30000);
-  try {
-    var peserta = [];
-    try {
-      peserta = JSON.parse(p.peserta || '[]');
-    } catch (parseErr) {
-      return jsonOutput_({ ok: false, error: 'Data peserta tidak terbaca: ' + parseErr });
-    }
-    if (!peserta.length) {
-      return jsonOutput_({ ok: false, error: 'Tidak ada peserta yang dikirim.' });
-    }
-
-    var blok = String(p.blok || '');
-    var nomorRumah = String(p.nomorRumah || '');
-    if (!blok || !nomorRumah) {
-      return jsonOutput_({ ok: false, error: 'Blok / nomor rumah kosong.' });
-    }
-
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
-    var sheet = ensureLombaSheet_(ss);
-
-    // Timestamp ditulis sebagai objek Date (bukan teks) supaya kolomnya bisa
-    // disortir & diformat sebagai tanggal di Google Sheet.
-    var ts = p.timestamp ? new Date(p.timestamp) : new Date();
-    if (isNaN(ts.getTime())) ts = new Date();
-    var submitId = blok + '-' + nomorRumah + '-' + Math.floor(ts.getTime() / 1000);
-
-    // Hapus baris lama rumah ini (dari bawah ke atas supaya index tidak geser)
-    if (sheet.getLastRow() > 1) {
-      var values = sheet.getDataRange().getValues();
-      for (var i = values.length - 1; i >= 1; i--) {
-        if (
-          String(values[i][LOMBA_COL_BLOK]) === blok &&
-          String(values[i][LOMBA_COL_NOMOR]) === nomorRumah
-        ) {
-          sheet.deleteRow(i + 1);
-        }
-      }
-    }
-
-    var rows = [];
-    for (var j = 0; j < peserta.length; j++) {
-      var orang = peserta[j] || {};
-      var dipilih = Array.isArray(orang.lomba) ? orang.lomba : [];
-
-      var row = [
-        ts,
-        submitId,
-        blok,
-        nomorRumah,
-        blok + '-' + nomorRumah,
-        String(p.namaAyah || ''),
-        String(p.namaIbu || ''),
-        String(p.whatsapp || ''),
-        String(orang.nama || ''),
-        String(orang.peran || ''),
-        orang.umur === '' || orang.umur === null || orang.umur === undefined
-          ? ''
-          : Number(orang.umur)
-      ];
-
-      var total = 0;
-      for (var k = 0; k < LOMBA_KEYS.length; k++) {
-        var ikut = dipilih.indexOf(LOMBA_KEYS[k]) !== -1;
-        row.push(ikut ? 1 : '');
-        if (ikut) total++;
-      }
-
-      row.push(String(orang.detailPentas || ''));
-      row.push(total);
-      rows.push(row);
-    }
-
-    var startRow = sheet.getLastRow() + 1;
-    sheet.getRange(startRow, 1, rows.length, LOMBA_HEADERS.length).setValues(rows);
-
-    return jsonOutput_({ ok: true, submitId: submitId, rows: rows.length });
-  } catch (err) {
-    return jsonOutput_({ ok: false, error: String(err) });
-  } finally {
-    lock.releaseLock();
-  }
-}
-
-/**
- * Mengembalikan data lomba untuk halaman /rekap-lomba.
- * Sengaja TIDAK mengirim WhatsApp agar nomor pribadi tidak bocor ke publik.
- */
-function handleLombaGet_() {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheetByName(LOMBA_SHEET);
-  // Tab belum ada = belum ada yang mendaftar. Balas daftar kosong, bukan error.
-  if (!sheet || sheet.getLastRow() < 2) {
-    return jsonOutput_({ ok: true, data: [] });
-  }
-
-  var values = sheet.getDataRange().getValues();
-  var out = [];
-  for (var i = 1; i < values.length; i++) {
-    var r = values[i];
-    if (!r[LOMBA_COL_BLOK] && !r[LOMBA_COL_NOMOR]) continue;
-
-    var lomba = [];
-    for (var k = 0; k < LOMBA_KEYS.length; k++) {
-      if (Number(r[LOMBA_COL_FIRST_LOMBA + k]) === 1) lomba.push(LOMBA_KEYS[k]);
-    }
-
-    out.push({
-      blok: String(r[LOMBA_COL_BLOK]),
-      nomorRumah: String(r[LOMBA_COL_NOMOR]),
-      namaAyah: String(r[5]),
-      namaIbu: String(r[6]),
-      // r[7] = WhatsApp TIDAK disertakan (privasi)
-      nama: String(r[8]),
-      peran: String(r[9]),
-      umur: r[10] === '' ? '' : String(r[10]),
-      lomba: lomba,
-      detailPentas: String(r[19]),
-      timestamp: r[0]
-    });
-  }
-
-  return jsonOutput_({ ok: true, data: out });
+  return ContentService
+    .createTextOutput(JSON.stringify({ ok: true, data: out }))
+    .setMimeType(ContentService.MimeType.JSON);
 }
 
 // ---------------------------------------------------------------------------

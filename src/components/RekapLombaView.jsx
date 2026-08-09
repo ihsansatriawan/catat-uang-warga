@@ -17,8 +17,8 @@ import { LOMBA_EVENT, LOMBA_LIST, LOMBA_BY_KEY } from '../data/lomba'
 import { trackEvent } from '../utils/tracking'
 import { BLOCK_BAR_COLORS } from '../data/constants'
 
-const ENDPOINT =
-  import.meta.env.VITE_LOMBA_ENDPOINT || import.meta.env.VITE_ATTENDANCE_ENDPOINT || ''
+// Endpoint spreadsheet lomba (terpisah dari IPL/kehadiran) — lihat LombaView.
+const ENDPOINT = import.meta.env.VITE_LOMBA_ENDPOINT || ''
 
 const TABS = [
   { key: 'lomba', label: 'Per Lomba' },

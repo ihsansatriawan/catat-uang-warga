@@ -90,14 +90,21 @@ Blocks are ranked by **collection percentage** (`collectionPct`): ratio of total
 ## Analytics
 Umami analytics via `src/utils/tracking.js`. Call `trackEvent(name, data)` — no-ops if `window.umami` is undefined.
 
-## Apps Script Web App
-One Apps Script project can only define a single `doPost` and a single `doGet`,
-but the app has two forms. Both are routed on the `form` parameter:
-`form=lomba` → tab `Lomba`; no `form` param → tab `Kehadiran` (legacy behaviour,
-so the attendance form keeps working untouched). The `Lomba` tab is created
-automatically on first submit. Column order in the sheet is positional —
-`LOMBA_KEYS` in `Code.gs` must stay in the same order as `LOMBA_LIST` in
-`src/data/lomba.js`.
+## Apps Script — two separate spreadsheets
+An Apps Script project can only define one `doPost` and one `doGet`, so the two
+forms live in **separate spreadsheets with separate Apps Script projects and
+separate Web App URLs**. Never paste one script into the other's project — the
+second `doPost` silently overwrites the first.
+
+| Spreadsheet | Script | Tabs | Env var |
+| --- | --- | --- | --- |
+| IPL | `scripts/google-apps-script/Code.gs` | Raw Data, Validated, Transaksi, Kehadiran | `VITE_ATTENDANCE_ENDPOINT` |
+| Lomba | `scripts/google-apps-script/Lomba.gs` | Lomba (auto-created) | `VITE_LOMBA_ENDPOINT` |
+
+`VITE_LOMBA_ENDPOINT` has **no fallback** — if unset the lomba form refuses to
+submit, so data can never land in the wrong spreadsheet. Sheet writes are
+positional: `LOMBA_KEYS` in `Lomba.gs` must stay in the same order as
+`LOMBA_LIST` in `src/data/lomba.js`.
 
 ## Notes
 - `raw_data/` is gitignored — contains the original CSV with sensitive fields

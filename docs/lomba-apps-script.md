@@ -1,68 +1,84 @@
 # Pendaftaran Lomba 17-an → Google Sheet
 
-Halaman `/lomba` mengirim data pendaftaran lomba ke Google Sheet yang sama
-dengan data lainnya, ke **tab terpisah bernama `Lomba`**. Halaman
-`/rekap-lomba` membaca data itu kembali.
+Halaman `/lomba` mengirim data pendaftaran ke **Google Sheet khusus lomba yang
+terpisah dari spreadsheet IPL**. Halaman `/rekap-lomba` membacanya kembali.
 
-Tab `Lomba` **dibuat otomatis** oleh Apps Script pada submit pertama —
-lengkap dengan header, baris judul yang di-freeze, dan lebar kolom. Tidak perlu
-membuat tab manual.
-
-## Ringkasan alur
+Karena spreadsheet-nya terpisah, Apps Script-nya juga **project sendiri** dengan
+Web App dan URL sendiri. Tidak ada hubungannya dengan `Code.gs` milik
+spreadsheet IPL.
 
 ```
-/lomba (form)  ──POST form=lomba──►  Apps Script Web App  ──►  tab "Lomba"
-/rekap-lomba   ──GET  ?form=lomba──►  Apps Script Web App  ◄──
+Spreadsheet IPL             Spreadsheet Lomba  ← baru, dibuat sendiri
+├─ tab Raw Data             └─ tab Lomba       ← dibuat otomatis
+├─ tab Validated
+├─ tab Transaksi
+└─ tab Kehadiran
+   Apps Script: Code.gs        Apps Script: Lomba.gs
+   VITE_ATTENDANCE_ENDPOINT    VITE_LOMBA_ENDPOINT
 ```
 
-Satu submit = satu rumah, tetapi ditulis **satu baris per peserta**. Semua baris
-dari submit yang sama berbagi Timestamp dan Submit ID yang sama.
+> **Kenapa harus project terpisah?** Apps Script hanya mengenali **satu**
+> `doPost` dan **satu** `doGet` per project. `Code.gs` sudah memakai keduanya
+> untuk form kehadiran. Kalau `Lomba.gs` ditempel ke project yang sama, salah
+> satu `doPost` akan diam-diam menimpa yang lain dan form kehadiran mati tanpa
+> pesan error. Jadi: satu spreadsheet, satu Apps Script project, satu Web App.
 
-## 1. Terapkan kode Apps Script
+## 1. Buat spreadsheet lomba
 
-Kode Apps Script proyek ini satu file: **`scripts/google-apps-script/Code.gs`**.
-Fungsi lomba (`LOMBA_SHEET`, `handleLombaPost_`, `handleLombaGet_`,
-`ensureLombaSheet_`) sudah ada di file itu.
+Buat Google Sheet baru, misalnya diberi nama **"Lomba 17-an 2026"**. Biarkan
+kosong — tab `Lomba` beserta headernya **dibuat otomatis** pada submit pertama,
+lengkap dengan baris judul yang di-freeze dan lebar kolom yang sudah diatur.
 
-1. Di Google Sheet, buka **Extensions → Apps Script**.
-2. **Salin seluruh isi** `scripts/google-apps-script/Code.gs` versi terbaru,
-   lalu **tempel menimpa** isi editor Apps Script.
+Jangan membuat tab `Lomba` manual. Script hanya mengisi header kalau sheet-nya
+masih kosong, jadi tab buatan tangan dengan header sendiri bisa bikin kolomnya
+tidak nyambung — penulisan ke sheet berdasarkan **posisi** kolom, bukan nama.
+
+## 2. Pasang Apps Script
+
+1. Dari spreadsheet lomba tadi, buka **Extensions → Apps Script**.
+2. Hapus isi `Code.gs` bawaan yang kosong itu, lalu **tempel seluruh isi**
+   `scripts/google-apps-script/Lomba.gs` dari repo ini.
 3. Simpan (ikon disket).
-4. **Deploy → Manage deployments → Edit (ikon pensil) → Version: New version →
-   Deploy.** Langkah ini wajib; tanpa "New version" kode baru tidak aktif dan
-   URL Web App yang lama tetap menjalankan kode lama.
 
-> **Penting soal `doPost` / `doGet`.** Apps Script hanya boleh punya **satu**
-> `doPost` dan **satu** `doGet` per project, sementara proyek ini punya dua form
-> (Kehadiran & Lomba). Karena itu keduanya kini dirutekan lewat parameter
-> `form`:
->
-> | Parameter | Tujuan |
-> | --------- | ------ |
-> | `form=lomba` | tab `Lomba` |
-> | tanpa `form` | tab `Kehadiran` (perilaku lama) |
->
-> Form kehadiran tidak mengirim parameter `form`, jadi tetap berjalan seperti
-> sebelumnya. Jangan menambahkan `doPost`/`doGet` kedua — Apps Script akan
-> memakai salah satu saja secara acak.
+> Jangan menempel `scripts/google-apps-script/Code.gs` ke sini — file itu milik
+> spreadsheet IPL dan berisi fungsi validasi pembayaran, deploy JSON ke GitHub,
+> serta form kehadiran. Begitu pula sebaliknya.
 
-## 2. Sambungkan ke aplikasi
+## 3. Deploy sebagai Web App
 
-Secara default halaman `/lomba` **menumpang endpoint yang sama** dengan form
-kehadiran, jadi kalau `VITE_ATTENDANCE_ENDPOINT` sudah terisi di Netlify,
-**tidak ada yang perlu diubah** — cukup lakukan langkah 1 lalu redeploy situs.
+1. **Deploy → New deployment**.
+2. Klik ikon gerigi → pilih **Web app**.
+3. Isi:
+   - **Description**: `Form Lomba`
+   - **Execute as**: `Me`
+   - **Who has access**: `Anyone`
+4. **Deploy**, lalu izinkan akses (authorize) saat diminta.
+5. Salin **Web app URL** — bentuknya
+   `https://script.google.com/macros/s/AKfycb.../exec`
 
-Kalau suatu saat ingin memisahkan (misalnya pakai Spreadsheet berbeda), isi
-variabel opsional berikut; bila ada, ia menang atas `VITE_ATTENDANCE_ENDPOINT`:
+> Kalau nanti isi `Lomba.gs` diubah, jalankan **Deploy → Manage deployments →
+> Edit (ikon pensil) → Version: New version → Deploy**. Tanpa "New version",
+> URL yang sama tetap menjalankan kode lama.
+
+## 4. Sambungkan ke aplikasi
 
 ```bash
-# .env.local (dev) atau Netlify → Site settings → Environment variables
+# .env.local (dev lokal)
 VITE_LOMBA_ENDPOINT=https://script.google.com/macros/s/AKfycb.../exec
 ```
 
-## 3. Kolom tab `Lomba`
+Produksi (Netlify): **Site settings → Environment variables**, tambahkan
+`VITE_LOMBA_ENDPOINT` dengan URL yang sama, lalu **redeploy**.
 
-Dibuat otomatis, tapi ini isinya supaya gampang dibaca saat mengecek data:
+**Isi URL Web App lomba, bukan URL yang dipakai `VITE_ATTENDANCE_ENDPOINT`.**
+Keduanya menunjuk spreadsheet yang berbeda. Kalau `VITE_LOMBA_ENDPOINT` kosong,
+form lomba sengaja menolak mengirim dan menampilkan pesan bahwa form belum
+terhubung — ini disengaja supaya data lomba tidak pernah nyasar ke spreadsheet
+IPL.
+
+## 5. Kolom tab `Lomba`
+
+Dibuat otomatis, tapi ini isinya supaya gampang saat mengecek data:
 
 | Kol | Nama | Keterangan |
 | --- | ---- | ---------- |
@@ -84,15 +100,14 @@ Dibuat otomatis, tapi ini isinya supaya gampang dibaca saat mengecek data:
 Urutan kolom L–S sama persis dengan urutan lomba di sheet lama:
 Bendera · Air · Kerupuk · Paku · Karung · Kelereng · Tepung · Pentas.
 
-> Urutan ini ditentukan oleh `LOMBA_KEYS` di `Code.gs` dan `LOMBA_LIST` di
-> `src/data/lomba.js`. Keduanya harus **selalu sama urutannya** — Apps Script
-> menulis berdasarkan posisi kolom, bukan nama.
+> Urutan ini ditentukan oleh `LOMBA_KEYS` di `Lomba.gs` dan `LOMBA_LIST` di
+> `src/data/lomba.js`. Keduanya harus **selalu sama urutannya**.
 
 ### Submit ulang = menimpa
 
 Kalau rumah yang sama mendaftar lagi, semua baris lama rumah itu **dihapus**
 lalu daftar peserta yang baru ditulis ulang. Jadi tidak akan pernah ada entri
-dobel untuk satu rumah di tab `Lomba`.
+dobel untuk satu rumah.
 
 Konsekuensinya: kalau warga mengirim daftar yang hanya berisi satu peserta baru,
 peserta yang sudah terdaftar sebelumnya ikut terhapus. Supaya itu tidak terjadi
@@ -108,9 +123,9 @@ Ingin menyimpan semua riwayat (setiap submit jadi baris baru, boleh dobel)?
 Di `handleLombaPost_`, hapus blok "Hapus baris lama rumah ini". Kalau itu
 dilakukan, matikan juga peringatan di form karena asumsinya berubah.
 
-## 4. Tab `Rekap Lomba` (opsional, buat panitia)
+## 6. Tab `Rekap Lomba` (opsional, buat panitia)
 
-Buat tab baru bernama `Rekap Lomba`, tempel di **A1**:
+Di spreadsheet lomba, buat tab baru bernama `Rekap Lomba`, tempel di **A1**:
 
 ```
 Lomba	Kategori	Kolom	Jumlah Peserta
@@ -120,7 +135,7 @@ Makan Kerupuk	Semua Umur	N
 Masukin Paku ke Botol	KU-7 ke atas	O	
 Balap Karung	KU-7 ke atas	P	
 Balap Kelereng	KU-7 ke atas	Q	
-Pindah Tepung Terigu (Tim)	KU-7 ke atas	R	
+Pindah Tepung Terigu	KU-7 ke atas	R	
 Pentas Seni	Semua Umur	S	
 ```
 
@@ -138,7 +153,7 @@ Total peserta	=COUNTA(Lomba!I2:I)
 Total rumah ikut	=COUNTUNIQUE(Lomba!E2:E)
 ```
 
-## 5. Tab `Rekap Rumah` (opsional) — siapa yang belum daftar
+## 7. Tab `Rekap Rumah` (opsional) — siapa yang belum daftar
 
 Buat tab `Rekap Rumah`. Kolom A–C diisi daftar seluruh rumah (salin dari
 bagian 5 di `docs/attendance-apps-script.md`), dengan header:
@@ -172,12 +187,13 @@ Filter kolom D ke "❌ Belum" untuk mendapat daftar rumah yang perlu ditagih.
 
 ## Catatan
 
-- Bila endpoint kosong, form tetap tampil tetapi menampilkan pesan bahwa form
-  belum terhubung — data tidak hilang diam-diam.
 - Request POST dikirim dengan `mode: 'no-cors'` (Apps Script tidak mengirim
   header CORS), sehingga respons tidak bisa dibaca browser. Aplikasi menganggap
   pengiriman sukses selama tidak ada error jaringan. Verifikasi entri masuk
   dengan mengecek tab `Lomba`.
+- Form mengirim parameter `form=lomba`. `Lomba.gs` mengabaikannya — parameter
+  itu hanya penanda supaya request tetap benar bila endpoint lomba suatu saat
+  digabung ke Web App yang merutekan berdasarkan `form`.
 - `handleLombaGet_` sengaja **tidak** mengirim kolom WhatsApp agar nomor
   pribadi tidak bocor ke halaman rekap yang bersifat publik.
 - Tanggal acara, jam, tempat, dan batas pendaftaran diatur di

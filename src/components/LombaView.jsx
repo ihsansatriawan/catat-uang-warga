@@ -35,11 +35,12 @@ import {
 import { trackEvent } from '../utils/tracking'
 import { BLOCK_COLORS, BLOCK_COLORS_UNSELECTED } from '../data/constants'
 
-// Endpoint Google Apps Script Web App. Secara default menumpang endpoint yang
-// sama dengan form kehadiran (satu Web App melayani dua form lewat parameter
-// `form`), tapi bisa dipisah kalau perlu — lihat docs/lomba-apps-script.md.
-const ENDPOINT =
-  import.meta.env.VITE_LOMBA_ENDPOINT || import.meta.env.VITE_ATTENDANCE_ENDPOINT || ''
+// Endpoint Google Apps Script Web App milik spreadsheet LOMBA — terpisah dari
+// spreadsheet IPL/kehadiran. Sengaja TIDAK ada fallback ke
+// VITE_ATTENDANCE_ENDPOINT: kalau variabel ini lupa diisi, lebih baik form
+// menolak mengirim daripada data lomba nyasar ke spreadsheet yang salah.
+// Setup: docs/lomba-apps-script.md
+const ENDPOINT = import.meta.env.VITE_LOMBA_ENDPOINT || ''
 
 const DRAFT_KEY = 'lomba-draft-v1'
 
@@ -269,6 +270,9 @@ export default function LombaView() {
 
     try {
       const params = new URLSearchParams({
+        // Diabaikan oleh Lomba.gs yang berdiri sendiri, tapi tetap dikirim agar
+        // request-nya jelas maksudnya dan tetap benar bila suatu saat endpoint
+        // lomba digabung ke Web App lain yang merutekan berdasarkan `form`.
         form: 'lomba',
         timestamp: new Date().toISOString(),
         blok,
