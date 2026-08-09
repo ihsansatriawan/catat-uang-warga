@@ -7,7 +7,7 @@
 export const LOMBA_EVENT = {
   title: 'Lomba 17-an',
   subtitle: 'D’Talago Regency 2026',
-  dateLabel: 'Minggu, 17 Agustus 2026',
+  dateLabel: 'Minggu, 16 Agustus 2026',
   timeLabel: '07.30 WIB',
   placeLabel: 'Lapangan depan Musola',
   // Batas akhir pendaftaran (akhir hari, WIB)
