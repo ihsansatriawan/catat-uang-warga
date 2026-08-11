@@ -106,6 +106,15 @@ submit, so data can never land in the wrong spreadsheet. Sheet writes are
 positional: `LOMBA_KEYS` in `Lomba.gs` must stay in the same order as
 `LOMBA_LIST` in `src/data/lomba.js`.
 
+## Verifikasi Bukti Transfer (Claude vision, di `Code.gs`)
+
+Claude **hanya mengekstrak** apa yang terbaca di gambar; `Code.gs` yang
+membandingkan dan menghasilkan `aiVerdict`/`aiAlasan`; `validationStatus` tetap
+hanya boleh ditulis manusia. Jangan longgarkan pemisahan ini — alasannya di
+`docs/adr/0001-rantai-wewenang-verifikasi-bukti.md`, kosakatanya di `CONTEXT.md`.
+Setup + urutan rollout (backfill dulu, trigger belakangan) di
+`docs/google-apps-script-setup.md` Step 7.
+
 ## Notes
 - `raw_data/` is gitignored — contains the original CSV with sensitive fields
 - Dev without `.env.local`: `index.html` keeps the literal `%VITE_UMAMI_SCRIPT_URL%`
