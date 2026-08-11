@@ -13,7 +13,15 @@ import {
   Circle,
 } from 'lucide-react'
 import { getAttendanceHouses } from '../data/helpers'
-import { LOMBA_EVENT, LOMBA_LIST, LOMBA_BY_KEY } from '../data/lomba'
+import {
+  LOMBA_EVENT,
+  LOMBA_LIST,
+  LOMBA_BY_KEY,
+  UMUR_GROUPS,
+  UMUR_GROUP_UNKNOWN,
+  getUmurGroup,
+  parseUmur,
+} from '../data/lomba'
 import { trackEvent } from '../utils/tracking'
 import { BLOCK_BAR_COLORS } from '../data/constants'
 
@@ -25,12 +33,38 @@ const TABS = [
   { key: 'rumah', label: 'Per Rumah' },
 ]
 
+const URUT_OPTIONS = [
+  { key: 'semua', label: 'Semua' },
+  { key: 'umur', label: 'Kelompok umur' },
+]
+
+const ALL_UMUR_GROUPS = [...UMUR_GROUPS, UMUR_GROUP_UNKNOWN]
+
+/**
+ * Pecah daftar peserta ke kelompok umur, urut sesuai UMUR_GROUPS dan yang
+ * tanpa umur ditaruh paling bawah. Kelompok kosong tidak ikut dikembalikan.
+ */
+function groupByUmur(peserta) {
+  const bucket = {}
+  for (const r of peserta) {
+    const g = getUmurGroup(r.umur)
+    if (!bucket[g.key]) bucket[g.key] = []
+    bucket[g.key].push(r)
+  }
+  return ALL_UMUR_GROUPS.filter((g) => bucket[g.key]?.length).map((g) => ({
+    ...g,
+    // Dalam satu kelompok, urut dari yang paling muda biar gampang dibaca.
+    peserta: bucket[g.key].sort((a, b) => (parseUmur(a.umur) ?? 0) - (parseUmur(b.umur) ?? 0)),
+  }))
+}
+
 export default function RekapLombaView() {
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [tab, setTab] = useState('lomba')
   const [openLomba, setOpenLomba] = useState(null)
+  const [urut, setUrut] = useState('semua')
 
   const load = useCallback(async () => {
     if (!ENDPOINT) {
@@ -68,10 +102,10 @@ export default function RekapLombaView() {
 
   // Peserta per lomba, urut dari yang paling ramai
   const perLomba = useMemo(() => {
-    return LOMBA_LIST.map((l) => ({
-      ...l,
-      peserta: rows.filter((r) => Array.isArray(r.lomba) && r.lomba.includes(l.key)),
-    })).sort((a, b) => b.peserta.length - a.peserta.length)
+    return LOMBA_LIST.map((l) => {
+      const peserta = rows.filter((r) => Array.isArray(r.lomba) && r.lomba.includes(l.key))
+      return { ...l, peserta, grupUmur: groupByUmur(peserta) }
+    }).sort((a, b) => b.peserta.length - a.peserta.length)
   }, [rows])
 
   const maxPeserta = Math.max(1, ...perLomba.map((l) => l.peserta.length))
@@ -244,6 +278,36 @@ export default function RekapLombaView() {
               </div>
 
               {tab === 'lomba' && (
+                <div className="flex items-center gap-2">
+                  <span className="font-heading font-bold text-[10px] uppercase tracking-wider text-slate-dark/40 flex-shrink-0">
+                    Tampilkan
+                  </span>
+                  <div className="flex gap-1.5">
+                    {URUT_OPTIONS.map((o) => (
+                      <button
+                        key={o.key}
+                        onClick={() => {
+                          setUrut(o.key)
+                          trackEvent('rekap_lomba_tampilan', { mode: o.key })
+                        }}
+                        className={`
+                          border-2 border-slate-dark rounded-full px-3 py-1
+                          font-heading font-bold text-[11px] transition-all
+                          ${
+                            urut === o.key
+                              ? 'bg-violet text-white shadow-hard-sm'
+                              : 'bg-white text-slate-dark/60 hover:bg-cream'
+                          }
+                        `}
+                      >
+                        {o.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {tab === 'lomba' && (
                 <div className="bg-white border-2 border-slate-dark rounded-3xl shadow-hard overflow-hidden animate-slide-up">
                   {perLomba.map((l, i) => {
                     const terbuka = openLomba === l.key
@@ -280,6 +344,18 @@ export default function RekapLombaView() {
                               {l.kategori}
                             </span>
                           </div>
+                          {urut === 'umur' && l.grupUmur.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mt-1.5">
+                              {l.grupUmur.map((g) => (
+                                <span
+                                  key={g.key}
+                                  className="font-heading font-bold text-[10px] bg-violet/15 text-violet border-2 border-violet/20 rounded-full px-2 py-0.5"
+                                >
+                                  {g.label} {g.peserta.length}
+                                </span>
+                              ))}
+                            </div>
+                          )}
                         </button>
 
                         {terbuka && (
@@ -288,6 +364,31 @@ export default function RekapLombaView() {
                               <p className="px-4 py-3 font-body text-sm text-slate-dark/50 border-t-2 border-slate-dark/10">
                                 Belum ada peserta.
                               </p>
+                            ) : urut === 'umur' ? (
+                              l.grupUmur.map((g) => (
+                                <div key={g.key}>
+                                  <div className="flex items-baseline gap-2 px-3 py-1.5 border-t-2 border-slate-dark/10 bg-violet/10">
+                                    <span className="font-heading font-black text-[11px] uppercase tracking-wider text-violet">
+                                      {g.label}
+                                    </span>
+                                    {g.note && (
+                                      <span className="font-body text-[10px] text-slate-dark/40">
+                                        {g.note}
+                                      </span>
+                                    )}
+                                    <span className="flex-1" />
+                                    <span className="font-heading font-black text-[11px] text-slate-dark/50">
+                                      {g.peserta.length}
+                                    </span>
+                                  </div>
+                                  {g.peserta.map((r, j) => (
+                                    <PesertaRow
+                                      key={`${r.blok}-${r.nomorRumah}-${r.nama}-${j}`}
+                                      r={r}
+                                    />
+                                  ))}
+                                </div>
+                              ))
                             ) : (
                               l.peserta.map((r, j) => (
                                 <PesertaRow key={`${r.blok}-${r.nomorRumah}-${r.nama}-${j}`} r={r} />

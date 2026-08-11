@@ -35,9 +35,9 @@ Web app for residents to check their IPL (housing fee) payment status for 2026.
 - `src/components/ProofModal.jsx` — placeholder modal for proof of transfer
 - `src/components/AttendanceView.jsx` — event RSVP form; posts to Google Sheet (`Kehadiran` tab) via Apps Script Web App (`VITE_ATTENDANCE_ENDPOINT`), setup in `docs/attendance-apps-script.md`
 - `src/components/RekapKehadiranView.jsx` — reads RSVP data via Apps Script `doGet` (GET, no WhatsApp/email) and shows sudah/belum konfirmasi per block
-- `src/data/lomba.js` — lomba config: `LOMBA_EVENT` (date/time/place/deadline), `LOMBA_LIST`, `LOMBA_GROUPS`, deadline helpers
+- `src/data/lomba.js` — lomba config: `LOMBA_EVENT` (date/time/place/deadline), `LOMBA_LIST`, `LOMBA_GROUPS`, `UMUR_GROUPS` + `getUmurGroup()` (age grouping for the recap), deadline helpers
 - `src/components/LombaView.jsx` — lomba registration form; posts to the same Apps Script Web App with `form=lomba`, setup in `docs/lomba-apps-script.md`
-- `src/components/RekapLombaView.jsx` — lomba recap: peserta per lomba, per rumah, belum daftar, and the pentas seni rundown
+- `src/components/RekapLombaView.jsx` — lomba recap: peserta per lomba (flat list or grouped by age band via the "Tampilkan" toggle), per rumah, belum daftar, and the pentas seni rundown
 - `scripts/convert-validated.js` — converts raw CSV export to `validated.json`
 - `scripts/convert-residents.js` — converts resident CSV to `residents.json`
 - `src/data/expenses.json` — expense data (rutin + insidental, with summary)
