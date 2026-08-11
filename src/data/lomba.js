@@ -36,6 +36,32 @@ export const LOMBA_GROUPS = [
 
 export const PERAN_OPTIONS = ['Ayah', 'Ibu', 'Anak', 'Lainnya']
 
+// Kelompok umur untuk tampilan rekap. Sama seperti kategori lomba, ini hanya
+// pengelompokan tampilan — bukan pembatas siapa yang boleh ikut lomba apa.
+// Batas terakhir sengaja dibiarkan tanpa `max` supaya jadi penampung sisanya.
+export const UMUR_GROUPS = [
+  { key: 'balita', label: 'Balita', note: '0–6 th', min: 0, max: 6 },
+  { key: 'anak', label: 'Anak', note: '7–12 th', min: 7, max: 12 },
+  { key: 'remaja', label: 'Remaja', note: '13–17 th', min: 13, max: 17 },
+  { key: 'dewasa', label: 'Dewasa', note: '18 th ke atas', min: 18, max: Infinity },
+]
+
+// Peserta yang tidak mengisi umur tetap harus muncul, jadi ditampung di sini.
+export const UMUR_GROUP_UNKNOWN = { key: 'tanpaUmur', label: 'Umur belum diisi', note: '' }
+
+/** Umur dari sheet bisa berupa string kosong, null, atau angka dalam string. */
+export function parseUmur(umur) {
+  if (umur === '' || umur == null) return null
+  const n = Number(umur)
+  return Number.isFinite(n) ? n : null
+}
+
+export function getUmurGroup(umur) {
+  const n = parseUmur(umur)
+  if (n == null) return UMUR_GROUP_UNKNOWN
+  return UMUR_GROUPS.find((g) => n >= g.min && n <= g.max) || UMUR_GROUP_UNKNOWN
+}
+
 // Batas "wajar" jumlah lomba per peserta — bukan larangan, hanya peringatan
 // halus supaya tidak asal centang semua dan bentrok jadwal.
 export const LOMBA_WARN_THRESHOLD = 4
