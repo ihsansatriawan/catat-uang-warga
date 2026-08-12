@@ -21,6 +21,7 @@ import {
   UMUR_GROUP_UNKNOWN,
   getUmurGroup,
   parseUmur,
+  isRegistrationClosed,
 } from '../data/lomba'
 import { trackEvent } from '../utils/tracking'
 import { BLOCK_BAR_COLORS } from '../data/constants'
@@ -65,6 +66,8 @@ export default function RekapLombaView() {
   const [tab, setTab] = useState('lomba')
   const [openLomba, setOpenLomba] = useState(null)
   const [urut, setUrut] = useState('semua')
+
+  const closed = isRegistrationClosed()
 
   const load = useCallback(async () => {
     if (!ENDPOINT) {
@@ -142,7 +145,9 @@ export default function RekapLombaView() {
       msg += `• ${l.label}: ${l.peserta.length} orang\n`
     }
     msg += `\n⬜ Belum daftar: ${rumahBelum.length} rumah\n`
-    msg += `\nDaftar sampai ${LOMBA_EVENT.deadlineLabel} di:\nhttps://ipl-talago.netlify.app/lomba`
+    msg += closed
+      ? `\nPendaftaran sudah ditutup ${LOMBA_EVENT.deadlineLabel}. Rekap lengkapnya di:\nhttps://ipl-talago.netlify.app/rekap-lomba`
+      : `\nDaftar sampai ${LOMBA_EVENT.deadlineLabel} di:\nhttps://ipl-talago.netlify.app/lomba`
     trackEvent('share_rekap_lomba')
     window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer')
   }
@@ -240,21 +245,25 @@ export default function RekapLombaView() {
               </div>
               <h2 className="font-heading font-black text-lg mb-1">Belum ada yang daftar</h2>
               <p className="font-body text-sm text-slate-dark/60 mb-4">
-                Jadilah yang pertama daftarin keluarga.
+                {closed
+                  ? `Pendaftaran sudah ditutup ${LOMBA_EVENT.deadlineLabel}.`
+                  : 'Jadilah yang pertama daftarin keluarga.'}
               </p>
-              <Link
-                to="/lomba"
-                className="
-                  inline-flex items-center justify-center gap-2
-                  bg-orange text-white font-heading font-extrabold text-sm
-                  border-2 border-slate-dark rounded-2xl px-5 py-3 shadow-hard
-                  active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-sm
-                  transition-all
-                "
-              >
-                <Trophy size={15} strokeWidth={2.5} />
-                Daftar Lomba
-              </Link>
+              {!closed && (
+                <Link
+                  to="/lomba"
+                  className="
+                    inline-flex items-center justify-center gap-2
+                    bg-orange text-white font-heading font-extrabold text-sm
+                    border-2 border-slate-dark rounded-2xl px-5 py-3 shadow-hard
+                    active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-sm
+                    transition-all
+                  "
+                >
+                  <Trophy size={15} strokeWidth={2.5} />
+                  Daftar Lomba
+                </Link>
+              )}
             </div>
           )}
 
@@ -518,7 +527,7 @@ export default function RekapLombaView() {
                   "
                 >
                   <Trophy size={15} strokeWidth={2.5} />
-                  Daftar
+                  {closed ? 'Info Lomba' : 'Daftar'}
                 </Link>
               </div>
             </>

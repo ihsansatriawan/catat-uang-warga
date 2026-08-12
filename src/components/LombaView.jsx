@@ -366,6 +366,23 @@ export default function LombaView() {
       <div className="flex-1 overflow-y-auto safe-x">
         <div className="max-w-lg mx-auto px-4 py-6 space-y-5">
 
+          {/* Pengumuman penutupan sengaja ditaruh paling atas — warga yang buka
+              halaman ini lewat chip depan harus langsung tahu, tanpa scroll. */}
+          {closed && (
+            <div className="bg-white border-2 border-slate-dark rounded-3xl shadow-hard p-6 text-center animate-pop-in">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-dark border-2 border-slate-dark shadow-hard-sm mb-4">
+                <Hourglass size={30} strokeWidth={2.5} className="text-cream" />
+              </div>
+              <h2 className="font-heading font-black text-xl text-slate-dark mb-2">
+                Pendaftaran Sudah Ditutup
+              </h2>
+              <p className="font-body text-sm text-slate-dark/70">
+                Batas akhirnya {LOMBA_EVENT.deadlineLabel}. Kalau masih mau ikut, japri panitia
+                langsung ya.
+              </p>
+            </div>
+          )}
+
           {/* Hero acara */}
           <div className="bg-orange border-2 border-slate-dark rounded-3xl shadow-hard overflow-hidden animate-slide-up stagger-1">
             <div className="px-5 pt-5 pb-4">
@@ -474,20 +491,7 @@ export default function LombaView() {
             Lihat Rekap Peserta
           </Link>
 
-          {closed ? (
-            <div className="bg-white border-2 border-slate-dark rounded-3xl shadow-hard p-6 text-center animate-pop-in">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-dark border-2 border-slate-dark shadow-hard-sm mb-4">
-                <Hourglass size={30} strokeWidth={2.5} className="text-cream" />
-              </div>
-              <h2 className="font-heading font-black text-xl text-slate-dark mb-2">
-                Pendaftaran Sudah Ditutup
-              </h2>
-              <p className="font-body text-sm text-slate-dark/70">
-                Batas akhirnya {LOMBA_EVENT.deadlineLabel}. Kalau masih mau ikut, japri panitia
-                langsung ya.
-              </p>
-            </div>
-          ) : submitted ? (
+          {closed ? null : submitted ? (
             /* Success */
             <div className="bg-white border-2 border-slate-dark rounded-3xl shadow-hard p-6 text-center animate-pop-in">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green border-2 border-slate-dark shadow-hard-sm mb-4">
