@@ -66,7 +66,7 @@ The `onEditHandler` function needs an installable trigger (simple triggers can't
 
 ### Test deploy:
 1. Reload the Google Sheet (to load the custom menu)
-2. Click **IPL Tools** → **Deploy to Site**
+2. Click **IPL Tools** → **Deploy Data ke Website**
 3. Confirm the dialog
 4. Wait for the toast notification ("X records deployed successfully!")
 5. Check the site: https://ipl-talago.netlify.app
@@ -96,5 +96,8 @@ The `onEditHandler` function needs an installable trigger (simple triggers can't
 2. Review new form submissions in raw tab
 3. Check bukti bayar (screenshot) for each entry
 4. Set `validationStatus` to `Valid` or `Invalid` — valid entries auto-copy to Validated tab
-5. When done reviewing, click **IPL Tools** → **Deploy to Site**
+5. When done reviewing, click **IPL Tools** → **Deploy Data ke Website**
 6. Site updates automatically via Netlify
+
+For expenses: fill the **Transaksi** tab (Rutin in columns A–C, Insidental in
+columns E–I), then click **IPL Tools** → **Deploy Pengeluaran ke Website**.

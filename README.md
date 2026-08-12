@@ -88,23 +88,76 @@ Setup awal sheet IPL ada di [`docs/google-apps-script-setup.md`](docs/google-app
 
 ## Update Data
 
-Data transaksi disimpan di `src/data/validated.json`. Update dapat dilakukan otomatis via Google Apps Script atau manual:
+Data IPL & pengeluaran ada di `src/data/validated.json` dan `src/data/expenses.json`.
+**Update sehari-hari tidak perlu buka code sama sekali** — cukup dari Google Sheet.
+Apps Script yang commit sendiri ke GitHub, lalu Netlify auto-deploy.
 
-**Manual:**
-1. Download CSV dari Google Sheets → simpan ke `raw_data/IPL 2026 - Validated.csv`
-2. Jalankan:
-   ```bash
-   npm run convert:validated
-   ```
-3. File `src/data/validated.json` akan diperbarui otomatis
+### Alur pengurus: update data pembayaran
 
-**Script konversi lainnya:**
-```bash
-npm run convert:residents   # update src/data/residents.json dari CSV daftar warga
-npm run convert:expenses    # update src/data/expenses.json dari CSV pengeluaran
+```
+Warga isi Google Form
+        │
+        ▼
+  Tab "Raw Data"  ──── pengurus cek bukti transfer
+        │
+        │  isi kolom validationStatus = "Valid"
+        ▼
+  Tab "Validated"  ← baris ter-copy otomatis (onEdit trigger),
+        │             Blok / Nomor rumah / Nama Pemilik sudah ter-parse
+        │  menu IPL Tools → Deploy Data ke Website
+        ▼
+  commit "chore: update data" ke main (src/data/validated.json)
+        │
+        ▼
+  Netlify auto-deploy → live
 ```
 
+Langkah detailnya:
+
+1. **Warga isi form konfirmasi pembayaran** → baris masuk ke tab **Raw Data**.
+2. **Pengurus review** bukti transfer, lalu isi kolom `validationStatus` dengan
+   `Valid` (atau `Invalid` kalau ditolak).
+3. Baris yang di-set `Valid` **otomatis ter-copy** ke tab **Validated**, lengkap
+   dengan kolom Blok, Nomor rumah, dan Nama Pemilik hasil parsing dari
+   `"E 5. Nama Pemilik"`.
+4. Setelah selesai review, klik menu **IPL Tools → Deploy Data ke Website** di
+   spreadsheet, konfirmasi **Yes**. Muncul toast berisi jumlah record yang ter-deploy.
+5. Apps Script build JSON-nya dan push ke `main` sebagai commit `chore: update data`.
+   Netlify mendeteksi push dan deploy ulang — situs live update dalam beberapa menit.
+
+### Alur pengurus: update pengeluaran
+
+1. Isi tab **Transaksi** — tabel Rutin di kolom A–C (Keterangan, Masuk, Keluar),
+   tabel Insidental di kolom E–I (Keterangan, Masuk, Keluar, Tanggal, Kategori).
+2. Klik menu **IPL Tools → Deploy Pengeluaran ke Website**, konfirmasi **Yes**.
+3. Apps Script push `src/data/expenses.json` ke `main` → Netlify deploy ulang.
+
+> Menu **IPL Tools** hanya muncul kalau Apps Script sudah ter-setup di spreadsheet
+> (Script Properties `GITHUB_TOKEN` + `GITHUB_REPO`, dan installable onEdit trigger).
+> Panduan lengkap + troubleshooting ada di
+> [`docs/google-apps-script-setup.md`](docs/google-apps-script-setup.md).
+
+### Fallback: update manual lewat CSV
+
+Dipakai kalau Apps Script bermasalah, atau untuk data yang belum ada menunya
+(daftar warga masih manual):
+
+```bash
+npm run convert:validated   # raw_data/IPL 2026 - Validated.csv  → src/data/validated.json
+npm run convert:expenses    # raw_data/IPL 2026 - Pengeluaran Rutin.csv → src/data/expenses.json
+npm run convert:residents   # CSV daftar warga → src/data/residents.json
+```
+
+Download dulu CSV-nya dari Google Sheets ke `raw_data/`, jalankan script-nya,
+lalu commit hasilnya.
+
 > `raw_data/` di-gitignore karena mengandung data sensitif (email, bukti transfer).
+
+### Data acara (kehadiran & lomba)
+
+Tidak perlu deploy sama sekali. Halaman `/rekap-kehadiran` dan `/rekap-lomba`
+membaca langsung dari spreadsheet lewat Apps Script `doGet` setiap kali dibuka,
+jadi data selalu real-time.
 
 ## Build & Deploy
 
