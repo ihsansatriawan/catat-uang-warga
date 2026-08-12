@@ -33,6 +33,30 @@ Web app warga D'Talago Regency untuk mengecek status pembayaran IPL (Iuran Penge
 - react-router-dom v7
 - Tanpa backend — data IPL statis (JSON), data acara lewat Google Apps Script
 
+## Alur Data
+
+Ada dua mekanisme yang berbeda: data IPL & pengeluaran ikut ter-*bundle* saat build
+(statis, perlu deploy ulang tiap update), sedangkan data acara dibaca real-time dari
+spreadsheet setiap halaman dibuka.
+
+```mermaid
+flowchart LR
+    S1["Spreadsheet IPL<br/>Raw Data · Validated<br/>Transaksi · Kehadiran"]
+    S2["Spreadsheet Lomba<br/>tab Lomba"]
+    CSV["CSV daftar warga"]
+
+    J12["validated.json<br/>expenses.json"]
+    J3["residents.json"]
+    APP["React app<br/>ipl-talago.netlify.app"]
+
+    S1 -->|"Apps Script<br/>push ke GitHub"| J12
+    CSV -->|"npm run convert:residents<br/>manual"| J3
+    J12 -->|"ter-bundle saat build"| APP
+    J3 -->|"ter-bundle saat build"| APP
+    S1 <-->|"doPost / doGet<br/>saat runtime"| APP
+    S2 <-->|"doPost / doGet<br/>saat runtime"| APP
+```
+
 ## Halaman
 
 | Path | Keterangan |
@@ -94,22 +118,19 @@ Apps Script yang commit sendiri ke GitHub, lalu Netlify auto-deploy.
 
 ### Alur pengurus: update data pembayaran
 
-```
-Warga isi Google Form
-        │
-        ▼
-  Tab "Raw Data"  ──── pengurus cek bukti transfer
-        │
-        │  isi kolom validationStatus = "Valid"
-        ▼
-  Tab "Validated"  ← baris ter-copy otomatis (onEdit trigger),
-        │             Blok / Nomor rumah / Nama Pemilik sudah ter-parse
-        │  menu IPL Tools → Deploy Data ke Website
-        ▼
-  commit "chore: update data" ke main (src/data/validated.json)
-        │
-        ▼
-  Netlify auto-deploy → live
+```mermaid
+flowchart TD
+    A["Warga isi Google Form<br/>konfirmasi pembayaran"] --> B["Tab: Raw Data"]
+    B --> C{"Pengurus cek bukti transfer,<br/>isi kolom validationStatus"}
+    C -->|Invalid| X["Baris diabaikan,<br/>tidak masuk situs"]
+    C -->|Valid| D["Tab: Validated<br/>baris auto-copy via onEdit trigger,<br/>Blok / Nomor rumah / Nama Pemilik ter-parse"]
+    D --> E["Menu IPL Tools<br/>→ Deploy Data ke Website"]
+    E --> F["Apps Script build JSON,<br/>push src/data/validated.json ke main<br/>sebagai commit chore: update data"]
+    F --> G["Netlify auto-deploy"]
+    G --> H["Situs live ter-update"]
+
+    style X fill:#fee2e2,stroke:#ef4444
+    style H fill:#dcfce7,stroke:#22c55e
 ```
 
 Langkah detailnya:
@@ -126,6 +147,16 @@ Langkah detailnya:
    Netlify mendeteksi push dan deploy ulang — situs live update dalam beberapa menit.
 
 ### Alur pengurus: update pengeluaran
+
+```mermaid
+flowchart TD
+    A["Pengurus isi Tab: Transaksi<br/>Rutin di kolom A-C,<br/>Insidental di kolom E-I"] --> B["Menu IPL Tools<br/>→ Deploy Pengeluaran ke Website"]
+    B --> C["Apps Script push<br/>src/data/expenses.json ke main"]
+    C --> D["Netlify auto-deploy"]
+    D --> E["Halaman /pengeluaran ter-update"]
+
+    style E fill:#dcfce7,stroke:#22c55e
+```
 
 1. Isi tab **Transaksi** — tabel Rutin di kolom A–C (Keterangan, Masuk, Keluar),
    tabel Insidental di kolom E–I (Keterangan, Masuk, Keluar, Tanggal, Kategori).
