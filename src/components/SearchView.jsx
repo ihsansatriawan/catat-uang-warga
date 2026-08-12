@@ -108,8 +108,24 @@ export default function SearchView({ onSearch }) {
             Cara Bayar IPL
           </button>
 
-          {/* Pendaftaran lomba 17-an — tampil selama pendaftaran masih dibuka */}
-          {!isRegistrationClosed() && (
+          {/* Lomba 17-an — ajakan mendaftar selama masih dibuka, setelah ditutup
+              tautannya diarahkan ke rekap supaya peserta tetap bisa dicek */}
+          {isRegistrationClosed() ? (
+            <Link
+              to="/rekap-lomba"
+              className="
+                w-full inline-flex items-center justify-center gap-2
+                bg-orange text-white border-2 border-slate-dark rounded-full px-5 py-2.5
+                font-heading font-extrabold text-sm shadow-hard
+                hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg
+                active:translate-x-0 active:translate-y-0 active:shadow-hard-sm
+                transition-all
+              "
+            >
+              <PartyPopper size={15} strokeWidth={2.5} />
+              Rekap Peserta Lomba 17-an
+            </Link>
+          ) : (
             <Link
               to="/lomba"
               className="

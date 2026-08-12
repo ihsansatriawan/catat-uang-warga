@@ -13,6 +13,10 @@ export const LOMBA_EVENT = {
   // Batas akhir pendaftaran (akhir hari, WIB)
   deadline: '2026-08-12T23:59:59+07:00',
   deadlineLabel: 'Rabu, 12 Agustus 2026',
+  // Saklar manual panitia. Kalau true, pendaftaran ditutup tanpa menunggu jam
+  // deadline — dipakai supaya penutupan tidak bergantung pada jam perangkat
+  // warga. Set ke false kalau pendaftaran mau dibuka lagi.
+  registrationClosed: true,
 }
 
 export const LOMBA_LIST = [
@@ -79,5 +83,6 @@ export function getDaysLeft(now = new Date()) {
 }
 
 export function isRegistrationClosed(now = new Date()) {
+  if (LOMBA_EVENT.registrationClosed) return true
   return now > new Date(LOMBA_EVENT.deadline)
 }

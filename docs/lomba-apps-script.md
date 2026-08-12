@@ -199,4 +199,7 @@ Filter kolom D ke "❌ Belum" untuk mendapat daftar rumah yang perlu ditagih.
 - Tanggal acara, jam, tempat, dan batas pendaftaran diatur di
   `src/data/lomba.js` (`LOMBA_EVENT`) — ubah di sana, bukan di komponen.
 - Kalau pendaftaran sudah lewat batas, form otomatis menutup diri dan chip
-  "Daftar Lomba 17-an" di halaman depan ikut disembunyikan.
+  "Daftar Lomba 17-an" di halaman depan berubah jadi tautan ke rekap peserta.
+- Panitia juga bisa menutup pendaftaran lebih awal tanpa menunggu jam deadline:
+  set `LOMBA_EVENT.registrationClosed` di `src/data/lomba.js` jadi `true`
+  (kembalikan ke `false` kalau mau dibuka lagi).
