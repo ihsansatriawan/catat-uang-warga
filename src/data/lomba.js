@@ -4,12 +4,14 @@
 // Sheet (kolom L–S). Jangan ubah urutannya tanpa menyesuaikan LOMBA_KEYS di
 // scripts/google-apps-script/Lomba.gs — Apps Script menulis berdasarkan posisi.
 
+import { IURAN, PERUMAHAN } from '../config'
+
 export const LOMBA_EVENT = {
   title: 'Lomba 17-an',
-  subtitle: 'D’Talago Regency 2026',
+  subtitle: `${PERUMAHAN.namaPendek} ${IURAN.tahun}`,
   dateLabel: 'Minggu, 16 Agustus 2026',
   timeLabel: '07.30 WIB',
-  placeLabel: 'Lapangan depan Musola',
+  placeLabel: 'Lapangan Utama',
   // Batas akhir pendaftaran (akhir hari, WIB)
   deadline: '2026-08-12T23:59:59+07:00',
   deadlineLabel: 'Rabu, 12 Agustus 2026',

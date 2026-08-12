@@ -14,9 +14,10 @@ import {
 import { getAvailableBlocks, getAttendanceHouses } from '../data/helpers'
 import { trackEvent } from '../utils/tracking'
 import { BLOCK_COLORS, BLOCK_COLORS_UNSELECTED } from '../data/constants'
+import { ACARA, siteUrl, waShareUrl } from '../config'
 
 const ENDPOINT = import.meta.env.VITE_ATTENDANCE_ENDPOINT || ''
-const EVENT_DATE_LABEL = 'Minggu, 2 Agustus 2026'
+const EVENT_DATE_LABEL = ACARA.tanggalLabel
 
 // Status → tampilan
 const STATUS_META = {
@@ -104,7 +105,7 @@ export default function RekapKehadiranView() {
 
   function handleShare() {
     const msg =
-      `📋 *Rekap Kehadiran Kumpul Warga*\n` +
+      `📋 *Rekap Kehadiran ${ACARA.judul}*\n` +
       `📅 ${EVENT_DATE_LABEL}\n\n` +
       `✅ Sudah konfirmasi: ${stats.filled}/${stats.total} rumah\n` +
       `   • Hadir: ${stats.hadir}\n` +
@@ -112,9 +113,9 @@ export default function RekapKehadiranView() {
       `   • Masih Ragu: ${stats.ragu}\n` +
       `⬜ Belum konfirmasi: ${stats.belum} rumah\n\n` +
       `Yuk konfirmasi kehadiran di:\n` +
-      `https://ipl-talago.netlify.app/kehadiran`
+      `${siteUrl('/kehadiran')}`
     trackEvent('share_rekap_kehadiran')
-    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer')
+    window.open(waShareUrl(msg), '_blank', 'noopener,noreferrer')
   }
 
   function StatusBadge({ status }) {

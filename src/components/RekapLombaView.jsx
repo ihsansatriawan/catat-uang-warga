@@ -23,6 +23,7 @@ import {
   parseUmur,
 } from '../data/lomba'
 import { trackEvent } from '../utils/tracking'
+import { siteUrl, waShareUrl } from '../config'
 import { BLOCK_BAR_COLORS } from '../data/constants'
 
 // Endpoint spreadsheet lomba (terpisah dari IPL/kehadiran) — lihat LombaView.
@@ -142,9 +143,9 @@ export default function RekapLombaView() {
       msg += `• ${l.label}: ${l.peserta.length} orang\n`
     }
     msg += `\n⬜ Belum daftar: ${rumahBelum.length} rumah\n`
-    msg += `\nDaftar sampai ${LOMBA_EVENT.deadlineLabel} di:\nhttps://ipl-talago.netlify.app/lomba`
+    msg += `\nDaftar sampai ${LOMBA_EVENT.deadlineLabel} di:\n${siteUrl('/lomba')}`
     trackEvent('share_rekap_lomba')
-    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer')
+    window.open(waShareUrl(msg), '_blank', 'noopener,noreferrer')
   }
 
   function PesertaRow({ r }) {

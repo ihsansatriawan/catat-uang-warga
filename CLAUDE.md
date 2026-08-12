@@ -2,68 +2,73 @@ Always use Context7 MCP when I need library/API documentation, code generation, 
 
 # Project: catat-uang-warga
 
-Web app for residents to check their IPL (housing fee) payment status for 2026.
+Produk siap jual: situs transparansi iuran warga untuk perumahan/RT-RW. Warga cek
+status pembayarannya sendiri, lihat pengeluaran kas, dan daftar acara warga.
+
+**Ini adalah versi produk (white-label), bukan instance satu perumahan.** Tidak
+boleh ada nama perumahan, nomor WhatsApp, rekening, atau data warga asli yang
+hardcode di dalam kode. Semuanya lewat `src/config/site.config.js`.
 
 ## Stack
-- React 19 + Vite
+- React 19 + Vite 6
 - Tailwind CSS v4
 - lucide-react for icons
 - react-router-dom v7 for routing
-- No backend — data is static JSON
+- No backend — data IPL statis (JSON), data acara lewat Google Apps Script
+
+## Konfigurasi (yang membuat ini bisa dijual)
+- `src/config/site.config.js` — **satu-satunya file yang diedit pembeli**:
+  identitas perumahan, label & nominal iuran, daftar blok, rekening, kontak
+  pengurus, toggle fitur, detail acara
+- `src/config/index.js` — turunan config: `SITE`, `TARGET_TAHUNAN`, `LABEL_IURAN`,
+  `DAFTAR_BLOK`, `siteUrl()`, `waPengurusUrl()`, `waShareUrl()`, `formatRupiah()`
+- `scripts/setup.js` (`npm run setup`) — wizard interaktif yang menulis ulang
+  `site.config.js` + membuat `.env.local`
+- `vite.config.js` — menyuntik `%SITE_TITLE%`, `%SITE_DESCRIPTION%`,
+  `%SITE_ANALYTICS%` ke `index.html` dari config + env. Kalau `VITE_UMAMI_*`
+  kosong, tag analytics tidak ditulis sama sekali (dulu ini bikin dev server 500)
+- `waPengurusUrl()` mengembalikan `null` kalau `kontak.whatsapp` kosong —
+  komponen menyembunyikan tombol WA-nya, jangan render link kosong
+- `FITUR.*` mematikan menu **dan** rute (`App.jsx` mengalihkan ke `/`)
+- Warna blok dibagikan otomatis dari palet di `src/data/constants.js`, jadi jumlah
+  blok bebas. Kelas Tailwind harus ditulis utuh agar ikut ter-scan saat build
 
 ## Routes
 - `/` — HomePage: search by blok + house number, leads to DashboardView
-- `/warga/:blok/:nomorRumah` — WargaPage: permalink to a single resident's DashboardView (target of the Share button); falls back to PaymentInfoCard when the house has no transactions yet
-- `/leaderboard` — LeaderboardView: block ranking + house-level leaderboard
-- `/broadcast` — BroadcastView: generate WhatsApp broadcast message
-- `/pengeluaran` — ExpensesView: expense transparency page with category filtering
-- `/kehadiran` — AttendanceView: RSVP form for the Kumpul Warga event (2 Aug 2026), submits to Google Sheet via Apps Script
-- `/rekap-kehadiran` — RekapKehadiranView: reads RSVP data back via Apps Script `doGet` (no WhatsApp/email), shows who has/hasn't confirmed
-- `/lomba` — LombaView: registration form for the 17 Agustus games; one submit per house, many peserta, writes one row per peserta
-- `/rekap-lomba` — RekapLombaView: reads lomba data back via Apps Script `doGet?form=lomba` (no WhatsApp), per-lomba and per-house breakdown
+- `/warga/:blok/:nomorRumah` — WargaPage: permalink ke satu rumah; fallback ke
+  PaymentInfoCard kalau rumah belum punya transaksi
+- `/leaderboard` — LeaderboardView (toggle `fitur.leaderboard`)
+- `/broadcast` — BroadcastView (toggle `fitur.broadcast`)
+- `/pengeluaran` — ExpensesView (toggle `fitur.pengeluaran`)
+- `/kehadiran` · `/rekap-kehadiran` — RSVP acara (toggle `fitur.kehadiran`)
+- `/lomba` · `/rekap-lomba` — pendaftaran lomba (toggle `fitur.lomba`)
+- `*` — dialihkan ke `/`
 
 ## Key Files
-- `src/data/validated.json` — source of truth for all transactions (flat array under `data`, with top-level `lastUpdate`)
-- `src/data/residents.json` — master registry of all residents (blok, nomorRumah, namaPemilik)
-- `src/data/helpers.js` — data access functions
-- `src/data/constants.js` — block colors (BLOCK_COLORS, BLOCK_COLORS_UNSELECTED, BLOCK_BAR_COLORS)
-- `src/utils/tracking.js` — Umami analytics wrapper (`trackEvent`)
-- `src/components/HomePage.jsx` — search form + result (SearchView + DashboardView combined)
-- `src/components/SearchView.jsx` — search form (select blok A–F + house number)
-- `src/components/DashboardView.jsx` — payment dashboard per resident (incl. `saldoLebih` overpayment credit + Share button via Web Share API with clipboard fallback)
-- `src/components/WargaPage.jsx` — resolves `/warga/:blok/:nomorRumah` to a resident and renders DashboardView
-- `src/components/PaymentInfoCard.jsx` / `PaymentInfoModal.jsx` — payment instructions (rekening, konfirmasi form, WA pengurus) shown when a house isn't found
-- `src/components/LeaderboardView.jsx` — block & house leaderboards with bar charts
-- `src/components/BroadcastView.jsx` — WhatsApp broadcast message generator
-- `src/components/ProofModal.jsx` — placeholder modal for proof of transfer
-- `src/components/AttendanceView.jsx` — event RSVP form; posts to Google Sheet (`Kehadiran` tab) via Apps Script Web App (`VITE_ATTENDANCE_ENDPOINT`), setup in `docs/attendance-apps-script.md`
-- `src/components/RekapKehadiranView.jsx` — reads RSVP data via Apps Script `doGet` (GET, no WhatsApp/email) and shows sudah/belum konfirmasi per block
-- `src/data/lomba.js` — lomba config: `LOMBA_EVENT` (date/time/place/deadline), `LOMBA_LIST`, `LOMBA_GROUPS`, `UMUR_GROUPS` + `getUmurGroup()` (age grouping for the recap), deadline helpers
-- `src/components/LombaView.jsx` — lomba registration form; posts with `form=lomba` to the **separate** lomba Web App (`VITE_LOMBA_ENDPOINT`), setup in `docs/lomba-apps-script.md`
-- `src/components/RekapLombaView.jsx` — lomba recap: peserta per lomba (flat list or grouped by age band via the "Tampilkan" toggle), per rumah, belum daftar, and the pentas seni rundown
-- `scripts/convert-validated.js` — converts raw CSV export to `validated.json`
-- `scripts/convert-residents.js` — converts resident CSV to `residents.json`
-- `src/data/expenses.json` — expense data (rutin + insidental, with summary)
-- `src/components/ExpensesView.jsx` — expense transparency page
-- `scripts/convert-expenses.js` — converts expense CSV to `expenses.json`
+- `src/data/validated.json` — sumber data transaksi (array `data` + `lastUpdate`)
+- `src/data/residents.json` — daftar seluruh warga (blok, nomorRumah, namaPemilik)
+- `src/data/expenses.json` — pengeluaran (rutin + insidental + summary)
+- `src/data/helpers.js` — akses data, semua konstanta dari `src/config`
+- `src/data/constants.js` — palet warna blok (dibagikan otomatis)
+- `src/data/lomba.js` — konfigurasi lomba; `LOMBA_EVENT.subtitle` ikut config
+- `src/utils/tracking.js` — wrapper Umami (`trackEvent`), no-op kalau tidak ada
+- `scripts/generate-demo-data.js` (`npm run demo:seed`) — data demo deterministik
+  mengikuti jumlah blok/rumah di config. **Data di `src/data/` saat ini demo.**
+- `scripts/convert-*.js` — konversi CSV → JSON, default path relatif ke `raw_data/`
 
 ## Helper Functions (`src/data/helpers.js`)
-- `getResident(blok, nomorRumah)` — single resident with transactions
-- `getAllResidents()` — all residents with payment stats from `residents.json`
-- `getBlockLeaderboard()` — blocks ranked by `collectionPct` (% of total expected revenue collected)
-- `getHouseLeaderboard(blok?)` — houses sorted by `completionPct`, optionally filtered by block
-- `generateBroadcastMessage()` — WhatsApp-formatted IPL report string
-- `getAttendanceHouses(blok?)` — house list used by the RSVP/lomba forms
-- `getResidentName(blok, nomorRumah)` — owner name lookup from `residents.json`
-- `getAvailableBlocks()` — returns `['A','B','C','D','E','F']`
-- `getLastUpdated()` — returns `lastUpdate` from `validated.json`
-- `formatRupiah(amount)` — formats number as IDR currency
-- `getExpenses()` — returns parsed `expenses.json` (rutin, insidental, summary)
-- `getExpenseCategories()` — returns unique kategori list from insidental data
-- `generateExpenseBroadcastMessage()` — WhatsApp-formatted expense report string
+- `getResident(blok, nomorRumah)` — satu warga + transaksinya
+- `getAllResidents()` — semua warga + statistik pembayaran
+- `getBlockLeaderboard()` — blok diurutkan by `collectionPct`
+- `getHouseLeaderboard(blok?)` — rumah diurutkan by `completionPct`
+- `generateBroadcastMessage()` / `generateExpenseBroadcastMessage()`
+- `getAttendanceHouses(blok?)`, `getResidentName(blok, nomorRumah)`
+- `getAvailableBlocks()` — dari config, bukan hardcode
+- `getLastUpdated()`, `formatRupiah(amount)`, `getExpenses()`, `getExpenseCategories()`
+
+Urutan blok mengikuti `DAFTAR_BLOK` (bukan abjad) lewat `compareBlok()`.
 
 ## Data Schema (`validated.json`)
-Each record in `data[]`:
 ```json
 {
   "timestamp": "2026-01-01T00:00:00+07:00",
@@ -73,48 +78,55 @@ Each record in `data[]`:
   "jumlahPembayaran": 250000
 }
 ```
-Fields `email` and `buktiTransfer` are intentionally excluded from the public JSON.
+Field `email` dan `buktiTransfer` sengaja tidak ikut ke JSON publik.
 
 ## Scripts
 ```bash
-npm run dev               # start dev server
+npm run setup             # wizard konfigurasi
+npm run dev               # dev server
 npm run build             # production build
-npm run convert:validated # convert raw_data/IPL 2026 - Validated.csv → src/data/validated.json
-npm run convert:residents # convert resident CSV → src/data/residents.json
-npm run convert:expenses       # convert raw_data/IPL 2026 - Pengeluaran Rutin.csv → src/data/expenses.json
+npm run lint              # eslint (eslint.config.js, flat config)
+npm run demo:seed         # regenerate data demo
+npm run convert:validated # raw_data/Validated.csv    → src/data/validated.json
+npm run convert:residents # raw_data/Data Warga.csv   → src/data/residents.json
+npm run convert:expenses  # raw_data/Transaksi.csv    → src/data/expenses.json
 ```
 
+## Dokumentasi (bagian dari produk yang dijual)
+- `README.md` — halaman depan produk
+- `docs/INSTALASI.md` — nol sampai online, untuk pembeli
+- `docs/KONFIGURASI.md` — referensi tiap field config + env var
+- `docs/PANDUAN-PENGURUS.md` — pemakaian harian tanpa menyentuh kode
+- `docs/google-apps-script-setup.md`, `attendance-apps-script.md`,
+  `lomba-apps-script.md`, `analytics.md` — setup integrasi
+- `LICENSE.md` — lisensi komersial satu komunitas
+
+Kalau mengubah perilaku yang dilihat pembeli, perbarui dokumennya di commit yang sama.
+
 ## Constants
-- Monthly IPL: Rp 250,000
-- Annual target: Rp 3,000,000 (12 months)
-- Blocks: A, B, C, D, E, F (up to 15 houses each)
+- Iuran bulanan, jumlah bulan, target tahunan: semua dari `src/config`
+- Blok: dari `rumah.blok` di config (default A–F, maksimal bebas)
 
 ## Block Ranking Logic
-Blocks are ranked by **collection percentage** (`collectionPct`): ratio of total payments collected to total expected (totalHouses × ANNUAL_TARGET), capped at 100%. This rewards partial payments — a block where many residents pay partially ranks higher than one where only a few pay in full.
+Blok diurutkan berdasarkan `collectionPct`: total terkumpul ÷ (jumlah rumah ×
+target tahunan), dibatasi 100%. Kontribusi tiap rumah di-cap di target tahunan
+supaya kelebihan bayar satu rumah tidak menutupi rumah yang belum bayar.
 
-## Analytics
-Umami analytics via `src/utils/tracking.js`. Call `trackEvent(name, data)` — no-ops if `window.umami` is undefined.
-
-## Apps Script — two separate spreadsheets
-An Apps Script project can only define one `doPost` and one `doGet`, so the two
-forms live in **separate spreadsheets with separate Apps Script projects and
-separate Web App URLs**. Never paste one script into the other's project — the
-second `doPost` silently overwrites the first.
+## Apps Script — dua spreadsheet terpisah
+Satu project Apps Script hanya bisa punya satu `doPost`/`doGet`, jadi kedua form
+tinggal di **spreadsheet + project + Web App URL yang berbeda**.
 
 | Spreadsheet | Script | Tabs | Env var |
 | --- | --- | --- | --- |
-| IPL | `scripts/google-apps-script/Code.gs` | Raw Data, Validated, Transaksi, Kehadiran | `VITE_ATTENDANCE_ENDPOINT` |
+| Iuran | `scripts/google-apps-script/Code.gs` | Raw Data, Validated, Transaksi, Kehadiran | `VITE_ATTENDANCE_ENDPOINT` |
 | Lomba | `scripts/google-apps-script/Lomba.gs` | Lomba (auto-created) | `VITE_LOMBA_ENDPOINT` |
 
-`VITE_LOMBA_ENDPOINT` has **no fallback** — if unset the lomba form refuses to
-submit, so data can never land in the wrong spreadsheet. Sheet writes are
-positional: `LOMBA_KEYS` in `Lomba.gs` must stay in the same order as
-`LOMBA_LIST` in `src/data/lomba.js`.
+`VITE_LOMBA_ENDPOINT` **tanpa fallback** — kalau kosong, form lomba menolak submit
+supaya data tidak nyasar ke spreadsheet iuran. Penulisan sheet bersifat posisional:
+`LOMBA_KEYS` di `Lomba.gs` harus urut sama dengan `LOMBA_LIST` di `src/data/lomba.js`.
 
 ## Notes
-- `raw_data/` is gitignored — contains the original CSV with sensitive fields
-- Dev without `.env.local`: `index.html` keeps the literal `%VITE_UMAMI_SCRIPT_URL%`
-  placeholder, which makes the Vite dev server return 500 (`URI malformed`) and
-  show an error overlay. Copy `.env.example` to `.env.local` before `npm run dev`.
-- ProofModal shows a static placeholder; it does not display actual transfer images
-- Deployed at: https://ipl-talago.netlify.app
+- `raw_data/` gitignored — berisi CSV dengan field sensitif
+- `.env.local` opsional; aplikasi jalan tanpa file itu
+- ProofModal masih placeholder statis, tidak menampilkan gambar bukti transfer
+- Jangan commit data warga asli ke branch produk ini

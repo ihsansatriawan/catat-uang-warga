@@ -1,7 +1,7 @@
 # Form Kehadiran Acara → Google Sheet
 
 Halaman `/kehadiran` mengirim data konfirmasi kehadiran acara **Kumpul Warga
-D'talago Regency (Minggu, 2 Agustus 2026)** ke Google Sheet yang sama dengan
+warga** ke Google Sheet yang sama dengan
 data lainnya, tetapi ke **tab (sheet) terpisah**.
 
 Karena aplikasi ini tanpa backend, pengiriman data memakai **Google Apps Script
@@ -124,7 +124,7 @@ F	3	Herdhana Prayana Dipura
 F	5	Dhany Yanuar Hindriyanto
 F	6	Thomas
 F	7	Erlin
-F	8	Ihsan Satriawan
+F	8	Budi Santoso
 F	9	Imam
 F	10	Lili Deviani
 F	11	Safrudin

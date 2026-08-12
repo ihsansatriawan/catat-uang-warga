@@ -1,12 +1,28 @@
 import validated from './validated.json'
 import residents from './residents.json'
 import expenses from './expenses.json'
+import {
+  BULAN_PER_TAHUN,
+  DAFTAR_BLOK,
+  IURAN_BULANAN,
+  LABEL_IURAN_TAHUN,
+  TARGET_TAHUNAN,
+  formatRupiah as formatRupiahConfig,
+  siteUrl,
+} from '../config'
 
 const { lastUpdate, data } = validated
 
-const MONTHLY_IPL = 250000
-const MONTHS_PER_YEAR = 12
-const ANNUAL_TARGET = MONTHLY_IPL * MONTHS_PER_YEAR
+const MONTHLY_IPL = IURAN_BULANAN
+const MONTHS_PER_YEAR = BULAN_PER_TAHUN
+const ANNUAL_TARGET = TARGET_TAHUNAN
+
+/** Urutan blok mengikuti site.config.js, bukan abjad. */
+const blokIndex = (blok) => {
+  const i = DAFTAR_BLOK.indexOf(blok)
+  return i === -1 ? DAFTAR_BLOK.length : i
+}
+const compareBlok = (a, b) => blokIndex(a) - blokIndex(b) || String(a).localeCompare(String(b))
 
 export function getResident(blok, nomorRumah) {
   const records = data.filter(
@@ -41,20 +57,14 @@ export function getResident(blok, nomorRumah) {
 }
 
 export function getAvailableBlocks() {
-  return ['A', 'B', 'C', 'D', 'E', 'F']
+  return [...DAFTAR_BLOK]
 }
 
 export function getLastUpdated() {
   return lastUpdate || null
 }
 
-export function formatRupiah(amount) {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-    minimumFractionDigits: 0,
-  }).format(amount)
-}
+export const formatRupiah = formatRupiahConfig
 
 export function getAllResidents() {
   return residents.map((r) => {
@@ -95,7 +105,7 @@ export function getBlockLeaderboard() {
       sumPaid,
       collectionPct: total > 0 ? Math.min(100, Math.round((sumPaid / (total * ANNUAL_TARGET)) * 100)) : 0,
     }))
-    .sort((a, b) => b.collectionPct - a.collectionPct || a.blok.localeCompare(b.blok))
+    .sort((a, b) => b.collectionPct - a.collectionPct || compareBlok(a.blok, b.blok))
 }
 
 export function getHouseLeaderboard(blok) {
@@ -106,19 +116,19 @@ export function getHouseLeaderboard(blok) {
   return all.sort(
     (a, b) =>
       b.completionPct - a.completionPct ||
-      a.blok.localeCompare(b.blok) ||
+      compareBlok(a.blok, b.blok) ||
       Number(a.nomorRumah) - Number(b.nomorRumah)
   )
 }
 
 export function generateBroadcastMessage() {
-  const blocks = getBlockLeaderboard().sort((a, b) => a.blok.localeCompare(b.blok))
+  const blocks = getBlockLeaderboard().sort((a, b) => compareBlok(a.blok, b.blok))
   const lastUpdated = getLastUpdated()
   const dateBase = lastUpdated ? new Date(lastUpdated) : new Date()
   const dateStr = dateBase.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' })
   const timeStr = dateBase.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })
 
-  let msg = `📊 *Laporan IPL 2026*\n📅 ${dateStr}\n🕐 Data per ${dateStr}, ${timeStr} WIB\n`
+  let msg = `📊 *Laporan ${LABEL_IURAN_TAHUN}*\n📅 ${dateStr}\n🕐 Data per ${dateStr}, ${timeStr} WIB\n`
 
   for (const block of blocks) {
     const houses = getHouseLeaderboard(block.blok)
@@ -129,7 +139,7 @@ export function generateBroadcastMessage() {
     msg += `\n*Blok ${block.blok} — ${block.collectionPct}%* (${block.lunasCount}/${block.totalHouses} rumah bayar penuh)\n`
 
     for (const h of lunas) {
-      const months = Math.min(12, Math.floor(h.totalPaid / MONTHLY_IPL))
+      const months = Math.min(MONTHS_PER_YEAR, Math.floor(h.totalPaid / MONTHLY_IPL))
       msg += `  ✅ ${h.blok}-${h.nomorRumah} ${h.namaPemilik} — ${months} bln\n`
     }
 
@@ -148,7 +158,7 @@ export function generateBroadcastMessage() {
     }
   }
 
-  msg += `\n📱 Cek detail → https://ipl-talago.netlify.app`
+  msg += `\n📱 Cek detail → ${siteUrl('/')}`
   return msg
 }
 
@@ -157,7 +167,7 @@ export function getAttendanceHouses(blok) {
   if (blok) list = list.filter((r) => r.blok === blok)
   return [...list].sort(
     (a, b) =>
-      a.blok.localeCompare(b.blok) ||
+      compareBlok(a.blok, b.blok) ||
       Number(a.nomorRumah) - Number(b.nomorRumah)
   )
 }
@@ -191,7 +201,7 @@ export function generateExpenseBroadcastMessage() {
     timeZone: 'Asia/Jakarta',
   })
 
-  let msg = `*Laporan Pengeluaran IPL 2026*\nUpdate: ${dateStr}\n\n`
+  let msg = `*Laporan Pengeluaran ${LABEL_IURAN_TAHUN}*\nUpdate: ${dateStr}\n\n`
   msg += `Total Masuk: ${formatRupiah(summary.totalMasuk)}\n`
   msg += `Total Keluar: ${formatRupiah(summary.totalKeluar)}\n`
   msg += `Sisa Anggaran: ${formatRupiah(summary.sisaAnggaran)}\n`
@@ -222,6 +232,6 @@ export function generateExpenseBroadcastMessage() {
     }
   }
 
-  msg += `\nDetail lengkap: https://ipl-talago.netlify.app/pengeluaran`
+  msg += `\nDetail lengkap: ${siteUrl('/pengeluaran')}`
   return msg
 }

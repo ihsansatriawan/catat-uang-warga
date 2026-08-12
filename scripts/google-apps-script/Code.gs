@@ -3,7 +3,7 @@
  * Automates: validation copy + JSON deploy to GitHub
  *
  * Setup:
- *   1. Script Properties: GITHUB_TOKEN, GITHUB_REPO (e.g. "ihsansatriawan/catat-uang-warga")
+ *   1. Script Properties: GITHUB_TOKEN, GITHUB_REPO (e.g. "<username-github>/<nama-repo>")
  *   2. Installable onEdit trigger → onEditHandler
  *   3. Raw data tab needs a "validationStatus" column
  *

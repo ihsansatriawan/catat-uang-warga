@@ -4,10 +4,15 @@ import { ArrowLeft, Trophy, Home, ChevronDown, ChevronUp, MessageCircle } from '
 import { getBlockLeaderboard, getHouseLeaderboard, getAvailableBlocks, formatRupiah, getLastUpdated } from '../data/helpers'
 import { trackEvent } from '../utils/tracking'
 import { BLOCK_COLORS, BLOCK_COLORS_UNSELECTED, BLOCK_BAR_COLORS } from '../data/constants'
+import { KONTAK, LABEL_IURAN, waPengurusUrl } from '../config'
 
 export default function LeaderboardView() {
     const [selectedBlok, setSelectedBlok] = useState('')
     const [showBelumBayar, setShowBelumBayar] = useState(false)
+
+    const laporUrl = waPengurusUrl(
+        `Halo ${KONTAK.namaPengurus}, saya mengecek data di Leaderboard ${LABEL_IURAN} dan sepertinya ada data yang kurang sesuai. Mohon bantuannya untuk dilakukan pengecekan.`
+    )
 
     useEffect(() => {
         trackEvent('open_leaderboard')
@@ -241,13 +246,14 @@ export default function LeaderboardView() {
                         )}
                     </div>
 
-                    {/* Help/Report Data section */}
+                    {/* Help/Report Data section — hanya tampil kalau nomor pengurus diisi */}
+                    {laporUrl && (
                     <div className="animate-fade-in stagger-3 flex flex-col items-center bg-cream/50 rounded-2xl py-4 px-4 border-2 border-transparent mt-4">
                         <p className="font-body text-sm text-center text-slate-dark/60 mb-2 font-semibold">
                             Ada data yang tidak sesuai?
                         </p>
                         <a
-                            href={`https://wa.me/628111719913?text=${encodeURIComponent('Halo Pengurus, saya mengecek data di Leaderboard IPL dan sepertinya ada data yang kurang sesuai. Mohon bantuannya untuk dilakukan pengecekan.')}`}
+                            href={laporUrl}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="
@@ -264,6 +270,7 @@ export default function LeaderboardView() {
                             Hubungi via WhatsApp
                         </a>
                     </div>
+                    )}
 
                     {/* Last updated */}
                     {lastUpdateText && (

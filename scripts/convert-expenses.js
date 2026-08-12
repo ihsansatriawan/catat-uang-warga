@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-const DEFAULT_SRC = path.resolve(__dirname, '../raw_data/IPL 2026 - Transaksi.csv')
+const DEFAULT_SRC = path.resolve(__dirname, '../raw_data/Transaksi.csv')
 const DEFAULT_DEST = path.resolve(__dirname, '../src/data/expenses.json')
 
 function readFileUtf8(p) {
@@ -101,7 +101,6 @@ function main() {
 
   // Parse Insidental (cols 4, 5, 6, 7, 8: Keterangan, Masuk, Keluar, Tanggal, Kategori)
   const insidental = []
-  let insidentalTotalMasuk = 0
   let insidentalTotalKeluar = 0
 
   for (const row of dataRows) {
@@ -113,7 +112,6 @@ function main() {
     const kategori = (row[8] || '').trim()
 
     insidental.push({ keterangan, masuk: masuk || null, keluar: keluar || null, tanggal, kategori })
-    insidentalTotalMasuk += masuk
     insidentalTotalKeluar += keluar
   }
 

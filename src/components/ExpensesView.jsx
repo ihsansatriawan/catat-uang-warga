@@ -8,6 +8,7 @@ import {
   formatRupiah,
 } from '../data/helpers'
 import { trackEvent } from '../utils/tracking'
+import { IURAN } from '../config'
 
 export default function ExpensesView() {
   const [selectedCategory, setSelectedCategory] = useState('')
@@ -102,7 +103,7 @@ export default function ExpensesView() {
         </Link>
         <div className="flex-1 text-center">
           <span className="font-heading font-bold text-sm text-slate-dark/50">
-            Pengeluaran 2026
+            Pengeluaran {IURAN.tahun}
           </span>
         </div>
         <Wallet size={20} strokeWidth={2.5} className="text-green" />

@@ -22,16 +22,14 @@ import {
 } from '../data/helpers'
 import { trackEvent } from '../utils/tracking'
 import { BLOCK_COLORS, BLOCK_COLORS_UNSELECTED } from '../data/constants'
+import { ACARA, PERUMAHAN } from '../config'
 
-// Info acara
-const EVENT_TITLE = 'Kumpul Warga D’talago Regency'
-const EVENT_DATE_LABEL = 'Minggu, 2 Agustus 2026'
-const EVENT_TIME_LABEL = '19.30 WIB'
-const EVENT_PLACE_LABEL = 'Depan Musola'
-const EVENT_AGENDA = [
-  'Acara 17 Agustusan 2026',
-  'Kelanjutan pengurusan Paguyuban D’Talago Regency',
-]
+// Info acara — diatur di src/config/site.config.js (bagian `acara`)
+const EVENT_TITLE = `${ACARA.judul} ${PERUMAHAN.namaPendek}`.trim()
+const EVENT_DATE_LABEL = ACARA.tanggalLabel
+const EVENT_TIME_LABEL = ACARA.waktuLabel
+const EVENT_PLACE_LABEL = ACARA.tempatLabel
+const EVENT_AGENDA = ACARA.agenda || []
 
 // Endpoint Google Apps Script Web App (lihat docs/attendance-apps-script.md).
 // Diisi lewat .env.local: VITE_ATTENDANCE_ENDPOINT=...

@@ -1,13 +1,16 @@
 {
-  "name": "extract-video-trend",
+  "name": "catat-uang-warga",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "Situs transparansi iuran warga: cek status pembayaran per rumah, laporan pengeluaran, leaderboard, dan pendaftaran acara warga.",
   "type": "module",
   "scripts": {
+    "setup": "node scripts/setup.js",
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
+    "demo:seed": "node scripts/generate-demo-data.js",
     "convert:validated": "node scripts/convert-validated.js",
     "convert:residents": "node scripts/convert-residents.js",
     "convert:expenses": "node scripts/convert-expenses.js"

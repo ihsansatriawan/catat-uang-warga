@@ -221,7 +221,6 @@ export default function LombaView() {
   }
 
   const totalPendaftaran = peserta.reduce((n, p) => n + p.lomba.length, 0)
-  const semuaPesertaValid = peserta.length > 0 && peserta.every(isPesertaValid)
   const identitasValid =
     blok && nomorRumah && (namaAyah.trim() || namaIbu.trim()) && whatsapp.trim()
   // Tombol sengaja TIDAK di-disable saat data belum lengkap — lebih baik warga

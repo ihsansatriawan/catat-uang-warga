@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { getResident } from '../data/helpers'
+import { LABEL_IURAN } from '../config'
 import DashboardView from './DashboardView'
 import PaymentInfoCard from './PaymentInfoCard'
 
@@ -14,7 +15,7 @@ export default function WargaPage() {
         <div className="bg-white border-2 border-slate-dark rounded-3xl shadow-hard p-8 max-w-sm w-full text-center space-y-4">
           <p className="font-heading text-xl font-bold text-slate-dark">Data tidak ditemukan</p>
           <p className="font-body text-sm text-slate-dark/70">
-            Mungkin Anda belum melakukan pembayaran IPL.
+            Mungkin Anda belum melakukan pembayaran {LABEL_IURAN}.
             <br />Berikut panduannya:
           </p>
 

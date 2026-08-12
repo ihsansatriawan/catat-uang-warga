@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url'
 
 const DEFAULT_SRC = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
-  '../raw_data/IPL 2026 - Data warga.csv'
+  '../raw_data/Data Warga.csv'
 )
 const DEFAULT_DEST = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),

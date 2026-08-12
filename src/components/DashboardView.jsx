@@ -1,6 +1,14 @@
 import { useState, useEffect } from 'react'
 import { ArrowLeft, CheckCircle, XCircle, Receipt, Image, Calendar, MessageCircle, Share2 } from 'lucide-react'
 import { formatRupiah, getLastUpdated } from '../data/helpers'
+import {
+  BULAN_PER_TAHUN,
+  IURAN,
+  IURAN_BULANAN,
+  KONTAK,
+  LABEL_IURAN,
+  waPengurusUrl,
+} from '../config'
 import { trackEvent } from '../utils/tracking'
 import ProofModal from './ProofModal'
 
@@ -13,14 +21,14 @@ export default function DashboardView({ resident, onBack }) {
 
   const handleShare = async () => {
     const shareData = {
-      title: `IPL ${resident.namaPemilik} - Blok ${resident.blok} No. ${resident.nomorRumah}`,
+      title: `${LABEL_IURAN} ${resident.namaPemilik} - Blok ${resident.blok} No. ${resident.nomorRumah}`,
       url: window.location.href,
     }
 
     if (navigator.share) {
       try {
         await navigator.share(shareData)
-      } catch (err) {
+      } catch {
         // User cancelled share — ignore
       }
     } else {
@@ -36,9 +44,13 @@ export default function DashboardView({ resident, onBack }) {
 
   const progressPct = Math.min(100, Math.round((resident.totalPaid / resident.annualTarget) * 100))
 
-  const monthsTotal = resident.monthsTotal ?? 12
-  const monthsPaid = resident.monthsPaid ?? Math.min(monthsTotal, Math.floor(resident.totalPaid / (resident.monthlyIpl ?? 250000)))
+  const monthsTotal = resident.monthsTotal ?? BULAN_PER_TAHUN
+  const monthsPaid = resident.monthsPaid ?? Math.min(monthsTotal, Math.floor(resident.totalPaid / (resident.monthlyIpl ?? IURAN_BULANAN)))
   const remainingMonths = MONTH_LABELS.slice(monthsPaid, monthsTotal)
+
+  const laporUrl = waPengurusUrl(
+    `Halo ${KONTAK.namaPengurus}, saya mengecek data ${LABEL_IURAN} untuk Blok ${resident.blok} No. ${resident.nomorRumah} dan sepertinya ada data yang kurang sesuai. Mohon bantuannya untuk dilakukan pengecekan.`
+  )
 
   const lastUpdatedRaw = getLastUpdated()
   const lastUpdateText = lastUpdatedRaw
@@ -139,7 +151,7 @@ export default function DashboardView({ resident, onBack }) {
                     dari {formatRupiah(resident.annualTarget)} target tahunan
                   </p>
                   <span className="inline-flex items-center gap-1 bg-violet/10 text-violet font-body text-xs font-semibold rounded-full px-2.5 py-0.5 mt-1">
-                    💡 Rp 250.000/bulan × 12 bulan
+                    💡 {formatRupiah(IURAN_BULANAN)}/bulan × {monthsTotal} bulan
                   </span>
                 </div>
                 <span className={`
@@ -175,7 +187,7 @@ export default function DashboardView({ resident, onBack }) {
                   </span>
                 </div>
                 <div className="grid grid-cols-6 gap-1.5">
-                  {MONTH_LABELS.map((label, i) => {
+                  {MONTH_LABELS.slice(0, monthsTotal).map((label, i) => {
                     const paid = i < monthsPaid
                     return (
                       <div
@@ -204,7 +216,7 @@ export default function DashboardView({ resident, onBack }) {
 
               {resident.isLunas && (
                 <p className="font-body text-xs text-green font-semibold mt-3">
-                  🎉 Lunas penuh — Januari s/d Desember 2026
+                  🎉 Lunas penuh — {MONTH_FULL[0]} s/d {MONTH_FULL[monthsTotal - 1]} {IURAN.tahun}
                 </p>
               )}
               {resident.isLunas && resident.saldoLebih > 0 && (
@@ -213,7 +225,7 @@ export default function DashboardView({ resident, onBack }) {
                   <p className="font-body text-xs text-slate-dark/70 font-semibold">
                     Kelebihan bayar <span className="text-green font-extrabold">{formatRupiah(resident.saldoLebih)}</span>
                     {resident.bulanMaju > 0 && (
-                      <> — jadi saldo ± <span className="text-green font-extrabold">{resident.bulanMaju} bulan</span> untuk IPL 2027</>
+                      <> — jadi saldo ± <span className="text-green font-extrabold">{resident.bulanMaju} bulan</span> untuk {LABEL_IURAN} {IURAN.tahun + 1}</>
                     )}
                   </p>
                 </div>
@@ -227,7 +239,7 @@ export default function DashboardView({ resident, onBack }) {
               )}
               {!resident.isLunas && monthsPaid === 0 && (
                 <p className="font-body text-xs text-pink font-semibold mt-3">
-                  Belum ada bulan yang terbayar untuk 2026
+                  Belum ada bulan yang terbayar untuk {IURAN.tahun}
                 </p>
               )}
 
@@ -242,13 +254,14 @@ export default function DashboardView({ resident, onBack }) {
             </div>
           </div>
 
-          {/* Help/Report Data section */}
+          {/* Help/Report Data section — hanya tampil kalau nomor pengurus diisi */}
+          {laporUrl && (
           <div className="animate-slide-up stagger-2 flex flex-col items-center bg-cream/50 rounded-2xl py-2 px-4 border-2 border-transparent">
             <p className="font-body text-sm text-center text-slate-dark/60 mb-2 font-semibold">
               Ada data yang tidak sesuai?
             </p>
             <a
-              href={`https://wa.me/628111719913?text=${encodeURIComponent(`Halo Pengurus, saya mengecek data IPL untuk Blok ${resident.blok} No. ${resident.nomorRumah} dan sepertinya ada data yang kurang sesuai. Mohon bantuannya untuk dilakukan pengecekan.`)}`}
+              href={laporUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="
@@ -265,6 +278,7 @@ export default function DashboardView({ resident, onBack }) {
               Hubungi via WhatsApp
             </a>
           </div>
+          )}
 
           {/* Summary pills */}
           <div className="grid grid-cols-2 gap-3 animate-slide-up stagger-3">
@@ -289,7 +303,7 @@ export default function DashboardView({ resident, onBack }) {
                 {resident.isLunas ? 'LUNAS' : monthsPaid > 0 ? `${monthsPaid}/${monthsTotal} bln` : 'BELUM'}
               </p>
               <p className="font-body text-xs text-slate-dark/50 mt-0.5">
-                {resident.isLunas ? 'status IPL' : monthsPaid > 0 ? 'sudah terbayar' : 'status IPL'}
+                {resident.isLunas ? `status ${LABEL_IURAN}` : monthsPaid > 0 ? 'sudah terbayar' : `status ${LABEL_IURAN}`}
               </p>
             </div>
           </div>

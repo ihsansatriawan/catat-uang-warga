@@ -5,6 +5,7 @@ import { getAvailableBlocks, getLastUpdated } from '../data/helpers'
 import { trackEvent } from '../utils/tracking'
 import { BLOCK_COLORS, BLOCK_COLORS_UNSELECTED } from '../data/constants'
 import { isRegistrationClosed } from '../data/lomba'
+import { ACARA, FITUR, LABEL_IURAN, PERUMAHAN, RUMAH } from '../config'
 import PaymentInfoModal from './PaymentInfoModal'
 
 export default function SearchView({ onSearch }) {
@@ -43,7 +44,7 @@ export default function SearchView({ onSearch }) {
         <div className="animate-pop-in mb-6">
           <span className="inline-flex items-center gap-1.5 bg-yellow border-2 border-slate-dark rounded-full px-4 py-1 font-heading font-bold text-sm shadow-hard-sm">
             <Home size={14} strokeWidth={2.5} />
-            IPL D'talago Regency
+            {LABEL_IURAN} {PERUMAHAN.namaPendek}
           </span>
         </div>
 
@@ -70,7 +71,7 @@ export default function SearchView({ onSearch }) {
             </span>
           </h1>
           <p className="font-body text-base text-slate-dark/60 max-w-xs mx-auto">
-            Pilih blok dan nomor rumah kamu untuk melihat status IPL
+            Pilih blok dan nomor rumah kamu untuk melihat status {LABEL_IURAN}
           </p>
         </div>
 
@@ -105,11 +106,11 @@ export default function SearchView({ onSearch }) {
             "
           >
             <CreditCard size={15} strokeWidth={2.5} />
-            Cara Bayar IPL
+            Cara Bayar {LABEL_IURAN}
           </button>
 
-          {/* Pendaftaran lomba 17-an — tampil selama pendaftaran masih dibuka */}
-          {!isRegistrationClosed() && (
+          {/* Pendaftaran lomba — tampil selama pendaftaran masih dibuka */}
+          {FITUR.lomba && !isRegistrationClosed() && (
             <Link
               to="/lomba"
               className="
@@ -127,6 +128,7 @@ export default function SearchView({ onSearch }) {
           )}
 
           {/* Event kehadiran — full-width chip */}
+          {FITUR.kehadiran && (
           <Link
             to="/kehadiran"
             className="
@@ -139,11 +141,14 @@ export default function SearchView({ onSearch }) {
             "
           >
             <CalendarCheck size={15} strokeWidth={2.5} />
-            Konfirmasi Kehadiran Kumpul Warga
+            Konfirmasi Kehadiran {ACARA.judul}
           </Link>
+          )}
 
           {/* Secondary chips row */}
+          {(FITUR.leaderboard || FITUR.pengeluaran) && (
           <div className="flex items-center gap-2 w-full">
+            {FITUR.leaderboard && (
             <Link
               to="/leaderboard"
               className="
@@ -157,6 +162,8 @@ export default function SearchView({ onSearch }) {
               <Trophy size={13} strokeWidth={2.5} />
               Leaderboard
             </Link>
+            )}
+            {FITUR.pengeluaran && (
             <Link
               to="/pengeluaran"
               className="
@@ -170,7 +177,9 @@ export default function SearchView({ onSearch }) {
               <Wallet size={13} strokeWidth={2.5} />
               Pengeluaran
             </Link>
+            )}
           </div>
+          )}
         </div>
 
         {/* Search Card */}
@@ -215,14 +224,14 @@ export default function SearchView({ onSearch }) {
             {/* House number — number pad style */}
             <div>
               <label className="font-heading font-bold text-xs uppercase tracking-wider text-slate-dark/50 mb-2 block">
-                Nomor Rumah <span className="text-slate-dark/30 normal-case">(1–15)</span>
+                Nomor Rumah <span className="text-slate-dark/30 normal-case">({RUMAH.nomorMin}–{RUMAH.nomorMax})</span>
               </label>
               <input
                 type="number"
                 inputMode="numeric"
                 pattern="[0-9]*"
-                min="1"
-                max="15"
+                min={RUMAH.nomorMin}
+                max={RUMAH.nomorMax}
                 value={nomorRumah}
                 onChange={(e) => setNomorRumah(e.target.value)}
                 placeholder="Masukkan nomor…"

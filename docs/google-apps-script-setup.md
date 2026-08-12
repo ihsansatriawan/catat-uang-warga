@@ -5,7 +5,7 @@ Automates the data pipeline: validation in Google Sheet → JSON push to GitHub 
 ## Prerequisites
 
 - Google Sheet with IPL payment data (raw + Validated tabs)
-- GitHub account with access to `ihsansatriawan/catat-uang-warga` repo
+- GitHub account with access to your own copy of this repo
 
 ## Step 1: Create GitHub Personal Access Token
 
@@ -43,7 +43,7 @@ Automates the data pipeline: validation in Google Sheet → JSON push to GitHub 
 | Property | Value |
 |----------|-------|
 | `GITHUB_TOKEN` | Your personal access token from Step 1 |
-| `GITHUB_REPO` | `ihsansatriawan/catat-uang-warga` |
+| `GITHUB_REPO` | `<username-github>/<nama-repo>` |
 
 ## Step 5: Set Up Installable onEdit Trigger
 
@@ -69,7 +69,7 @@ The `onEditHandler` function needs an installable trigger (simple triggers can't
 2. Click **IPL Tools** → **Deploy Data ke Website**
 3. Confirm the dialog
 4. Wait for the toast notification ("X records deployed successfully!")
-5. Check the site: https://ipl-talago.netlify.app
+5. Check the site at your deployed URL (`perumahan.url` di `src/config/site.config.js`)
 
 ## Troubleshooting
 

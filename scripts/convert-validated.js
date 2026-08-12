@@ -2,8 +2,11 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-const DEFAULT_SRC = '/Users/ihsansatriawan/Projects/personal/catat-uang-warga/raw_data/IPL 2026 - Validated.csv';
-const DEFAULT_DEST = '/Users/ihsansatriawan/Projects/personal/catat-uang-warga/src/data/validated.json';
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// Bisa ditimpa lewat argumen: node scripts/convert-validated.js <sumber.csv> <tujuan.json>
+const DEFAULT_SRC = path.resolve(__dirname, '../raw_data/Validated.csv');
+const DEFAULT_DEST = path.resolve(__dirname, '../src/data/validated.json');
 
 function readFileUtf8(p) {
   const raw = fs.readFileSync(p, 'utf8');
@@ -56,7 +59,7 @@ function pad2(n) {
 function toIsoWIBFromDDMMYYYY(s) {
   if (!s) return null;
   const [datePart, timePart = '00:00:00'] = s.split(' ');
-  const d = datePart.split(/[\/\-]/);
+  const d = datePart.split(/[/-]/);
   if (d.length !== 3) return null;
   const dd = parseInt(d[0], 10);
   const mm = parseInt(d[1], 10);

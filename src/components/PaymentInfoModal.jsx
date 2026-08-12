@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { X, Info } from 'lucide-react'
 import { trackEvent } from '../utils/tracking'
+import { LABEL_IURAN } from '../config'
 import PaymentInfoCard from './PaymentInfoCard'
 
 export default function PaymentInfoModal({ onClose }) {
@@ -31,7 +32,7 @@ export default function PaymentInfoModal({ onClose }) {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <Info size={18} strokeWidth={2.5} className="text-violet" />
-            <h3 className="font-heading font-bold text-base">Info Pembayaran IPL</h3>
+            <h3 className="font-heading font-bold text-base">Info Pembayaran {LABEL_IURAN}</h3>
           </div>
           <button
             onClick={onClose}

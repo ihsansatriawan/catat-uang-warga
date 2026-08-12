@@ -1,418 +1,166 @@
 {
-  "lastUpdate": "2026-08-09",
+  "lastUpdate": "2026-12-31",
   "rutin": [
     {
       "keterangan": "Sisa Kas 2025",
-      "masuk": 22408505,
+      "masuk": 15000000,
       "keluar": null
     },
     {
       "keterangan": "Total Iuran Warga 2026",
-      "masuk": 91450000,
+      "masuk": 144000000,
       "keluar": null
     },
     {
       "keterangan": "Security Januari",
       "masuk": null,
-      "keluar": 2450000
+      "keluar": 2400000
+    },
+    {
+      "keterangan": "Kebersihan Januari",
+      "masuk": null,
+      "keluar": 900000
     },
     {
       "keterangan": "Security Februari",
       "masuk": null,
-      "keluar": 2700000
+      "keluar": 2400000
+    },
+    {
+      "keterangan": "Kebersihan Februari",
+      "masuk": null,
+      "keluar": 900000
     },
     {
       "keterangan": "Security Maret",
       "masuk": null,
-      "keluar": 1700000
+      "keluar": 2400000
+    },
+    {
+      "keterangan": "Kebersihan Maret",
+      "masuk": null,
+      "keluar": 900000
     },
     {
       "keterangan": "Security April",
       "masuk": null,
-      "keluar": 1700000
+      "keluar": 2400000
+    },
+    {
+      "keterangan": "Kebersihan April",
+      "masuk": null,
+      "keluar": 900000
     },
     {
       "keterangan": "Security Mei",
       "masuk": null,
-      "keluar": 1700000
+      "keluar": 2400000
+    },
+    {
+      "keterangan": "Kebersihan Mei",
+      "masuk": null,
+      "keluar": 900000
     },
     {
       "keterangan": "Security Juni",
       "masuk": null,
-      "keluar": 1700000
+      "keluar": 2400000
     },
     {
-      "keterangan": "Security Juli",
+      "keterangan": "Kebersihan Juni",
       "masuk": null,
-      "keluar": 1500000
-    },
-    {
-      "keterangan": "Security Agustus",
-      "masuk": null,
-      "keluar": null
-    },
-    {
-      "keterangan": "Security September",
-      "masuk": null,
-      "keluar": null
-    },
-    {
-      "keterangan": "Security October",
-      "masuk": null,
-      "keluar": null
-    },
-    {
-      "keterangan": "Security November",
-      "masuk": null,
-      "keluar": null
-    },
-    {
-      "keterangan": "Security December",
-      "masuk": null,
-      "keluar": null
+      "keluar": 900000
     }
   ],
   "insidental": [
     {
-      "keterangan": "sisa uang (potong biaya rutin)",
-      "masuk": 100408505,
-      "keluar": null,
-      "tanggal": "2026-01-01",
-      "kategori": ""
+      "keterangan": "Perbaikan lampu jalan blok depan",
+      "masuk": null,
+      "keluar": 1250000,
+      "tanggal": "2026-01-06",
+      "kategori": "Fasilitas Umum"
     },
     {
-      "keterangan": "Bahan renovasi taman blok F",
+      "keterangan": "Servis pompa air taman",
       "masuk": null,
-      "keluar": 1500000,
-      "tanggal": "2026-01-03",
+      "keluar": 850000,
+      "tanggal": "2026-02-11",
+      "kategori": "Fasilitas Umum"
+    },
+    {
+      "keterangan": "Cat ulang pos satpam",
+      "masuk": null,
+      "keluar": 1600000,
+      "tanggal": "2026-03-27",
       "kategori": "Renovasi"
     },
     {
-      "keterangan": "pasir renovasi taman blok F",
+      "keterangan": "Perbaikan gerbang otomatis",
       "masuk": null,
-      "keluar": 5300000,
-      "tanggal": "2026-01-03",
+      "keluar": 3200000,
+      "tanggal": "2026-04-06",
       "kategori": "Renovasi"
     },
     {
-      "keterangan": "semen 20 sak + deposit enovasi taman blok F",
+      "keterangan": "Konsumsi rapat warga",
+      "masuk": null,
+      "keluar": 450000,
+      "tanggal": "2026-05-11",
+      "kategori": "Kegiatan Warga"
+    },
+    {
+      "keterangan": "Santunan warga sakit",
       "masuk": null,
       "keluar": 1000000,
-      "tanggal": "2026-01-07",
-      "kategori": "Renovasi"
+      "tanggal": "2026-06-22",
+      "kategori": "Sosial"
     },
     {
-      "keterangan": "kran pipa renovasi taman blok F",
-      "masuk": null,
-      "keluar": 50000,
-      "tanggal": "2026-01-08",
-      "kategori": "Renovasi"
-    },
-    {
-      "keterangan": "bahan semen renovasi taman blok F",
-      "masuk": null,
-      "keluar": 385000,
-      "tanggal": "2026-01-10",
-      "kategori": "Renovasi"
-    },
-    {
-      "keterangan": "pasir renovasi taman blok F",
-      "masuk": null,
-      "keluar": 2500000,
-      "tanggal": "2026-01-11",
-      "kategori": "Renovasi"
-    },
-    {
-      "keterangan": "tukang renovasi taman blok F",
-      "masuk": null,
-      "keluar": 1000000,
-      "tanggal": "2026-01-11",
-      "kategori": "Renovasi"
-    },
-    {
-      "keterangan": "pasir semen renovasi taman blok F",
-      "masuk": null,
-      "keluar": 900000,
-      "tanggal": "2026-01-16",
-      "kategori": "Renovasi"
-    },
-    {
-      "keterangan": "Bahan renovasi taman blok F",
-      "masuk": null,
-      "keluar": 900000,
-      "tanggal": "2026-01-20",
-      "kategori": "Renovasi"
-    },
-    {
-      "keterangan": "tukang renovasi taman blok F",
-      "masuk": null,
-      "keluar": 1000000,
-      "tanggal": "2026-01-23",
-      "kategori": "Renovasi"
-    },
-    {
-      "keterangan": "semen + paralon renovasi taman blok F",
-      "masuk": null,
-      "keluar": 602500,
-      "tanggal": "2026-01-24",
-      "kategori": "Renovasi"
-    },
-    {
-      "keterangan": "semen renovasi taman blok F",
-      "masuk": null,
-      "keluar": 722500,
-      "tanggal": "2026-01-27",
-      "kategori": "Renovasi"
-    },
-    {
-      "keterangan": "fogging + angkut sampah fasum",
-      "masuk": null,
-      "keluar": 452500,
-      "tanggal": "2026-01-31",
-      "kategori": "Operational"
-    },
-    {
-      "keterangan": "tukang renovasi taman blok F",
-      "masuk": null,
-      "keluar": 1000000,
-      "tanggal": "2026-02-02",
-      "kategori": "Renovasi"
-    },
-    {
-      "keterangan": "belanja taman renov blok F",
-      "masuk": null,
-      "keluar": 1500000,
-      "tanggal": "2026-02-15",
-      "kategori": "Renovasi"
-    },
-    {
-      "keterangan": "net dan jaring lapangan blok F",
-      "masuk": null,
-      "keluar": 266400,
-      "tanggal": "2026-02-21",
-      "kategori": "Renovasi"
-    },
-    {
-      "keterangan": "ngebor lubang pipa lapangan",
-      "masuk": null,
-      "keluar": 250000,
-      "tanggal": "2026-02-22",
-      "kategori": "Fasilitas"
-    },
-    {
-      "keterangan": "tukang 2 orang",
-      "masuk": null,
-      "keluar": 1800000,
-      "tanggal": "2026-02-28",
-      "kategori": "Renovasi"
-    },
-    {
-      "keterangan": "THR 2026",
+      "keterangan": "Hadiah lomba 17 Agustus",
       "masuk": null,
       "keluar": 2750000,
-      "tanggal": "2026-02-28",
-      "kategori": "THR"
-    },
-    {
-      "keterangan": "aksesoris bahan lapangan",
-      "masuk": null,
-      "keluar": 400000,
-      "tanggal": "2026-03-25",
-      "kategori": "Renovasi"
-    },
-    {
-      "keterangan": "satpam infal lebaran",
-      "masuk": null,
-      "keluar": 300000,
-      "tanggal": "2026-03-25",
-      "kategori": "Operational"
-    },
-    {
-      "keterangan": "aqua 3 dus halbil",
-      "masuk": null,
-      "keluar": 179280,
-      "tanggal": "2026-04-04",
-      "kategori": "Halbil 2026"
-    },
-    {
-      "keterangan": "pylox tiang",
-      "masuk": null,
-      "keluar": 150100,
-      "tanggal": "2026-04-04",
-      "kategori": "Fasilitas"
-    },
-    {
-      "keterangan": "jeruk",
-      "masuk": null,
-      "keluar": 210000,
-      "tanggal": "2026-04-04",
-      "kategori": "Halbil 2026"
-    },
-    {
-      "keterangan": "sate",
-      "masuk": null,
-      "keluar": 440000,
-      "tanggal": "2026-04-04",
-      "kategori": "Halbil 2026"
-    },
-    {
-      "keterangan": "pizza",
-      "masuk": null,
-      "keluar": 356000,
-      "tanggal": "2026-04-06",
-      "kategori": "Halbil 2026"
-    },
-    {
-      "keterangan": "beli lampu jalan blok F dan blok C",
-      "masuk": null,
-      "keluar": 808805,
-      "tanggal": "2026-04-14",
-      "kategori": "Fasilitas"
-    },
-    {
-      "keterangan": "jasa pasang lampu jalan blok C",
-      "masuk": null,
-      "keluar": 200000,
-      "tanggal": "2026-04-17",
-      "kategori": "Fasilitas"
-    },
-    {
-      "keterangan": "jasa pasang lampu jalan blok F (2 buah)",
-      "masuk": null,
-      "keluar": 800000,
-      "tanggal": "2026-04-21",
-      "kategori": "Fasilitas"
-    },
-    {
-      "keterangan": "check bak kontrol komplek",
-      "masuk": null,
-      "keluar": 100000,
-      "tanggal": "2026-05-01",
-      "kategori": "Operational"
-    },
-    {
-      "keterangan": "tukang bersih2 borongan",
-      "masuk": null,
-      "keluar": 750000,
-      "tanggal": "2026-05-10",
-      "kategori": "Operational"
-    },
-    {
-      "keterangan": "roof drain taman",
-      "masuk": null,
-      "keluar": 57000,
-      "tanggal": "2026-05-24",
-      "kategori": "Fasilitas"
-    },
-    {
-      "keterangan": "kabel cctv",
-      "masuk": null,
-      "keluar": 17704,
-      "tanggal": "2026-06-05",
-      "kategori": "Operational"
-    },
-    {
-      "keterangan": "jasa kebersihan komplek",
-      "masuk": null,
-      "keluar": 400000,
-      "tanggal": "2026-06-07",
-      "kategori": "Operational"
-    },
-    {
-      "keterangan": "jasa angkut sampah",
-      "masuk": null,
-      "keluar": 50000,
-      "tanggal": "2026-06-14",
-      "kategori": "Operational"
-    },
-    {
-      "keterangan": "satpam kasbon",
-      "masuk": null,
-      "keluar": 200000,
-      "tanggal": "2026-07-08",
-      "kategori": "Operational"
-    },
-    {
-      "keterangan": "tukang bersih panggilan",
-      "masuk": null,
-      "keluar": 300000,
       "tanggal": "2026-07-14",
-      "kategori": "Operational"
+      "kategori": "Kegiatan Warga"
     },
     {
-      "keterangan": "konsumsi kumpul warga",
+      "keterangan": "Dekorasi acara warga",
       "masuk": null,
-      "keluar": 190000,
-      "tanggal": "2026-07-18",
-      "kategori": "Operational"
+      "keluar": 1200000,
+      "tanggal": "2026-08-05",
+      "kategori": "Kegiatan Warga"
     },
     {
-      "keterangan": "sumbangan RT17-an",
+      "keterangan": "Pembelian tanaman taman",
       "masuk": null,
-      "keluar": 500000,
-      "tanggal": "2026-07-27",
-      "kategori": "Operational"
+      "keluar": 700000,
+      "tanggal": "2026-09-14",
+      "kategori": "Fasilitas Umum"
     },
     {
-      "keterangan": "biaya kirim surat ke compok",
+      "keterangan": "Alat kebersihan",
       "masuk": null,
-      "keluar": 42000,
-      "tanggal": "2026-07-27",
-      "kategori": "Operational"
+      "keluar": 380000,
+      "tanggal": "2026-10-12",
+      "kategori": "Operasional"
     },
     {
-      "keterangan": "konsumsi kumpul warga",
-      "masuk": null,
-      "keluar": 60000,
-      "tanggal": "2026-08-02",
-      "kategori": "Operational"
-    },
-    {
-      "keterangan": "kebersihan komplek",
-      "masuk": null,
-      "keluar": 175000,
-      "tanggal": "2026-08-06",
-      "kategori": "Operational"
-    },
-    {
-      "keterangan": "tukang potong phon2 bwt kebersihan",
-      "masuk": null,
-      "keluar": 50000,
-      "tanggal": "2026-08-08",
-      "kategori": "Operational"
-    },
-    {
-      "keterangan": "konsumsi kerja bakti warga",
-      "masuk": null,
-      "keluar": 659000,
-      "tanggal": "2026-08-08",
-      "kategori": "Operational"
-    },
-    {
-      "keterangan": "kebersihan komplek",
-      "masuk": null,
-      "keluar": 20000,
-      "tanggal": "2026-08-08",
-      "kategori": "Operational"
-    },
-    {
-      "keterangan": "kebersihan komplek (buang puing)",
+      "keterangan": "Token listrik fasilitas umum",
       "masuk": null,
       "keluar": 600000,
-      "tanggal": "2026-08-09",
-      "kategori": "Operational"
+      "tanggal": "2026-11-23",
+      "kategori": "Operasional"
     },
     {
-      "keterangan": "konsumsi kerja bakti warga",
+      "keterangan": "Perbaikan saluran air",
       "masuk": null,
-      "keluar": 86000,
-      "tanggal": "2026-08-09",
-      "kategori": "Operational"
+      "keluar": 1900000,
+      "tanggal": "2026-12-07",
+      "kategori": "Fasilitas Umum"
     }
   ],
   "summary": {
-    "totalMasuk": 113858505,
-    "totalKeluar": 45429789,
-    "sisaAnggaran": 68428716
+    "totalMasuk": 159000000,
+    "totalKeluar": 35680000,
+    "sisaAnggaran": 123320000
   }
 }
