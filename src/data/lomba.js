@@ -2,7 +2,7 @@
 //
 // PENTING: urutan LOMBA_LIST menentukan urutan kolom di tab "Lomba" pada Google
 // Sheet (kolom L–S). Jangan ubah urutannya tanpa menyesuaikan LOMBA_KEYS di
-// scripts/google-apps-script/Code.gs — Apps Script menulis berdasarkan posisi.
+// scripts/google-apps-script/Lomba.gs — Apps Script menulis berdasarkan posisi.
 
 export const LOMBA_EVENT = {
   title: 'Lomba 17-an',

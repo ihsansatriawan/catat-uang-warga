@@ -13,6 +13,7 @@ Web app for residents to check their IPL (housing fee) payment status for 2026.
 
 ## Routes
 - `/` — HomePage: search by blok + house number, leads to DashboardView
+- `/warga/:blok/:nomorRumah` — WargaPage: permalink to a single resident's DashboardView (target of the Share button); falls back to PaymentInfoCard when the house has no transactions yet
 - `/leaderboard` — LeaderboardView: block ranking + house-level leaderboard
 - `/broadcast` — BroadcastView: generate WhatsApp broadcast message
 - `/pengeluaran` — ExpensesView: expense transparency page with category filtering
@@ -29,14 +30,16 @@ Web app for residents to check their IPL (housing fee) payment status for 2026.
 - `src/utils/tracking.js` — Umami analytics wrapper (`trackEvent`)
 - `src/components/HomePage.jsx` — search form + result (SearchView + DashboardView combined)
 - `src/components/SearchView.jsx` — search form (select blok A–F + house number)
-- `src/components/DashboardView.jsx` — payment dashboard per resident
+- `src/components/DashboardView.jsx` — payment dashboard per resident (incl. `saldoLebih` overpayment credit + Share button via Web Share API with clipboard fallback)
+- `src/components/WargaPage.jsx` — resolves `/warga/:blok/:nomorRumah` to a resident and renders DashboardView
+- `src/components/PaymentInfoCard.jsx` / `PaymentInfoModal.jsx` — payment instructions (rekening, konfirmasi form, WA pengurus) shown when a house isn't found
 - `src/components/LeaderboardView.jsx` — block & house leaderboards with bar charts
 - `src/components/BroadcastView.jsx` — WhatsApp broadcast message generator
 - `src/components/ProofModal.jsx` — placeholder modal for proof of transfer
 - `src/components/AttendanceView.jsx` — event RSVP form; posts to Google Sheet (`Kehadiran` tab) via Apps Script Web App (`VITE_ATTENDANCE_ENDPOINT`), setup in `docs/attendance-apps-script.md`
 - `src/components/RekapKehadiranView.jsx` — reads RSVP data via Apps Script `doGet` (GET, no WhatsApp/email) and shows sudah/belum konfirmasi per block
 - `src/data/lomba.js` — lomba config: `LOMBA_EVENT` (date/time/place/deadline), `LOMBA_LIST`, `LOMBA_GROUPS`, `UMUR_GROUPS` + `getUmurGroup()` (age grouping for the recap), deadline helpers
-- `src/components/LombaView.jsx` — lomba registration form; posts to the same Apps Script Web App with `form=lomba`, setup in `docs/lomba-apps-script.md`
+- `src/components/LombaView.jsx` — lomba registration form; posts with `form=lomba` to the **separate** lomba Web App (`VITE_LOMBA_ENDPOINT`), setup in `docs/lomba-apps-script.md`
 - `src/components/RekapLombaView.jsx` — lomba recap: peserta per lomba (flat list or grouped by age band via the "Tampilkan" toggle), per rumah, belum daftar, and the pentas seni rundown
 - `scripts/convert-validated.js` — converts raw CSV export to `validated.json`
 - `scripts/convert-residents.js` — converts resident CSV to `residents.json`
@@ -50,6 +53,8 @@ Web app for residents to check their IPL (housing fee) payment status for 2026.
 - `getBlockLeaderboard()` — blocks ranked by `collectionPct` (% of total expected revenue collected)
 - `getHouseLeaderboard(blok?)` — houses sorted by `completionPct`, optionally filtered by block
 - `generateBroadcastMessage()` — WhatsApp-formatted IPL report string
+- `getAttendanceHouses(blok?)` — house list used by the RSVP/lomba forms
+- `getResidentName(blok, nomorRumah)` — owner name lookup from `residents.json`
 - `getAvailableBlocks()` — returns `['A','B','C','D','E','F']`
 - `getLastUpdated()` — returns `lastUpdate` from `validated.json`
 - `formatRupiah(amount)` — formats number as IDR currency
