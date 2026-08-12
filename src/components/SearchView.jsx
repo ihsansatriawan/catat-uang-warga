@@ -108,39 +108,22 @@ export default function SearchView({ onSearch }) {
             Cara Bayar IPL
           </button>
 
-          {/* Lomba 17-an — ajakan mendaftar selama masih dibuka, setelah ditutup
-              tautannya diarahkan ke rekap supaya peserta tetap bisa dicek */}
-          {isRegistrationClosed() ? (
-            <Link
-              to="/rekap-lomba"
-              className="
-                w-full inline-flex items-center justify-center gap-2
-                bg-orange text-white border-2 border-slate-dark rounded-full px-5 py-2.5
-                font-heading font-extrabold text-sm shadow-hard
-                hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg
-                active:translate-x-0 active:translate-y-0 active:shadow-hard-sm
-                transition-all
-              "
-            >
-              <PartyPopper size={15} strokeWidth={2.5} />
-              Rekap Peserta Lomba 17-an
-            </Link>
-          ) : (
-            <Link
-              to="/lomba"
-              className="
-                w-full inline-flex items-center justify-center gap-2
-                bg-orange text-white border-2 border-slate-dark rounded-full px-5 py-2.5
-                font-heading font-extrabold text-sm shadow-hard
-                hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg
-                active:translate-x-0 active:translate-y-0 active:shadow-hard-sm
-                transition-all
-              "
-            >
-              <PartyPopper size={15} strokeWidth={2.5} />
-              Daftar Lomba 17-an
-            </Link>
-          )}
+          {/* Lomba 17-an — chip tetap mengarah ke /lomba walau pendaftaran sudah
+              ditutup, supaya warga lihat pengumuman penutupan + info acaranya */}
+          <Link
+            to="/lomba"
+            className="
+              w-full inline-flex items-center justify-center gap-2
+              bg-orange text-white border-2 border-slate-dark rounded-full px-5 py-2.5
+              font-heading font-extrabold text-sm shadow-hard
+              hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg
+              active:translate-x-0 active:translate-y-0 active:shadow-hard-sm
+              transition-all
+            "
+          >
+            <PartyPopper size={15} strokeWidth={2.5} />
+            {isRegistrationClosed() ? 'Info Lomba 17-an' : 'Daftar Lomba 17-an'}
+          </Link>
 
           {/* Event kehadiran — full-width chip */}
           <Link
