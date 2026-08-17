@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2026-08-09",
+  "lastUpdate": "2026-08-17",
   "rutin": [
     {
       "keterangan": "Sisa Kas 2025",
@@ -8,7 +8,7 @@
     },
     {
       "keterangan": "Total Iuran Warga 2026",
-      "masuk": 91450000,
+      "masuk": 95450000,
       "keluar": null
     },
     {
@@ -49,7 +49,7 @@
     {
       "keterangan": "Security Agustus",
       "masuk": null,
-      "keluar": null
+      "keluar": 1700000
     },
     {
       "keterangan": "Security September",
@@ -70,12 +70,17 @@
       "keterangan": "Security December",
       "masuk": null,
       "keluar": null
+    },
+    {
+      "keterangan": "sisa saldo 17an 2025",
+      "masuk": 755101,
+      "keluar": null
     }
   ],
   "insidental": [
     {
       "keterangan": "sisa uang (potong biaya rutin)",
-      "masuk": 100408505,
+      "masuk": 103463606,
       "keluar": null,
       "tanggal": "2026-01-01",
       "kategori": ""
@@ -408,11 +413,46 @@
       "keluar": 86000,
       "tanggal": "2026-08-09",
       "kategori": "Operational"
+    },
+    {
+      "keterangan": "buang sampah dan material tmn blok F",
+      "masuk": null,
+      "keluar": 2662000,
+      "tanggal": "2026-08-10",
+      "kategori": "Operational"
+    },
+    {
+      "keterangan": "bayar tukang pak yitno (benerin air taman)",
+      "masuk": null,
+      "keluar": 100000,
+      "tanggal": "2026-08-10",
+      "kategori": "Operational"
+    },
+    {
+      "keterangan": "material rata taman blok F",
+      "masuk": null,
+      "keluar": 1218000,
+      "tanggal": "2026-08-11",
+      "kategori": "Operational"
+    },
+    {
+      "keterangan": "tukang rapihin cat dll tmn blok F",
+      "masuk": null,
+      "keluar": 3000000,
+      "tanggal": "2026-08-11",
+      "kategori": "Operational"
+    },
+    {
+      "keterangan": "17an 2026",
+      "masuk": null,
+      "keluar": 7483379,
+      "tanggal": null,
+      "kategori": "Operational"
     }
   ],
   "summary": {
-    "totalMasuk": 113858505,
-    "totalKeluar": 45429789,
-    "sisaAnggaran": 68428716
+    "totalMasuk": 118613606,
+    "totalKeluar": 61593168,
+    "sisaAnggaran": 57020438
   }
 }
