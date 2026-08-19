@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2026-08-17",
+  "lastUpdate": "2026-08-19",
   "rutin": [
     {
       "keterangan": "Sisa Kas 2025",
@@ -445,14 +445,14 @@
     {
       "keterangan": "17an 2026",
       "masuk": null,
-      "keluar": 7483379,
-      "tanggal": null,
-      "kategori": "Operational"
+      "keluar": 7823279,
+      "tanggal": "2026-08-15",
+      "kategori": "17an 2026"
     }
   ],
   "summary": {
     "totalMasuk": 118613606,
-    "totalKeluar": 61593168,
-    "sisaAnggaran": 57020438
+    "totalKeluar": 61933068,
+    "sisaAnggaran": 56680538
   }
 }
