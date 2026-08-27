@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2026-08-19",
+  "lastUpdate": "2026-08-27",
   "data": [
     {
       "timestamp": "2025-12-31T19:16:46+07:00",
@@ -1120,6 +1120,48 @@
       "nomorRumah": "3",
       "namaPemilik": "Juwarno",
       "jumlahPembayaran": 500000
+    },
+    {
+      "timestamp": "2026-08-18T11:40:14+07:00",
+      "blok": "B",
+      "nomorRumah": "9",
+      "namaPemilik": "Ukky January Linzki",
+      "jumlahPembayaran": 250000
+    },
+    {
+      "timestamp": "2026-08-21T13:12:59+07:00",
+      "blok": "D",
+      "nomorRumah": "7",
+      "namaPemilik": "Mega Prasetyawan",
+      "jumlahPembayaran": 500000
+    },
+    {
+      "timestamp": "2026-08-24T07:34:46+07:00",
+      "blok": "A",
+      "nomorRumah": "9",
+      "namaPemilik": "Simon",
+      "jumlahPembayaran": 500000
+    },
+    {
+      "timestamp": "2026-08-25T17:53:44+07:00",
+      "blok": "F",
+      "nomorRumah": "7",
+      "namaPemilik": "Erlin",
+      "jumlahPembayaran": 500000
+    },
+    {
+      "timestamp": null,
+      "blok": "F",
+      "nomorRumah": "1",
+      "namaPemilik": "Widdesto Ari",
+      "jumlahPembayaran": 250000
+    },
+    {
+      "timestamp": null,
+      "blok": "D",
+      "nomorRumah": "10",
+      "namaPemilik": "Andika Amri",
+      "jumlahPembayaran": 250000
     }
   ]
 }
