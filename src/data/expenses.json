@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2026-08-27",
+  "lastUpdate": "2026-09-12",
   "rutin": [
     {
       "keterangan": "Sisa Kas 2025",
@@ -8,7 +8,7 @@
     },
     {
       "keterangan": "Total Iuran Warga 2026",
-      "masuk": 99200000,
+      "masuk": 101200000,
       "keluar": null
     },
     {
@@ -80,7 +80,7 @@
   "insidental": [
     {
       "keterangan": "sisa uang (potong biaya rutin)",
-      "masuk": 107213606,
+      "masuk": 109213606,
       "keluar": null,
       "tanggal": "2026-01-01",
       "kategori": ""
@@ -448,11 +448,39 @@
       "keluar": 7823279,
       "tanggal": "2026-08-15",
       "kategori": "17an 2026"
+    },
+    {
+      "keterangan": "jasa kuras bak kontrol taman blok F",
+      "masuk": null,
+      "keluar": 2000000,
+      "tanggal": "2026-08-28",
+      "kategori": "Fasilitas"
+    },
+    {
+      "keterangan": "konsumsi warga",
+      "masuk": null,
+      "keluar": 55700,
+      "tanggal": "2026-08-29",
+      "kategori": "Operational"
+    },
+    {
+      "keterangan": "adaptor cctv",
+      "masuk": null,
+      "keluar": 146500,
+      "tanggal": "2026-09-02",
+      "kategori": "Operational"
+    },
+    {
+      "keterangan": "satpam kasbon",
+      "masuk": null,
+      "keluar": 100000,
+      "tanggal": "2026-09-12",
+      "kategori": "Operational"
     }
   ],
   "summary": {
-    "totalMasuk": 122363606,
-    "totalKeluar": 61933068,
-    "sisaAnggaran": 60430538
+    "totalMasuk": 124363606,
+    "totalKeluar": 64235268,
+    "sisaAnggaran": 60128338
   }
 }
