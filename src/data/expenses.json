@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2026-09-12",
+  "lastUpdate": "2026-10-02",
   "rutin": [
     {
       "keterangan": "Sisa Kas 2025",
@@ -8,7 +8,7 @@
     },
     {
       "keterangan": "Total Iuran Warga 2026",
-      "masuk": 101200000,
+      "masuk": 104200000,
       "keluar": null
     },
     {
@@ -54,7 +54,7 @@
     {
       "keterangan": "Security September",
       "masuk": null,
-      "keluar": null
+      "keluar": 1600000
     },
     {
       "keterangan": "Security October",
@@ -80,7 +80,7 @@
   "insidental": [
     {
       "keterangan": "sisa uang (potong biaya rutin)",
-      "masuk": 109213606,
+      "masuk": 110613606,
       "keluar": null,
       "tanggal": "2026-01-01",
       "kategori": ""
@@ -476,11 +476,53 @@
       "keluar": 100000,
       "tanggal": "2026-09-12",
       "kategori": "Operational"
+    },
+    {
+      "keterangan": "lampu taman",
+      "masuk": null,
+      "keluar": 808750,
+      "tanggal": "2026-09-13",
+      "kategori": "Fasilitas"
+    },
+    {
+      "keterangan": "bahan benerin resapan taman",
+      "masuk": null,
+      "keluar": 576000,
+      "tanggal": "2026-09-14",
+      "kategori": "Renovasi"
+    },
+    {
+      "keterangan": "uang makan tukang",
+      "masuk": null,
+      "keluar": 100000,
+      "tanggal": "2026-09-14",
+      "kategori": "Operational"
+    },
+    {
+      "keterangan": "jasa buang puing",
+      "masuk": null,
+      "keluar": 600000,
+      "tanggal": "2026-09-16",
+      "kategori": "Operational"
+    },
+    {
+      "keterangan": "benerin kran blok E",
+      "masuk": null,
+      "keluar": 50000,
+      "tanggal": "2026-09-17",
+      "kategori": "Operational"
+    },
+    {
+      "keterangan": "bersihin jalanan komplek",
+      "masuk": null,
+      "keluar": 282000,
+      "tanggal": "2026-09-17",
+      "kategori": "Operational"
     }
   ],
   "summary": {
-    "totalMasuk": 124363606,
-    "totalKeluar": 64235268,
-    "sisaAnggaran": 60128338
+    "totalMasuk": 127363606,
+    "totalKeluar": 68252018,
+    "sisaAnggaran": 59111588
   }
 }
