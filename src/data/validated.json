@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2026-10-02",
+  "lastUpdate": "2026-10-03",
   "data": [
     {
       "timestamp": "2025-12-31T19:16:46+07:00",
@@ -1260,6 +1260,62 @@
       "nomorRumah": "9",
       "namaPemilik": "Ukky January Linzki",
       "jumlahPembayaran": 250000
+    },
+    {
+      "timestamp": "2026-10-02T14:39:19+07:00",
+      "blok": "E",
+      "nomorRumah": "7",
+      "namaPemilik": "Arief Rahman Hakim",
+      "jumlahPembayaran": 1000000
+    },
+    {
+      "timestamp": "2026-10-02T15:31:41+07:00",
+      "blok": "C",
+      "nomorRumah": "9",
+      "namaPemilik": "Sunyata",
+      "jumlahPembayaran": 250000
+    },
+    {
+      "timestamp": "2026-10-02T19:07:19+07:00",
+      "blok": "C",
+      "nomorRumah": "5",
+      "namaPemilik": "Riza Ardiansyah",
+      "jumlahPembayaran": 500000
+    },
+    {
+      "timestamp": "2026-10-02T21:08:34+07:00",
+      "blok": "C",
+      "nomorRumah": "2",
+      "namaPemilik": "Siti Munifah",
+      "jumlahPembayaran": 1000000
+    },
+    {
+      "timestamp": "2026-10-02T22:22:22+07:00",
+      "blok": "D",
+      "nomorRumah": "6",
+      "namaPemilik": "Andi Supandi",
+      "jumlahPembayaran": 250000
+    },
+    {
+      "timestamp": "2026-10-03T12:27:18+07:00",
+      "blok": "A",
+      "nomorRumah": "3",
+      "namaPemilik": "Agus Herianto",
+      "jumlahPembayaran": 1250000
+    },
+    {
+      "timestamp": "2026-10-03T18:05:11+07:00",
+      "blok": "D",
+      "nomorRumah": "5",
+      "namaPemilik": "Ken Garda Pinilih",
+      "jumlahPembayaran": 250000
+    },
+    {
+      "timestamp": "2026-10-03T18:23:42+07:00",
+      "blok": "F",
+      "nomorRumah": "10",
+      "namaPemilik": "Lili Deviani",
+      "jumlahPembayaran": 500000
     }
   ]
 }
