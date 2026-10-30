@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2026-10-11",
+  "lastUpdate": "2026-10-31",
   "data": [
     {
       "timestamp": "2025-12-31T19:16:46+07:00",
@@ -1343,6 +1343,48 @@
       "blok": "E",
       "nomorRumah": "15",
       "namaPemilik": "Eko Prastyawan",
+      "jumlahPembayaran": 250000
+    },
+    {
+      "timestamp": "2026-10-11T05:02:14+07:00",
+      "blok": "A",
+      "nomorRumah": "9",
+      "namaPemilik": "Simon",
+      "jumlahPembayaran": 450000
+    },
+    {
+      "timestamp": "2026-10-16T10:43:12+07:00",
+      "blok": "A",
+      "nomorRumah": "9",
+      "namaPemilik": "Simon",
+      "jumlahPembayaran": 750000
+    },
+    {
+      "timestamp": "2026-10-18T16:53:54+07:00",
+      "blok": "D",
+      "nomorRumah": "7",
+      "namaPemilik": "Mega Prasetyawan",
+      "jumlahPembayaran": 500000
+    },
+    {
+      "timestamp": "2026-10-23T14:21:59+07:00",
+      "blok": "F",
+      "nomorRumah": "1",
+      "namaPemilik": "Widdesto Ari",
+      "jumlahPembayaran": 250000
+    },
+    {
+      "timestamp": "2026-10-24T23:32:42+07:00",
+      "blok": "C",
+      "nomorRumah": "6",
+      "namaPemilik": "Andi Medika Satria",
+      "jumlahPembayaran": 1000000
+    },
+    {
+      "timestamp": "2026-10-25T08:46:12+07:00",
+      "blok": "D",
+      "nomorRumah": "10",
+      "namaPemilik": "Andika Amri",
       "jumlahPembayaran": 250000
     }
   ]
