@@ -3,12 +3,12 @@
   "rutin": [
     {
       "keterangan": "Sisa Kas 2025",
-      "masuk": 22408505,
+      "masuk": 22357827,
       "keluar": null
     },
     {
       "keterangan": "Total Iuran Warga 2026",
-      "masuk": 114900000,
+      "masuk": 116200000,
       "keluar": null
     },
     {
@@ -80,7 +80,7 @@
   "insidental": [
     {
       "keterangan": "sisa uang (potong biaya rutin)",
-      "masuk": 119813606,
+      "masuk": 121062928,
       "keluar": null,
       "tanggal": "2026-01-01",
       "kategori": ""
@@ -303,6 +303,13 @@
       "kategori": "Operational"
     },
     {
+      "keterangan": "perbaikan mesin + transport + sampah",
+      "masuk": null,
+      "keluar": 200000,
+      "tanggal": "2026-05-11",
+      "kategori": "Operational"
+    },
+    {
       "keterangan": "roof drain taman",
       "masuk": null,
       "keluar": 57000,
@@ -445,7 +452,7 @@
     {
       "keterangan": "17an 2026",
       "masuk": null,
-      "keluar": 7823279,
+      "keluar": 7817279,
       "tanggal": "2026-08-15",
       "kategori": "17an 2026"
     },
@@ -506,6 +513,13 @@
       "kategori": "Operational"
     },
     {
+      "keterangan": "jasa jasang benerin taman blok F",
+      "masuk": null,
+      "keluar": 500000,
+      "tanggal": "2026-09-16",
+      "kategori": "Operational"
+    },
+    {
       "keterangan": "benerin kran blok E",
       "masuk": null,
       "keluar": 50000,
@@ -528,8 +542,8 @@
     }
   ],
   "summary": {
-    "totalMasuk": 138063606,
-    "totalKeluar": 69952018,
-    "sisaAnggaran": 68111588
+    "totalMasuk": 139312928,
+    "totalKeluar": 70646018,
+    "sisaAnggaran": 68666910
   }
 }
