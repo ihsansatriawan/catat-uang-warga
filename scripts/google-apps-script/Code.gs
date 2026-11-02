@@ -71,6 +71,10 @@ function onOpen() {
     .addItem('Deploy Data ke Website', 'deployToSite')
     .addSeparator()
     .addItem('Deploy Pengeluaran ke Website', 'deployExpensesToSite')
+    .addSeparator()
+    .addItem('Backfill Cek AI (15 baris)', 'backfillCekAi')
+    .addItem('Cek AI Baris Terpilih', 'cekAiBarisTerpilih')
+    .addItem('Reset Posisi Backfill', 'resetBackfillCursor')
     .addToUi();
 }
 
@@ -679,4 +683,747 @@ function getTodayISO() {
  */
 function pad2(n) {
   return (n < 10 ? '0' : '') + n;
+}
+
+// ===========================================================================
+// Verifikasi Bukti Transfer dengan Claude API (vision)
+// ===========================================================================
+//
+// Pembagian wewenang (lihat docs/adr/0001-rantai-wewenang-verifikasi-bukti.md):
+//   Claude    → HANYA mengekstrak apa yang terbaca di gambar, tanpa penilaian
+//   Code.gs   → membandingkannya dengan EXPECTED_* dan menghasilkan aiVerdict
+//   Bendahara → satu-satunya yang boleh menulis validationStatus
+//
+// Kode di bawah ini TIDAK PERNAH menulis ke kolom validationStatus.
+//
+// Script Properties yang dibutuhkan:
+//   ANTHROPIC_API_KEY   — API key dari console.anthropic.com
+//   EXPECTED_REKENING   — nomor rekening Jago bendahara (digit saja)
+//   EXPECTED_NAMA       — nama pemilik rekening, mis. "Ihsan Satriawan"
+
+var AI_CONFIG = {
+  // Ganti satu baris ini untuk pindah model. Kandidat lain: 'claude-sonnet-5'
+  MODEL: 'claude-haiku-4-5',
+  API_URL: 'https://api.anthropic.com/v1/messages',
+  API_VERSION: '2023-06-01',
+  MAX_TOKENS: 1024,
+
+  // Kolom di tab Raw Data — dicari BY HEADER NAME, dibuat kalau belum ada.
+  // Jangan pernah pakai index: Google Form bisa menambah field dan menggeser kolom.
+  VERDICT_HEADER: 'aiVerdict',
+  ALASAN_HEADER: 'aiAlasan',
+  SIDIK_JARI_HEADER: 'aiSidikJari',
+  BUKTI_HEADER: 'Unggah Bukti Transfer Pembayaran IPL-2026',
+
+  // Hanya format yang bisa dibaca Claude. HEIC dari iPhone sengaja ditolak
+  // di sini supaya tidak membuang satu panggilan API untuk pasti gagal.
+  ALLOWED_MIME: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
+  MAX_IMAGE_BYTES: 4500000, // batas API ~5MB per gambar, disisakan margin
+
+  // Selisih Nominal (Nominal Bukti − Nominal Klaim) yang masih diloloskan.
+  // Sengaja asimetris: longgar ke atas (biaya admin bank), ketat ke bawah.
+  TOLERANSI_ADMIN: 10000,
+
+  BACKFILL_BATCH: 15,
+  BACKFILL_CURSOR_KEY: 'AI_BACKFILL_CURSOR',
+
+  RETRY_DELAYS_MS: [2000, 5000], // 3 percobaan total
+  RETRYABLE_CODES: [429, 500, 502, 503, 529]
+};
+
+var VERDICT = {
+  COCOK: '✅ COCOK',
+  BEDA_NOMINAL: '⚠️ BEDA NOMINAL',
+  RAGU: '❓ RAGU',
+  DUPLIKAT: '🔴 DUPLIKAT',
+  GAGAL: '🔴 GAGAL'
+};
+
+var AI_SYSTEM_PROMPT = [
+  'Kamu membaca screenshot bukti transfer bank Indonesia.',
+  'Laporkan HANYA apa yang terbaca di gambar. Jangan menilai, jangan menyimpulkan, jangan menebak.',
+  '',
+  'Aturan tiap field:',
+  '- nomorRekeningTujuan: nomor rekening PENERIMA persis seperti tertulis, termasuk',
+  '  tanda bintang atau x kalau disamarkan bank. Bukan rekening pengirim. null kalau tidak ada.',
+  '- empatDigitTerakhir: 4 digit terakhir rekening penerima kalau terbaca, selain itu null.',
+  '- namaPenerima: nama pemilik rekening TUJUAN persis seperti tertulis. Bukan nama pengirim.',
+  '  null kalau tidak ada.',
+  '- nominal: jumlah yang DITERIMA penerima, BUKAN total yang didebet dari pengirim.',
+  '  Struk sering menampilkan "Nominal", "Biaya Admin", dan "Total" secara terpisah —',
+  '  ambil angka Nominal / Jumlah Transfer, JANGAN Total. Tulis angka saja tanpa "Rp"',
+  '  dan tanpa pemisah ribuan. null kalau tidak terbaca.',
+  '- tanggal: tanggal transaksi, format YYYY-MM-DD. null kalau tidak terbaca.',
+  '- jam: jam transaksi, format HH:MM 24 jam. null kalau tidak terbaca.',
+  '- catatan: satu kalimat singkat bahasa Indonesia. Sebut nama bank atau aplikasi kalau',
+  '  terlihat, dan apa saja yang tidak terbaca atau meragukan. String kosong kalau semua jelas.',
+  '',
+  'Kalau gambar jelas bukan bukti transfer, isi semua field null dan jelaskan di catatan.'
+].join('\n');
+
+/** Schema structured outputs — menjamin bentuk JSON balikan Claude. */
+var AI_SCHEMA = {
+  type: 'object',
+  properties: {
+    nomorRekeningTujuan: { anyOf: [{ type: 'string' }, { type: 'null' }] },
+    empatDigitTerakhir: { anyOf: [{ type: 'string' }, { type: 'null' }] },
+    namaPenerima: { anyOf: [{ type: 'string' }, { type: 'null' }] },
+    nominal: { anyOf: [{ type: 'number' }, { type: 'null' }] },
+    tanggal: { anyOf: [{ type: 'string' }, { type: 'null' }] },
+    jam: { anyOf: [{ type: 'string' }, { type: 'null' }] },
+    catatan: { type: 'string' }
+  },
+  required: [
+    'nomorRekeningTujuan', 'empatDigitTerakhir', 'namaPenerima',
+    'nominal', 'tanggal', 'jam', 'catatan'
+  ],
+  additionalProperties: false
+};
+
+// ---------------------------------------------------------------------------
+// Menu: Backfill
+// ---------------------------------------------------------------------------
+
+/**
+ * Memproses maksimal AI_CONFIG.BACKFILL_BATCH baris per klik.
+ *
+ * Apps Script mati di 6 menit dan satu panggilan vision makan beberapa detik,
+ * jadi seluruh riwayat tidak muat dalam satu eksekusi. Posisi terakhir disimpan
+ * di Script Properties supaya bisa dilanjut.
+ *
+ * Idempoten: baris yang aiVerdict-nya sudah terisi dilewati tanpa panggilan API.
+ * Baris yang validationStatus-nya sudah terisi TIDAK dilewati — justru itu kunci
+ * jawaban yang dipakai untuk mengukur akurasi.
+ */
+function backfillCekAi() {
+  var ui = SpreadsheetApp.getUi();
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(CONFIG.RAW_TAB);
+  if (!sheet) {
+    ui.alert('Tab "' + CONFIG.RAW_TAB + '" tidak ditemukan.');
+    return;
+  }
+
+  var ctx;
+  try {
+    ctx = buildAiContext_(sheet);
+  } catch (err) {
+    ui.alert('Setup belum lengkap: ' + err.message);
+    return;
+  }
+
+  var props = PropertiesService.getScriptProperties();
+  var cursor = parseInt(props.getProperty(AI_CONFIG.BACKFILL_CURSOR_KEY) || '1', 10);
+  if (!cursor || cursor < 1) cursor = 1;
+
+  var lastRow = sheet.getLastRow();
+  if (lastRow < 2) {
+    ui.alert('Tab Raw Data masih kosong.');
+    return;
+  }
+
+  var startRow = Math.max(2, cursor + 1);
+  var diproses = 0;
+  var dilewati = 0;
+  var ringkasan = {};
+  var row = startRow;
+
+  for (; row <= lastRow && diproses < AI_CONFIG.BACKFILL_BATCH; row++) {
+    var rowData = sheet.getRange(row, 1, 1, sheet.getLastColumn()).getValues()[0];
+
+    if (String(rowData[ctx.idx.verdict] || '').trim() !== '') {
+      dilewati++;
+      continue;
+    }
+
+    var hasil = verifikasiBaris_(sheet, ctx, rowData, row);
+    ringkasan[hasil.verdict] = (ringkasan[hasil.verdict] || 0) + 1;
+    diproses++;
+  }
+
+  props.setProperty(AI_CONFIG.BACKFILL_CURSOR_KEY, String(row - 1));
+
+  var selesai = (row - 1) >= lastRow;
+  var pesan = diproses + ' baris diproses';
+  if (dilewati > 0) pesan += ', ' + dilewati + ' dilewati (sudah ada aiVerdict)';
+  pesan += '.\n\n';
+  for (var v in ringkasan) pesan += '  ' + v + ' : ' + ringkasan[v] + '\n';
+  pesan += '\n' + (selesai
+    ? 'Sudah sampai baris terakhir. Backfill selesai.'
+    : 'Berhenti di baris ' + (row - 1) + ' dari ' + lastRow + '. Klik lagi untuk melanjutkan.');
+
+  ui.alert('Backfill Cek AI', pesan, ui.ButtonSet.OK);
+}
+
+/**
+ * Memproses ulang baris yang sedang dipilih, walaupun aiVerdict-nya sudah terisi.
+ * Dipakai untuk menguji satu bukti tertentu tanpa menjalankan seluruh backfill.
+ */
+function cekAiBarisTerpilih() {
+  var ui = SpreadsheetApp.getUi();
+  var sheet = SpreadsheetApp.getActiveSheet();
+  if (sheet.getName() !== CONFIG.RAW_TAB) {
+    ui.alert('Pilih dulu satu baris di tab "' + CONFIG.RAW_TAB + '".');
+    return;
+  }
+
+  var row = sheet.getActiveRange().getRow();
+  if (row < 2) {
+    ui.alert('Baris 1 itu header. Pilih baris data.');
+    return;
+  }
+
+  var ctx;
+  try {
+    ctx = buildAiContext_(sheet);
+  } catch (err) {
+    ui.alert('Setup belum lengkap: ' + err.message);
+    return;
+  }
+
+  var rowData = sheet.getRange(row, 1, 1, sheet.getLastColumn()).getValues()[0];
+  var hasil = verifikasiBaris_(sheet, ctx, rowData, row);
+
+  ui.alert('Baris ' + row, hasil.verdict + '\n\n' + hasil.alasan, ui.ButtonSet.OK);
+}
+
+/** Mengembalikan posisi backfill ke awal. Tidak menghapus aiVerdict yang sudah ada. */
+function resetBackfillCursor() {
+  var ui = SpreadsheetApp.getUi();
+  PropertiesService.getScriptProperties().deleteProperty(AI_CONFIG.BACKFILL_CURSOR_KEY);
+  ui.alert(
+    'Posisi backfill direset ke baris 2.\n\n' +
+    'Baris yang aiVerdict-nya sudah terisi tetap dilewati. Untuk memproses ulang, ' +
+    'kosongkan dulu kolom aiVerdict-nya.'
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Trigger onFormSubmit
+// ---------------------------------------------------------------------------
+
+/**
+ * Memverifikasi satu Setoran baru begitu form disubmit.
+ *
+ * JANGAN pasang trigger ini sebelum backfill dijalankan dan matriks
+ * aiVerdict x validationStatus direview bersama bendahara — lihat
+ * docs/adr/0001-rantai-wewenang-verifikasi-bukti.md.
+ */
+function onFormSubmitHandler(e) {
+  if (!e || !e.range) return;
+
+  var sheet = e.range.getSheet();
+  if (sheet.getName() !== CONFIG.RAW_TAB) return;
+
+  var row = e.range.getRow();
+  if (row < 2) return;
+
+  var ctx = buildAiContext_(sheet);
+  var rowData = sheet.getRange(row, 1, 1, sheet.getLastColumn()).getValues()[0];
+
+  verifikasiBaris_(sheet, ctx, rowData, row);
+}
+
+// ---------------------------------------------------------------------------
+// Orkestrasi satu baris
+// ---------------------------------------------------------------------------
+
+/**
+ * Membaca konfigurasi + header sekali di awal, supaya tidak diulang per baris.
+ * Melempar Error kalau Script Properties belum lengkap.
+ */
+function buildAiContext_(sheet) {
+  var props = PropertiesService.getScriptProperties();
+  var apiKey = props.getProperty('ANTHROPIC_API_KEY');
+  var rekening = String(props.getProperty('EXPECTED_REKENING') || '').replace(/\D/g, '');
+  var nama = String(props.getProperty('EXPECTED_NAMA') || '').trim();
+
+  var kurang = [];
+  if (!apiKey) kurang.push('ANTHROPIC_API_KEY');
+  if (!rekening) kurang.push('EXPECTED_REKENING');
+  if (!nama) kurang.push('EXPECTED_NAMA');
+  if (kurang.length) {
+    throw new Error('Script Properties belum diisi: ' + kurang.join(', '));
+  }
+
+  var idx = ensureAiColumns_(sheet);
+
+  return {
+    apiKey: apiKey,
+    expectedRekening: rekening,
+    expectedEmpatDigit: rekening.slice(-4),
+    expectedNama: normalisasiNama_(nama),
+    idx: idx,
+    sidikJariIndex: buildSidikJariIndex_(sheet, idx)
+  };
+}
+
+/**
+ * Mencari kolom aiVerdict / aiAlasan / aiSidikJari by header name.
+ * Kolom yang belum ada dibuat di ujung kanan.
+ */
+function ensureAiColumns_(sheet) {
+  var lastCol = sheet.getLastColumn();
+  var headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
+
+  function cariAtauBuat(nama) {
+    var i = headers.indexOf(nama);
+    if (i !== -1) return i;
+    lastCol++;
+    sheet.getRange(1, lastCol).setValue(nama);
+    headers.push(nama);
+    return lastCol - 1;
+  }
+
+  var idx = {
+    verdict: cariAtauBuat(AI_CONFIG.VERDICT_HEADER),
+    alasan: cariAtauBuat(AI_CONFIG.ALASAN_HEADER),
+    sidikJari: cariAtauBuat(AI_CONFIG.SIDIK_JARI_HEADER),
+    bukti: headers.indexOf(AI_CONFIG.BUKTI_HEADER),
+    timestamp: headers.indexOf('Timestamp'),
+    jumlah: headers.indexOf('Jumlah Pembayaran'),
+    status: headers.indexOf(CONFIG.STATUS_COLUMN_HEADER)
+  };
+
+  if (idx.bukti === -1) {
+    throw new Error('Kolom "' + AI_CONFIG.BUKTI_HEADER + '" tidak ditemukan di Raw Data.');
+  }
+  if (idx.jumlah === -1) {
+    throw new Error('Kolom "Jumlah Pembayaran" tidak ditemukan di Raw Data.');
+  }
+
+  return idx;
+}
+
+/**
+ * Mengumpulkan Sidik Jari Bukti dari baris yang sudah diproses, supaya deteksi
+ * duplikat tetap jalan lintas batch backfill (tanpa memanggil API ulang).
+ * Map: sidikJari -> nomor baris pertama yang memakainya.
+ */
+function buildSidikJariIndex_(sheet, idx) {
+  var index = {};
+  var lastRow = sheet.getLastRow();
+  if (lastRow < 2) return index;
+
+  var kolom = sheet.getRange(2, idx.sidikJari + 1, lastRow - 1, 1).getValues();
+  for (var i = 0; i < kolom.length; i++) {
+    var sj = String(kolom[i][0] || '').trim();
+    if (!sj) continue;
+    if (!(sj in index)) index[sj] = i + 2; // baris pertama yang memakainya menang
+  }
+  return index;
+}
+
+/**
+ * Alur satu baris: baca file Drive -> cek MIME -> panggil Claude -> bandingkan
+ * -> tulis aiVerdict / aiAlasan / aiSidikJari.
+ *
+ * TIDAK PERNAH menyentuh kolom validationStatus.
+ */
+function verifikasiBaris_(sheet, ctx, rowData, rowNum) {
+  var hasil;
+  var sidikJari = '';
+
+  var gambar = bacaBuktiGambar_(rowData[ctx.idx.bukti]);
+
+  if (!gambar.ok) {
+    hasil = { verdict: VERDICT.GAGAL, alasan: gambar.error };
+  } else {
+    var api = panggilClaudeVision_(ctx.apiKey, gambar.base64, gambar.mimeType);
+
+    if (!api.ok) {
+      hasil = { verdict: VERDICT.GAGAL, alasan: api.error };
+    } else {
+      var klaim = toIntAmount(rowData[ctx.idx.jumlah]);
+      var submit = ctx.idx.timestamp !== -1 ? rowData[ctx.idx.timestamp] : null;
+
+      sidikJari = buatSidikJari_(api.data);
+      hasil = nilaiBukti_(api.data, klaim, submit, ctx, sidikJari, rowNum);
+
+      if (gambar.jumlahFile > 1) {
+        hasil.alasan = gambar.jumlahFile + ' file di-upload, yang dibaca file pertama | ' + hasil.alasan;
+      }
+    }
+  }
+
+  sheet.getRange(rowNum, ctx.idx.verdict + 1).setValue(hasil.verdict);
+  sheet.getRange(rowNum, ctx.idx.alasan + 1).setValue(hasil.alasan);
+  sheet.getRange(rowNum, ctx.idx.sidikJari + 1).setValue(sidikJari);
+
+  // Baris ini sekarang ikut jadi pembanding untuk baris berikutnya
+  if (sidikJari && !(sidikJari in ctx.sidikJariIndex)) {
+    ctx.sidikJariIndex[sidikJari] = rowNum;
+  }
+
+  return hasil;
+}
+
+// ---------------------------------------------------------------------------
+// Aturan pembanding — dieksekusi kode, bukan Claude
+// ---------------------------------------------------------------------------
+
+/**
+ * Mengubah hasil ekstraksi menjadi aiVerdict + aiAlasan.
+ *
+ * Urutan pemeriksaan sengaja begini: duplikat diperiksa paling awal karena
+ * bukti lama yang di-upload ulang justru terbaca "cocok" di semua cek lain.
+ */
+function nilaiBukti_(data, nominalKlaim, waktuSubmit, ctx, sidikJari, rowNum) {
+  var catatan = [];
+
+  // --- Duplikat ---------------------------------------------------------
+  if (sidikJari && (sidikJari in ctx.sidikJariIndex) && ctx.sidikJariIndex[sidikJari] !== rowNum) {
+    return {
+      verdict: VERDICT.DUPLIKAT,
+      alasan: 'sidik jari bukti sama dengan baris ' + ctx.sidikJariIndex[sidikJari] +
+              ' (' + sidikJari + ')'
+    };
+  }
+
+  // --- Sinyal Tujuan (bertingkat) ---------------------------------------
+  var sinyal = cekSinyalTujuan_(data, ctx);
+  if (!sinyal.cocok) {
+    return {
+      verdict: VERDICT.RAGU,
+      alasan: gabungAlasan_([sinyal.alasan, catatanClaude_(data)])
+    };
+  }
+  catatan.push(sinyal.alasan);
+
+  // --- Nominal ----------------------------------------------------------
+  if (data.nominal === null || data.nominal === undefined) {
+    return {
+      verdict: VERDICT.RAGU,
+      alasan: gabungAlasan_(catatan.concat(['nominal tidak terbaca di gambar', catatanClaude_(data)]))
+    };
+  }
+
+  var nominalBukti = Math.round(Number(data.nominal));
+  var selisih = nominalBukti - nominalKlaim;
+
+  // Umur bukti: dicatat saja, TIDAK menghasilkan flag. Belum ada data jeda
+  // upload yang wajar di komplek ini, jadi ambang batas apa pun masih tebakan.
+  var umur = hitungUmurBukti_(data.tanggal, waktuSubmit);
+  if (umur !== null) catatan.push('upload H+' + umur);
+
+  if (selisih < 0) {
+    return {
+      verdict: VERDICT.BEDA_NOMINAL,
+      alasan: gabungAlasan_(catatan.concat([
+        'bukti ' + formatAngka_(nominalBukti) + ' KURANG ' + formatAngka_(-selisih) +
+        ' dari klaim ' + formatAngka_(nominalKlaim),
+        catatanClaude_(data)
+      ]))
+    };
+  }
+
+  if (selisih > AI_CONFIG.TOLERANSI_ADMIN) {
+    // Tidak ada di spesifikasi awal. Diperlakukan sebagai perlu-dilihat karena
+    // selisih sebesar ini biasanya berarti bukti tertukar atau pembayaran
+    // beberapa bulan yang diklaim satu bulan — warga yang rugi, bukan kas.
+    return {
+      verdict: VERDICT.BEDA_NOMINAL,
+      alasan: gabungAlasan_(catatan.concat([
+        'bukti ' + formatAngka_(nominalBukti) + ' LEBIH ' + formatAngka_(selisih) +
+        ' dari klaim ' + formatAngka_(nominalKlaim) + ' — di luar toleransi biaya admin',
+        catatanClaude_(data)
+      ]))
+    };
+  }
+
+  catatan.push(selisih === 0
+    ? 'nominal ' + formatAngka_(nominalBukti) + ' persis sama dengan klaim'
+    : 'nominal ' + formatAngka_(nominalBukti) + ' lebih ' + formatAngka_(selisih) +
+      ' dari klaim (kemungkinan biaya admin bank)');
+
+  return {
+    verdict: VERDICT.COCOK,
+    alasan: gabungAlasan_(catatan.concat([catatanClaude_(data)]))
+  };
+}
+
+/**
+ * Sinyal Tujuan bertingkat: nomor penuh (kuat) -> 4 digit terakhir (sedang)
+ * -> nama saja (lemah). Sinyal lemah tetap diloloskan, tapi kekuatannya
+ * selalu ditulis di aiAlasan supaya bisa diaudit.
+ */
+function cekSinyalTujuan_(data, ctx) {
+  var digitRekening = String(data.nomorRekeningTujuan || '').replace(/\D/g, '');
+
+  if (digitRekening && digitRekening === ctx.expectedRekening) {
+    return { cocok: true, alasan: 'cocok via NOMOR REKENING PENUH (sinyal kuat)' };
+  }
+
+  var empatDigit = String(data.empatDigitTerakhir || '').replace(/\D/g, '').slice(-4);
+  if (!empatDigit && digitRekening.length >= 4) {
+    // Nomor tersamar seperti "50379xxxx221" — sisa digitnya masih berguna
+    empatDigit = digitRekening.slice(-4);
+  }
+  if (empatDigit && empatDigit === ctx.expectedEmpatDigit) {
+    return {
+      cocok: true,
+      alasan: 'cocok via 4 DIGIT TERAKHIR ' + empatDigit +
+              ' (sinyal sedang — nomor penuh tidak terbaca)'
+    };
+  }
+
+  var namaBukti = normalisasiNama_(data.namaPenerima);
+  if (namaBukti && cocokNama_(namaBukti, ctx.expectedNama)) {
+    return {
+      cocok: true,
+      alasan: 'cocok via NAMA saja "' + namaBukti +
+              '" (sinyal lemah — nomor rekening tidak terbaca)'
+    };
+  }
+
+  var terbaca = [];
+  if (digitRekening) terbaca.push('rekening "' + data.nomorRekeningTujuan + '"');
+  if (namaBukti) terbaca.push('nama "' + namaBukti + '"');
+
+  return {
+    cocok: false,
+    alasan: terbaca.length
+      ? 'tidak ada sinyal tujuan yang cocok — terbaca ' + terbaca.join(', ')
+      : 'tidak ada sinyal tujuan yang terbaca di gambar'
+  };
+}
+
+/**
+ * Normalisasi nama: huruf besar, buang gelar/sapaan dan karakter non-alfanumerik.
+ * "Bpk. IHSAN SATRIAWAN" -> "IHSAN SATRIAWAN"
+ */
+function normalisasiNama_(nama) {
+  if (!nama) return '';
+
+  var s = String(nama)
+    .toUpperCase()
+    .replace(/[^A-Z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  var sapaan = ['BPK', 'BAPAK', 'IBU', 'SDR', 'SDRI', 'TN', 'NY', 'MR', 'MRS', 'PT', 'CV'];
+  var kata = s.split(' ');
+  while (kata.length > 1 && sapaan.indexOf(kata[0]) !== -1) kata.shift();
+
+  return kata.join(' ');
+}
+
+/**
+ * Aturan longgar: kata pertama harus persis sama, DAN kalau nama yang diharapkan
+ * punya kata kedua, huruf awal kata kedua di bukti harus cocok.
+ *
+ *   "IHSAN SATRIAWAN"   vs "IHSAN SATRIAWAN"  -> cocok
+ *   "IHSAN S"           vs "IHSAN SATRIAWAN"  -> cocok  (bank memotong nama)
+ *   "IHSAN SATRIAWAN P" vs "IHSAN SATRIAWAN"  -> cocok  (bank menambah nama)
+ *   "I SATRIAWAN"       vs "IHSAN SATRIAWAN"  -> TIDAK  (kata pertama beda)
+ *   "IHSAN"             vs "IHSAN SATRIAWAN"  -> TIDAK  (terlalu sedikit informasi)
+ */
+function cocokNama_(namaBukti, namaHarapan) {
+  if (!namaBukti || !namaHarapan) return false;
+
+  var bukti = namaBukti.split(' ');
+  var harap = namaHarapan.split(' ');
+
+  if (bukti[0] !== harap[0]) return false;
+  if (harap.length === 1) return true;
+  if (bukti.length < 2) return false;
+
+  return bukti[1].charAt(0) === harap[1].charAt(0);
+}
+
+/**
+ * Sidik Jari Bukti: nominal|tanggal|jam.
+ * Jam wajib ikut — tanpa jam, dua warga yang transfer nominal sama di hari
+ * yang sama akan saling tertuduh duplikat.
+ * Mengembalikan string kosong kalau salah satu komponen tidak terbaca.
+ */
+function buatSidikJari_(data) {
+  if (data.nominal === null || data.nominal === undefined) return '';
+  if (!data.tanggal || !data.jam) return '';
+  return Math.round(Number(data.nominal)) + '|' + data.tanggal + '|' + data.jam;
+}
+
+/** Selisih hari antara tanggal di gambar dan waktu submit form. null kalau tidak terhitung. */
+function hitungUmurBukti_(tanggalBukti, waktuSubmit) {
+  if (!tanggalBukti || !waktuSubmit) return null;
+
+  var m = String(tanggalBukti).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!m) return null;
+
+  var bukti = new Date(parseInt(m[1], 10), parseInt(m[2], 10) - 1, parseInt(m[3], 10));
+  var submit = (waktuSubmit instanceof Date) ? new Date(waktuSubmit) : new Date(String(waktuSubmit));
+  if (isNaN(submit.getTime())) return null;
+
+  submit = new Date(submit.getFullYear(), submit.getMonth(), submit.getDate());
+  return Math.round((submit - bukti) / 86400000);
+}
+
+// ---------------------------------------------------------------------------
+// Drive: baca file bukti
+// ---------------------------------------------------------------------------
+
+/**
+ * Mengambil gambar bukti dari kolom upload Google Form.
+ * Isinya berupa URL Drive; kalau form mengizinkan lebih dari satu file,
+ * URL-nya dipisah koma dan yang dibaca hanya yang pertama.
+ */
+function bacaBuktiGambar_(cellValue) {
+  var raw = String(cellValue || '').trim();
+  if (!raw) {
+    return { ok: false, error: 'tidak ada file bukti di kolom upload' };
+  }
+
+  var ids = [];
+  var re = /(?:[?&]id=|\/d\/)([-\w]{20,})/g;
+  var m;
+  while ((m = re.exec(raw)) !== null) ids.push(m[1]);
+
+  if (!ids.length) {
+    return { ok: false, error: 'isi kolom bukti bukan link Drive yang dikenali: ' + raw.slice(0, 80) };
+  }
+
+  var file;
+  try {
+    file = DriveApp.getFileById(ids[0]);
+  } catch (err) {
+    return { ok: false, error: 'file Drive tidak bisa dibuka (' + ids[0] + '): ' + err.message };
+  }
+
+  var mime = file.getMimeType();
+  if (AI_CONFIG.ALLOWED_MIME.indexOf(mime) === -1) {
+    return {
+      ok: false,
+      error: 'format file "' + mime + '" tidak bisa dibaca AI — buka manual ' +
+             '(hanya JPG/PNG/GIF/WEBP yang didukung)'
+    };
+  }
+
+  var blob = file.getBlob();
+  var bytes = blob.getBytes();
+  if (bytes.length > AI_CONFIG.MAX_IMAGE_BYTES) {
+    return {
+      ok: false,
+      error: 'gambar terlalu besar (' + Math.round(bytes.length / 1048576) + ' MB) — buka manual'
+    };
+  }
+
+  return {
+    ok: true,
+    base64: Utilities.base64Encode(bytes),
+    mimeType: mime,
+    jumlahFile: ids.length
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Claude API
+// ---------------------------------------------------------------------------
+
+/**
+ * Memanggil Claude vision dengan structured outputs.
+ *
+ * Retry hanya untuk error yang bisa berubah hasilnya (429/5xx/koneksi putus).
+ * Error 400/401 tidak diulang — hasilnya akan sama, cuma buang 3 panggilan.
+ */
+function panggilClaudeVision_(apiKey, base64, mimeType) {
+  var payload = {
+    model: AI_CONFIG.MODEL,
+    max_tokens: AI_CONFIG.MAX_TOKENS,
+    system: AI_SYSTEM_PROMPT,
+    output_config: {
+      format: { type: 'json_schema', schema: AI_SCHEMA }
+    },
+    messages: [{
+      role: 'user',
+      content: [
+        { type: 'image', source: { type: 'base64', media_type: mimeType, data: base64 } },
+        { type: 'text', text: 'Baca bukti transfer ini.' }
+      ]
+    }]
+  };
+
+  var options = {
+    method: 'post',
+    contentType: 'application/json',
+    headers: {
+      'x-api-key': apiKey,
+      'anthropic-version': AI_CONFIG.API_VERSION
+    },
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true
+  };
+
+  var errorTerakhir = '';
+
+  for (var percobaan = 0; percobaan <= AI_CONFIG.RETRY_DELAYS_MS.length; percobaan++) {
+    if (percobaan > 0) Utilities.sleep(AI_CONFIG.RETRY_DELAYS_MS[percobaan - 1]);
+
+    var code, body;
+    try {
+      var response = UrlFetchApp.fetch(AI_CONFIG.API_URL, options);
+      code = response.getResponseCode();
+      body = response.getContentText();
+    } catch (err) {
+      errorTerakhir = 'koneksi gagal: ' + err.message;
+      continue; // koneksi putus selalu layak diulang
+    }
+
+    if (code === 200) {
+      try {
+        return { ok: true, data: parseJawabanClaude_(body) };
+      } catch (err) {
+        return { ok: false, error: 'jawaban AI tidak bisa dibaca: ' + err.message };
+      }
+    }
+
+    if (AI_CONFIG.RETRYABLE_CODES.indexOf(code) === -1) {
+      return { ok: false, error: 'API error ' + code + ': ' + ringkasErrorApi_(body) };
+    }
+
+    errorTerakhir = 'API error ' + code + ': ' + ringkasErrorApi_(body);
+  }
+
+  return { ok: false, error: 'gagal setelah 3 percobaan — ' + errorTerakhir };
+}
+
+/** Mengambil objek JSON dari content block teks pertama. */
+function parseJawabanClaude_(body) {
+  var json = JSON.parse(body);
+  var blocks = json.content || [];
+
+  for (var i = 0; i < blocks.length; i++) {
+    if (blocks[i].type === 'text') return JSON.parse(blocks[i].text);
+  }
+
+  throw new Error('tidak ada content block teks di jawaban API');
+}
+
+function ringkasErrorApi_(body) {
+  try {
+    var json = JSON.parse(body);
+    if (json.error && json.error.message) return json.error.message;
+  } catch (err) { /* body bukan JSON — pakai apa adanya */ }
+  return String(body || '').slice(0, 200);
+}
+
+// ---------------------------------------------------------------------------
+// Helper format
+// ---------------------------------------------------------------------------
+
+function gabungAlasan_(bagian) {
+  var bersih = [];
+  for (var i = 0; i < bagian.length; i++) {
+    var s = String(bagian[i] || '').trim();
+    if (s) bersih.push(s);
+  }
+  return bersih.join(' | ');
+}
+
+function catatanClaude_(data) {
+  var c = String(data.catatan || '').trim();
+  return c ? 'catatan AI: ' + c : '';
+}
+
+function formatAngka_(n) {
+  return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 }
