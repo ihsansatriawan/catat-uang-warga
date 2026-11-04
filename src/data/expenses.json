@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2026-10-31",
+  "lastUpdate": "2026-11-05",
   "rutin": [
     {
       "keterangan": "Sisa Kas 2025",
@@ -8,7 +8,7 @@
     },
     {
       "keterangan": "Total Iuran Warga 2026",
-      "masuk": 116200000,
+      "masuk": 117450000,
       "keluar": null
     },
     {
@@ -80,7 +80,7 @@
   "insidental": [
     {
       "keterangan": "sisa uang (potong biaya rutin)",
-      "masuk": 121062928,
+      "masuk": 122312928,
       "keluar": null,
       "tanggal": "2026-01-01",
       "kategori": ""
@@ -539,11 +539,18 @@
       "keluar": 200000,
       "tanggal": "2026-10-07",
       "kategori": "Operational"
+    },
+    {
+      "keterangan": "alat kebersihan dan bensin mesin pemotong",
+      "masuk": null,
+      "keluar": 300000,
+      "tanggal": "2026-11-02",
+      "kategori": "Operational"
     }
   ],
   "summary": {
-    "totalMasuk": 139312928,
-    "totalKeluar": 70646018,
-    "sisaAnggaran": 68666910
+    "totalMasuk": 140562928,
+    "totalKeluar": 70946018,
+    "sisaAnggaran": 69616910
   }
 }
