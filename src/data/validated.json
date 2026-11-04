@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2026-10-31",
+  "lastUpdate": "2026-11-05",
   "data": [
     {
       "timestamp": "2025-12-31T19:16:46+07:00",
@@ -1393,6 +1393,41 @@
       "nomorRumah": "6",
       "namaPemilik": "Thomas",
       "jumlahPembayaran": 750000
+    },
+    {
+      "timestamp": "2026-11-02T06:37:52+07:00",
+      "blok": "D",
+      "nomorRumah": "3",
+      "namaPemilik": "Giyono",
+      "jumlahPembayaran": 250000
+    },
+    {
+      "timestamp": "2026-11-02T10:17:01+07:00",
+      "blok": "B",
+      "nomorRumah": "9",
+      "namaPemilik": "Ukky January Linzki",
+      "jumlahPembayaran": 250000
+    },
+    {
+      "timestamp": "2026-11-03T04:42:03+07:00",
+      "blok": "D",
+      "nomorRumah": "6",
+      "namaPemilik": "Andi Supandi",
+      "jumlahPembayaran": 250000
+    },
+    {
+      "timestamp": "2026-11-03T17:46:16+07:00",
+      "blok": "C",
+      "nomorRumah": "2",
+      "namaPemilik": "Siti Munifah",
+      "jumlahPembayaran": 250000
+    },
+    {
+      "timestamp": "2026-11-04T10:07:07+07:00",
+      "blok": "F",
+      "nomorRumah": "6",
+      "namaPemilik": "Thomas",
+      "jumlahPembayaran": 250000
     }
   ]
 }
