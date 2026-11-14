@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2026-11-05",
+  "lastUpdate": "2026-11-14",
   "rutin": [
     {
       "keterangan": "Sisa Kas 2025",
@@ -8,7 +8,7 @@
     },
     {
       "keterangan": "Total Iuran Warga 2026",
-      "masuk": 117450000,
+      "masuk": 118450000,
       "keluar": null
     },
     {
@@ -64,7 +64,7 @@
     {
       "keterangan": "Security November",
       "masuk": null,
-      "keluar": null
+      "keluar": 1500000
     },
     {
       "keterangan": "Security December",
@@ -80,7 +80,7 @@
   "insidental": [
     {
       "keterangan": "sisa uang (potong biaya rutin)",
-      "masuk": 122312928,
+      "masuk": 121812928,
       "keluar": null,
       "tanggal": "2026-01-01",
       "kategori": ""
@@ -546,11 +546,25 @@
       "keluar": 300000,
       "tanggal": "2026-11-02",
       "kategori": "Operational"
+    },
+    {
+      "keterangan": "biaya angkut sampah komplek",
+      "masuk": null,
+      "keluar": 50000,
+      "tanggal": "2026-11-06",
+      "kategori": "Operational"
+    },
+    {
+      "keterangan": "satpam kasbon (haery)",
+      "masuk": null,
+      "keluar": 200000,
+      "tanggal": "2026-11-10",
+      "kategori": "Operational"
     }
   ],
   "summary": {
-    "totalMasuk": 140562928,
-    "totalKeluar": 70946018,
-    "sisaAnggaran": 69616910
+    "totalMasuk": 141562928,
+    "totalKeluar": 72696018,
+    "sisaAnggaran": 68866910
   }
 }
