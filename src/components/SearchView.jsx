@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Search, Home, MapPin, Calendar, Trophy, Wallet, CreditCard } from 'lucide-react'
+import { Search, Home, MapPin, Calendar, Activity, Wallet, CreditCard } from 'lucide-react'
 import { getAvailableBlocks, getLastUpdated } from '../data/helpers'
 import { trackEvent } from '../utils/tracking'
 import { BLOCK_COLORS, BLOCK_COLORS_UNSELECTED } from '../data/constants'
@@ -119,8 +119,8 @@ export default function SearchView({ onSearch }) {
                 transition-all
               "
             >
-              <Trophy size={13} strokeWidth={2.5} />
-              Leaderboard
+              <Activity size={13} strokeWidth={2.5} />
+              Kondisi IPL
             </Link>
             <Link
               to="/pengeluaran"

@@ -1,24 +1,35 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowLeft, Trophy, Home, ChevronDown, ChevronUp, MessageCircle } from 'lucide-react'
-import { getBlockLeaderboard, getHouseLeaderboard, getAvailableBlocks, formatRupiah, getLastUpdated } from '../data/helpers'
+import { ArrowLeft, Activity, MessageCircle, ChevronRight } from 'lucide-react'
+import { getComplexSummary, getHousesByBlock, formatRupiah, getLastUpdated } from '../data/helpers'
 import { trackEvent } from '../utils/tracking'
-import { BLOCK_COLORS, BLOCK_COLORS_UNSELECTED, BLOCK_BAR_COLORS } from '../data/constants'
+import { BLOCK_BAR_COLORS } from '../data/constants'
+
+// "sesuai" disembunyikan di Desember karena identik dengan "lengkap".
+const STATUSES = [
+    { key: 'lengkap', label: 'Lengkap 12 bulan', tile: 'bg-green' },
+    { key: 'sesuai', label: 'Sesuai jadwal', tile: 'bg-[#86EFAC]' },
+    { key: 'belumSesuai', label: 'Belum sesuai jadwal', tile: 'bg-yellow' },
+    { key: 'belum', label: 'Belum ada pembayaran', tile: 'bg-white' },
+]
+const STATUS_BY_KEY = Object.fromEntries(STATUSES.map((s) => [s.key, s]))
+
+const MONTH_NAMES = ['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember']
+
+const sameHouse = (a, b) => a && b && a.blok === b.blok && a.nomorRumah === b.nomorRumah
 
 export default function LeaderboardView() {
-    const [selectedBlok, setSelectedBlok] = useState('')
-    const [showBelumBayar, setShowBelumBayar] = useState(false)
+    const [filter, setFilter] = useState(null)
+    const [selected, setSelected] = useState(null)
 
     useEffect(() => {
         trackEvent('open_leaderboard')
     }, [])
 
-    const blockLeaderboard = getBlockLeaderboard()
-    const houseLeaderboard = getHouseLeaderboard(selectedBlok || undefined)
-    const blocks = getAvailableBlocks()
-
-    const paidHouses = houseLeaderboard.filter((h) => h.totalPaid > 0)
-    const unpaidHouses = houseLeaderboard.filter((h) => h.totalPaid === 0)
+    const summary = getComplexSummary()
+    const blocks = getHousesByBlock()
+    const { counts, currentMonth } = summary
+    const visibleStatuses = STATUSES.filter((s) => s.key !== 'sesuai' || currentMonth < 12)
 
     const lastUpdatedRaw = getLastUpdated()
     const lastUpdateText = lastUpdatedRaw
@@ -28,6 +39,14 @@ export default function LeaderboardView() {
             year: 'numeric',
         })
         : null
+
+    // Lingkaran progres
+    const R = 54
+    const CIRC = 2 * Math.PI * R
+    const offset = CIRC * (1 - summary.collectionPct / 100)
+
+    const toggleFilter = (key) => setFilter((f) => (f === key ? null : key))
+    const toggleHouse = (house) => setSelected((s) => (sameHouse(s, house) ? null : house))
 
     return (
         <div className="flex flex-col min-h-dvh animate-pop-in">
@@ -48,198 +67,156 @@ export default function LeaderboardView() {
                 </Link>
                 <div className="flex-1 text-center">
                     <span className="font-heading font-bold text-sm text-slate-dark/50">
-                        Leaderboard
+                        Kondisi IPL
                     </span>
                 </div>
-                <Trophy size={20} strokeWidth={2.5} className="text-yellow" />
+                <Activity size={20} strokeWidth={2.5} className="text-violet" />
             </div>
 
-            {/* Scrollable content */}
-            <div className="flex-1 overflow-y-auto safe-x">
+            <div className="flex-1 safe-x">
                 <div className="max-w-lg mx-auto px-4 py-6 space-y-5">
 
-                    {/* Block Ranking Section */}
-                    <div className="bg-white border-2 border-slate-dark rounded-3xl shadow-hard overflow-hidden animate-slide-up stagger-1">
+                    {/* Title */}
+                    <div className="px-1 animate-slide-up stagger-1">
+                        <h1 className="font-heading font-extrabold text-2xl leading-tight">Kondisi IPL 2026</h1>
+                        <p className="font-body text-sm text-slate-dark/50 mt-1">
+                            Gambaran pembayaran IPL seluruh komplek
+                        </p>
+                    </div>
+
+                    {/* Complex summary */}
+                    <div className="bg-white border-2 border-slate-dark rounded-3xl shadow-hard p-4 flex items-center gap-4 animate-slide-up stagger-1">
+                        <svg width="130" height="130" viewBox="0 0 130 130" className="flex-shrink-0" role="img" aria-label={`${summary.collectionPct}% terkumpul`}>
+                            <circle cx="65" cy="65" r={R} fill="none" stroke="#FFFDF5" strokeWidth="16" />
+                            <circle
+                                cx="65" cy="65" r={R} fill="none" stroke="#8B5CF6" strokeWidth="16"
+                                strokeLinecap="round" strokeDasharray={CIRC} strokeDashoffset={offset}
+                                transform="rotate(-90 65 65)"
+                            />
+                            <text x="65" y="64" textAnchor="middle" fontSize="30" fontWeight="800" className="font-heading" fill="#1E293B">
+                                {summary.collectionPct}%
+                            </text>
+                            <text x="65" y="82" textAnchor="middle" fontSize="10" fill="#64748b">terkumpul</text>
+                        </svg>
+                        <div className="min-w-0">
+                            <p className="font-heading font-bold text-lg leading-tight">{formatRupiah(summary.totalCollected)}</p>
+                            <p className="font-body text-xs text-slate-dark/50">dari target {formatRupiah(summary.totalTarget)}</p>
+                            <p className="font-body text-xs mt-2 leading-relaxed">
+                                Sekarang <b>bulan ke-{currentMonth}</b> dari 12
+                                {currentMonth > 0 && <><br />Selaras jadwal ≈ <b>{summary.expectedPct}%</b></>}
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Status tiles (also act as filter) */}
+                    <div className="grid grid-cols-2 gap-2 animate-slide-up stagger-2">
+                        {visibleStatuses.map((s) => {
+                            const active = filter === s.key
+                            return (
+                                <button
+                                    key={s.key}
+                                    type="button"
+                                    onClick={() => toggleFilter(s.key)}
+                                    aria-pressed={active}
+                                    className={`
+                    flex items-center gap-3 text-left border-2 border-slate-dark rounded-2xl px-3 py-2.5
+                    transition-all duration-150
+                    ${active ? 'bg-slate-dark text-white' : 'bg-white'}
+                    ${filter && !active ? 'opacity-45' : ''}
+                  `}
+                                >
+                                    <span className={`w-3.5 h-3.5 rounded border-[1.5px] border-slate-dark flex-shrink-0 ${s.tile}`} />
+                                    <span>
+                                        <span className="block font-heading font-extrabold text-xl leading-none">{counts[s.key]}</span>
+                                        <span className="block font-body text-[11px] mt-0.5">{s.label}</span>
+                                    </span>
+                                </button>
+                            )
+                        })}
+                    </div>
+
+                    {/* House status map */}
+                    <div className="bg-white border-2 border-slate-dark rounded-3xl shadow-hard overflow-hidden animate-slide-up stagger-3">
                         <div className="px-5 py-4 border-b-2 border-slate-dark flex items-center gap-2">
-                            <span className="text-lg">🏆</span>
-                            <h2 className="font-heading font-bold text-base">Ranking Blok</h2>
-                            <span className="ml-auto font-body text-xs text-slate-dark/40">% terkumpul</span>
+                            <h2 className="font-heading font-bold text-base">Status Tiap Rumah</h2>
+                            <span className="ml-auto font-body text-xs text-slate-dark/40">angka = bulan terbayar</span>
                         </div>
 
-                        <div className="p-4 space-y-3">
-                            {blockLeaderboard.map((block, i) => (
-                                <div key={block.blok} className="flex items-center gap-2">
-                                    {/* Rank medal or number */}
-                                    <span className="w-6 text-center font-heading font-bold text-sm flex-shrink-0">
-                                        {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`}
-                                    </span>
+                        <div className="p-4 space-y-4">
+                            <p className="font-body text-xs text-slate-dark/60 leading-relaxed">
+                                <b>Sesuai jadwal</b> = pembayaran sudah sampai bulan berjalan
+                                {currentMonth > 0 && <> ({MONTH_NAMES[currentMonth]})</>}.
+                                Ketuk kotak status di atas untuk menyorot, ketuk rumah untuk melihat detail.
+                            </p>
 
-                                    {/* Block letter */}
-                                    <span
-                                        className="w-8 h-8 rounded-lg border-2 border-slate-dark flex items-center justify-center font-heading font-extrabold text-sm flex-shrink-0 text-white"
-                                        style={{ backgroundColor: BLOCK_BAR_COLORS[block.blok] }}
-                                    >
-                                        {block.blok}
-                                    </span>
-
-                                    {/* Bar */}
-                                    <div className="flex-1 h-7 bg-cream border-2 border-slate-dark rounded-lg overflow-hidden relative">
-                                        <div
-                                            className="h-full rounded-lg progress-bar"
-                                            style={{
-                                                '--progress-width': `${block.collectionPct}%`,
-                                                backgroundColor: BLOCK_BAR_COLORS[block.blok],
-                                            }}
-                                        />
-                                        <span className="absolute right-2 top-1/2 -translate-y-1/2 font-heading font-bold text-xs text-slate-dark">
-                                            {block.collectionPct}%
+                            {blocks.map((block) => (
+                                <div key={block.blok}>
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <span
+                                            className={`w-[22px] h-[22px] rounded-lg border-2 border-slate-dark flex items-center justify-center font-heading font-extrabold text-[11px] ${block.blok === 'C' ? 'text-slate-dark' : 'text-white'}`}
+                                            style={{ backgroundColor: BLOCK_BAR_COLORS[block.blok] }}
+                                        >
+                                            {block.blok}
+                                        </span>
+                                        <h3 className="font-heading font-bold text-sm">Blok {block.blok}</h3>
+                                        <span className="ml-auto font-body text-xs text-slate-dark/50">
+                                            {block.lengkapCount} dari {block.totalHouses} rumah lengkap 12 bln
                                         </span>
                                     </div>
 
-                                    {/* House count */}
-                                    <span className="font-body text-xs text-slate-dark/50 w-12 text-right flex-shrink-0">
-                                        {block.lunasCount}/{block.totalHouses} 🏠
-                                    </span>
+                                    <div className="grid grid-cols-5 gap-1.5">
+                                        {block.houses.map((house) => {
+                                            const dimmed = filter && filter !== house.status
+                                            return (
+                                                <button
+                                                    key={house.nomorRumah}
+                                                    type="button"
+                                                    onClick={() => toggleHouse(house)}
+                                                    aria-label={`Rumah ${house.blok}-${house.nomorRumah}, ${STATUS_BY_KEY[house.status].label}`}
+                                                    className={`
+                            border-2 border-slate-dark rounded-[10px] py-1.5 text-center
+                            font-heading font-bold text-[11px] leading-tight transition-all duration-150
+                            ${STATUS_BY_KEY[house.status].tile}
+                            ${dimmed ? 'opacity-20' : ''}
+                            ${sameHouse(selected, house) ? 'outline-3 outline-violet outline-offset-1' : ''}
+                          `}
+                                                >
+                                                    {house.nomorRumah}
+                                                    <span className="block font-body font-semibold text-[9px] opacity-75">
+                                                        {house.monthsPaid} bln
+                                                    </span>
+                                                </button>
+                                            )
+                                        })}
+                                    </div>
                                 </div>
                             ))}
                         </div>
                     </div>
 
-                    {/* House Ranking Section */}
-                    <div className="bg-white border-2 border-slate-dark rounded-3xl shadow-hard overflow-hidden animate-slide-up stagger-2">
-                        <div className="px-5 py-4 border-b-2 border-slate-dark flex items-center gap-2">
-                            <span className="text-lg">🏠</span>
-                            <h2 className="font-heading font-bold text-base">Ranking Per Rumah</h2>
-                        </div>
-
-                        {/* Block filter chips */}
-                        <div className="px-5 py-3 border-b border-slate-dark/10 flex gap-2 overflow-x-auto">
-                            <button
-                                onClick={() => setSelectedBlok('')}
-                                className={`
-                  flex-shrink-0 border-2 rounded-full px-3 py-1 font-heading font-bold text-xs
-                  transition-all duration-150
-                  ${!selectedBlok
-                                        ? 'bg-violet text-white border-violet shadow-hard-sm'
-                                        : 'bg-white text-slate-dark border-slate-dark hover:bg-violet/10'
-                                    }
-                `}
+                    {/* Selected house detail — sticks to the bottom so it's visible from any tile */}
+                    {selected && (
+                        <Link
+                            to={`/warga/${selected.blok}/${selected.nomorRumah}`}
+                            className="sticky bottom-4 z-10 flex items-center gap-3 bg-white border-2 border-slate-dark rounded-2xl shadow-hard px-3 py-2.5 animate-pop-in"
+                        >
+                            <span
+                                className={`px-2 py-0.5 rounded-lg border-2 border-slate-dark font-heading font-bold text-xs flex-shrink-0 ${selected.blok === 'C' ? 'text-slate-dark' : 'text-white'}`}
+                                style={{ backgroundColor: BLOCK_BAR_COLORS[selected.blok] }}
                             >
-                                Semua
-                            </button>
-                            {blocks.map((b) => (
-                                <button
-                                    key={b}
-                                    onClick={() => setSelectedBlok(b)}
-                                    className={`
-                    flex-shrink-0 border-2 rounded-full px-3 py-1 font-heading font-bold text-xs
-                    transition-all duration-150
-                    ${selectedBlok === b
-                                            ? `${BLOCK_COLORS[b]} shadow-hard-sm`
-                                            : BLOCK_COLORS_UNSELECTED[b]
-                                        }
-                  `}
-                                >
-                                    {b}
-                                </button>
-                            ))}
-                        </div>
-
-                        {/* Paid houses list */}
-                        <div>
-                            {paidHouses.map((house, i) => (
-                                <Link
-                                    to={`/warga/${house.blok}/${house.nomorRumah}`}
-                                    key={`${house.blok}-${house.nomorRumah}`}
-                                    className={`
-                    flex items-center gap-3 px-5 py-3 cursor-pointer
-                    hover:bg-cream/60 active:bg-cream transition-colors
-                    ${i < paidHouses.length - 1 || unpaidHouses.length > 0 ? 'border-b border-slate-dark/10' : ''}
-                  `}
-                                >
-                                    {/* Rank */}
-                                    <span className="w-6 text-center font-heading font-bold text-sm text-slate-dark/50 flex-shrink-0">
-                                        {i + 1}
-                                    </span>
-
-                                    {/* Block-house badge */}
-                                    <span
-                                        className="px-2 py-0.5 rounded-lg border-2 border-slate-dark font-heading font-bold text-xs text-white flex-shrink-0"
-                                        style={{ backgroundColor: BLOCK_BAR_COLORS[house.blok] }}
-                                    >
-                                        {house.blok}-{house.nomorRumah}
-                                    </span>
-
-                                    {/* Name + secondary info */}
-                                    <div className="flex-1 min-w-0">
-                                        <p className="font-heading font-bold text-sm text-slate-dark truncate">
-                                            {house.namaPemilik}
-                                        </p>
-                                        <p className="font-body text-xs text-slate-dark/40">
-                                            {formatRupiah(house.totalPaid)} · {house.monthsPaid} bln
-                                        </p>
-                                    </div>
-
-                                    {/* Mini progress bar */}
-                                    <div className="w-16 h-3 bg-cream border border-slate-dark/20 rounded-full overflow-hidden flex-shrink-0">
-                                        <div
-                                            className={`h-full rounded-full ${house.isLunas ? 'bg-green' : 'bg-violet'}`}
-                                            style={{ width: `${house.completionPct}%` }}
-                                        />
-                                    </div>
-
-                                    {/* Percentage */}
-                                    <span className={`font-heading font-bold text-xs w-10 text-right flex-shrink-0 ${house.isLunas ? 'text-green' : 'text-violet'}`}>
-                                        {house.completionPct}%
-                                    </span>
-                                </Link>
-                            ))}
-                        </div>
-
-                        {/* Collapsible belum bayar section */}
-                        {unpaidHouses.length > 0 && (
-                            <div>
-                                <button
-                                    onClick={() => setShowBelumBayar(!showBelumBayar)}
-                                    className="w-full flex items-center justify-between px-5 py-3 bg-cream/50 border-t border-slate-dark/10 hover:bg-cream transition-colors"
-                                >
-                                    <span className="font-heading font-bold text-sm text-slate-dark/50">
-                                        Belum bayar ({unpaidHouses.length})
-                                    </span>
-                                    {showBelumBayar
-                                        ? <ChevronUp size={16} strokeWidth={2.5} className="text-slate-dark/40" />
-                                        : <ChevronDown size={16} strokeWidth={2.5} className="text-slate-dark/40" />
-                                    }
-                                </button>
-
-                                {showBelumBayar && (
-                                    <div>
-                                        {unpaidHouses.map((house, i) => (
-                                            <Link
-                                                to={`/warga/${house.blok}/${house.nomorRumah}`}
-                                                key={`${house.blok}-${house.nomorRumah}`}
-                                                className={`
-                          flex items-center gap-3 px-5 py-2.5 cursor-pointer
-                          hover:bg-cream/60 active:bg-cream transition-colors
-                          ${i < unpaidHouses.length - 1 ? 'border-b border-slate-dark/5' : ''}
-                        `}
-                                            >
-                                                <span className="w-6 flex-shrink-0" />
-                                                <span
-                                                    className="px-2 py-0.5 rounded-lg border-2 border-slate-dark/30 font-heading font-bold text-xs text-slate-dark/40 flex-shrink-0"
-                                                >
-                                                    {house.blok}-{house.nomorRumah}
-                                                </span>
-                                                <p className="font-body text-sm text-slate-dark/40 truncate">
-                                                    {house.namaPemilik}
-                                                </p>
-                                            </Link>
-                                        ))}
-                                    </div>
-                                )}
+                                {selected.blok}-{selected.nomorRumah}
+                            </span>
+                            <div className="flex-1 min-w-0">
+                                <p className="font-heading font-bold text-sm truncate">{selected.namaPemilik}</p>
+                                <p className="font-body text-xs text-slate-dark/50">
+                                    {selected.monthsPaid}/12 bln · {formatRupiah(selected.totalPaid)} · {STATUS_BY_KEY[selected.status].label}
+                                </p>
                             </div>
-                        )}
-                    </div>
+                            <span className="flex items-center font-heading font-bold text-xs text-violet flex-shrink-0">
+                                Detail <ChevronRight size={14} strokeWidth={2.5} />
+                            </span>
+                        </Link>
+                    )}
 
                     {/* Help/Report Data section */}
                     <div className="animate-fade-in stagger-3 flex flex-col items-center bg-cream/50 rounded-2xl py-4 px-4 border-2 border-transparent mt-4">
@@ -247,7 +224,7 @@ export default function LeaderboardView() {
                             Ada data yang tidak sesuai?
                         </p>
                         <a
-                            href={`https://wa.me/628111719913?text=${encodeURIComponent('Halo Pengurus, saya mengecek data di Leaderboard IPL dan sepertinya ada data yang kurang sesuai. Mohon bantuannya untuk dilakukan pengecekan.')}`}
+                            href={`https://wa.me/628111719913?text=${encodeURIComponent('Halo Pengurus, saya mengecek data di halaman Kondisi IPL dan sepertinya ada data yang kurang sesuai. Mohon bantuannya untuk dilakukan pengecekan.')}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="
