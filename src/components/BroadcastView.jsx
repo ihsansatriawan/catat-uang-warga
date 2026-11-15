@@ -137,7 +137,7 @@ export default function BroadcastView() {
               to="/leaderboard"
               className="font-body text-sm text-slate-dark/50 hover:text-slate-dark transition-colors"
             >
-              Lihat Leaderboard →
+              Lihat Kondisi IPL →
             </Link>
           </div>
 

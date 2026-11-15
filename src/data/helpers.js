@@ -111,6 +111,77 @@ export function getHouseLeaderboard(blok) {
   )
 }
 
+const IPL_YEAR = 2026
+
+// Bulan berjalan (1–12) menurut WIB untuk tahun IPL. Sebelum tahun IPL = 0,
+// sesudahnya = 12, sehingga status "sesuai jadwal" tetap masuk akal di luar 2026.
+export function getCurrentMonthNumber(now = new Date()) {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Asia/Jakarta',
+    year: 'numeric',
+    month: 'numeric',
+  }).formatToParts(now)
+  const year = Number(parts.find((p) => p.type === 'year').value)
+  const month = Number(parts.find((p) => p.type === 'month').value)
+  if (year < IPL_YEAR) return 0
+  if (year > IPL_YEAR) return MONTHS_PER_YEAR
+  return month
+}
+
+// Status pembayaran satu rumah, relatif terhadap bulan berjalan:
+// 'lengkap' (12 bulan), 'sesuai' (sudah sampai bulan berjalan),
+// 'belumSesuai' (ada pembayaran tapi di bawah bulan berjalan), 'belum' (belum ada).
+export function getHouseStatus(resident, currentMonth = getCurrentMonthNumber()) {
+  if (resident.isLunas) return 'lengkap'
+  if (resident.monthsPaid >= currentMonth && resident.monthsPaid > 0) return 'sesuai'
+  if (resident.monthsPaid > 0) return 'belumSesuai'
+  return 'belum'
+}
+
+// Ringkasan seluruh komplek untuk halaman /leaderboard ("Kondisi IPL").
+export function getComplexSummary(now = new Date()) {
+  const currentMonth = getCurrentMonthNumber(now)
+  const all = getAllResidents()
+  const totalTarget = all.length * ANNUAL_TARGET
+  // Cap per rumah di target tahunan, sama seperti getBlockLeaderboard()
+  const totalCollected = all.reduce((sum, r) => sum + Math.min(r.totalPaid, ANNUAL_TARGET), 0)
+  const counts = { lengkap: 0, sesuai: 0, belumSesuai: 0, belum: 0 }
+  for (const r of all) counts[getHouseStatus(r, currentMonth)]++
+  return {
+    currentMonth,
+    totalHouses: all.length,
+    totalCollected,
+    totalTarget,
+    collectionPct: totalTarget > 0 ? Math.round((totalCollected / totalTarget) * 100) : 0,
+    expectedPct: Math.round((currentMonth / MONTHS_PER_YEAR) * 100),
+    counts,
+  }
+}
+
+// Rumah dikelompokkan per blok, urut abjad lalu nomor rumah (bukan ranking).
+export function getHousesByBlock(now = new Date()) {
+  const currentMonth = getCurrentMonthNumber(now)
+  const all = getAllResidents()
+  return getAvailableBlocks()
+    .map((blok) => {
+      const houses = all
+        .filter((r) => r.blok === blok)
+        .sort((a, b) => Number(a.nomorRumah) - Number(b.nomorRumah))
+        .map((r) => ({
+          ...r,
+          monthsPaid: Math.min(MONTHS_PER_YEAR, r.monthsPaid),
+          status: getHouseStatus(r, currentMonth),
+        }))
+      return {
+        blok,
+        totalHouses: houses.length,
+        lengkapCount: houses.filter((h) => h.status === 'lengkap').length,
+        houses,
+      }
+    })
+    .filter((b) => b.totalHouses > 0)
+}
+
 export function generateBroadcastMessage() {
   const blocks = getBlockLeaderboard().sort((a, b) => a.blok.localeCompare(b.blok))
   const lastUpdated = getLastUpdated()

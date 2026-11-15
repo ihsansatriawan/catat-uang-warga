@@ -12,7 +12,7 @@ Web app warga D'Talago Regency untuk mengecek status pembayaran IPL (Iuran Penge
 - Progress bar pembayaran tahunan & info kelebihan bayar
 - Link permanen per rumah (`/warga/A/1`) — bisa di-share via tombol Share
 - Panduan pembayaran (rekening, form konfirmasi, kontak pengurus) saat data belum ditemukan
-- Leaderboard blok & rumah (ranking berdasarkan % terkumpul)
+- Kondisi IPL komplek: ringkasan % terkumpul + peta status tiap rumah (tanpa ranking)
 - Transparansi pengeluaran rutin & insidental, dengan filter kategori
 - Generate pesan broadcast WhatsApp untuk laporan IPL maupun pengeluaran
 
@@ -63,7 +63,7 @@ flowchart LR
 |------|-----------|
 | `/` | Cek status pembayaran per rumah |
 | `/warga/:blok/:nomorRumah` | Dashboard satu rumah (link permanen, bisa di-share) |
-| `/leaderboard` | Ranking blok & rumah |
+| `/leaderboard` | Kondisi IPL: ringkasan komplek & status tiap rumah |
 | `/broadcast` | Generate pesan WhatsApp laporan IPL |
 | `/pengeluaran` | Transparansi pengeluaran + filter kategori |
 | `/kehadiran` | Form RSVP acara Kumpul Warga |

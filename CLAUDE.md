@@ -14,7 +14,7 @@ Web app for residents to check their IPL (housing fee) payment status for 2026.
 ## Routes
 - `/` — HomePage: search by blok + house number, leads to DashboardView
 - `/warga/:blok/:nomorRumah` — WargaPage: permalink to a single resident's DashboardView (target of the Share button); falls back to PaymentInfoCard when the house has no transactions yet
-- `/leaderboard` — LeaderboardView: block ranking + house-level leaderboard
+- `/leaderboard` — LeaderboardView ("Kondisi IPL"): complex-wide summary + per-house status map, no ranking
 - `/broadcast` — BroadcastView: generate WhatsApp broadcast message
 - `/pengeluaran` — ExpensesView: expense transparency page with category filtering
 - `/kehadiran` — AttendanceView: RSVP form for the Kumpul Warga event (2 Aug 2026), submits to Google Sheet via Apps Script
@@ -33,7 +33,7 @@ Web app for residents to check their IPL (housing fee) payment status for 2026.
 - `src/components/DashboardView.jsx` — payment dashboard per resident (incl. `saldoLebih` overpayment credit + Share button via Web Share API with clipboard fallback)
 - `src/components/WargaPage.jsx` — resolves `/warga/:blok/:nomorRumah` to a resident and renders DashboardView
 - `src/components/PaymentInfoCard.jsx` / `PaymentInfoModal.jsx` — payment instructions (rekening, konfirmasi form, WA pengurus) shown when a house isn't found
-- `src/components/LeaderboardView.jsx` — block & house leaderboards with bar charts
+- `src/components/LeaderboardView.jsx` — "Kondisi IPL" page: progress ring, 4 status tiles (also filters), house grid per block (A–F, alphabetical); tapping a house shows name + link to `/warga/:blok/:nomor`
 - `src/components/BroadcastView.jsx` — WhatsApp broadcast message generator
 - `src/components/ProofModal.jsx` — placeholder modal for proof of transfer
 - `src/components/AttendanceView.jsx` — event RSVP form; posts to Google Sheet (`Kehadiran` tab) via Apps Script Web App (`VITE_ATTENDANCE_ENDPOINT`), setup in `docs/attendance-apps-script.md`
@@ -50,8 +50,12 @@ Web app for residents to check their IPL (housing fee) payment status for 2026.
 ## Helper Functions (`src/data/helpers.js`)
 - `getResident(blok, nomorRumah)` — single resident with transactions
 - `getAllResidents()` — all residents with payment stats from `residents.json`
-- `getBlockLeaderboard()` — blocks ranked by `collectionPct` (% of total expected revenue collected)
-- `getHouseLeaderboard(blok?)` — houses sorted by `completionPct`, optionally filtered by block
+- `getBlockLeaderboard()` — blocks ranked by `collectionPct` (% of total expected revenue collected); now only used by the broadcast message
+- `getCurrentMonthNumber(now?)` — current month (1–12, WIB) for the IPL year; 0 before 2026, 12 after
+- `getHouseStatus(resident, currentMonth?)` — `lengkap` (12 bln) / `sesuai` (monthsPaid ≥ current month) / `belumSesuai` / `belum`
+- `getComplexSummary()` — totals, `collectionPct`, `expectedPct`, status counts for the leaderboard page
+- `getHousesByBlock()` — houses grouped per block (A–F) with `status`, sorted by house number
+- `getHouseLeaderboard(blok?)` — houses sorted by `completionPct`, optionally filtered by block (used by broadcast)
 - `generateBroadcastMessage()` — WhatsApp-formatted IPL report string
 - `getAttendanceHouses(blok?)` — house list used by the RSVP/lomba forms
 - `getResidentName(blok, nomorRumah)` — owner name lookup from `residents.json`
