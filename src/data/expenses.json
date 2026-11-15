@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2026-11-14",
+  "lastUpdate": "2026-11-16",
   "rutin": [
     {
       "keterangan": "Sisa Kas 2025",
@@ -560,11 +560,25 @@
       "keluar": 200000,
       "tanggal": "2026-11-10",
       "kategori": "Operational"
+    },
+    {
+      "keterangan": "2 lt bensin mesin pemotong",
+      "masuk": null,
+      "keluar": 24000,
+      "tanggal": "2026-11-15",
+      "kategori": "Operational"
+    },
+    {
+      "keterangan": "jasa kebersihan komplek",
+      "masuk": null,
+      "keluar": 300000,
+      "tanggal": "2026-11-15",
+      "kategori": "Operational"
     }
   ],
   "summary": {
     "totalMasuk": 141562928,
-    "totalKeluar": 72696018,
-    "sisaAnggaran": 68866910
+    "totalKeluar": 73020018,
+    "sisaAnggaran": 68542910
   }
 }
