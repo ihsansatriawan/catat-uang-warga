@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2026-11-16",
+  "lastUpdate": "2026-11-17",
   "rutin": [
     {
       "keterangan": "Sisa Kas 2025",
@@ -8,7 +8,7 @@
     },
     {
       "keterangan": "Total Iuran Warga 2026",
-      "masuk": 118450000,
+      "masuk": 119450000,
       "keluar": null
     },
     {
@@ -80,7 +80,7 @@
   "insidental": [
     {
       "keterangan": "sisa uang (potong biaya rutin)",
-      "masuk": 121812928,
+      "masuk": 122812928,
       "keluar": null,
       "tanggal": "2026-01-01",
       "kategori": ""
@@ -577,8 +577,8 @@
     }
   ],
   "summary": {
-    "totalMasuk": 141562928,
+    "totalMasuk": 142562928,
     "totalKeluar": 73020018,
-    "sisaAnggaran": 68542910
+    "sisaAnggaran": 69542910
   }
 }
